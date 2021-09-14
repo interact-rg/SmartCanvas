@@ -1,1 +1,4 @@
 # SmartCanvas
+
+## Contributors
+- @vtiinanen
