@@ -3,3 +3,4 @@
 ## Contributors
 - @vtiinanen
 - @jarkkokotaniemi
+- @jvuorine
