@@ -2,3 +2,4 @@
 
 ## Contributors
 - @vtiinanen
+- @jarkkokotaniemi
