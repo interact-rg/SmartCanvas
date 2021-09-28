@@ -21,3 +21,4 @@ Clean development environment:
 - @vtiinanen
 - @jarkkokotaniemi
 - @jvuorine
+- @jruntti20
