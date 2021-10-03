@@ -1,11 +1,32 @@
 """ __main__.py """
 
-from .core import hmm
-from .helpers import get_answer
+# Default packages
+import time
+import argparse
+
+# External packages
+import cv2
+
+# Internal packages
+from .core import process
 
 def main():
-    hmm()
-    if get_answer():
-        return
+    device = cv2.VideoCapture(0)
 
-main()
+    while(True):
+        res, frame = device.read()
+        if not res:
+            break
+        processed_frame = process(frame)
+        cv2.imshow('output', processed_frame)
+        key = cv2.waitKey(1)
+        if key == ord('q'): 
+            break
+
+    if res:    
+        cv2.destroyWindow('output')
+    device.release()
+    exit(0)
+
+if __name__ == '__main__':
+    main()

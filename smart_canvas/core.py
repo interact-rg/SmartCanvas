@@ -1,12 +1,14 @@
 """ core.py """
 
-from . import helpers
+# Default packages
 
-def get_hmm():
-    """Get a thought."""
-    return 'hmmm...'
+# External packages
 
-def hmm():
-    """Contemplation..."""
-    if helpers.get_answer():
-        print(get_hmm())
+# Internal packages
+from . import filtering
+
+current_filter = filtering.catalog[next(filtering.carousel)]
+
+def process(frame):
+    handled_frame = current_filter(frame)
+    return handled_frame
