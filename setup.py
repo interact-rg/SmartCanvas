@@ -22,6 +22,8 @@ setup(
         'pylint==2.11.1',
         'pytest==5.4.2',
         'pytest-cov==2.8.0',
+        # gestureDetection
+        'mediapipe==0.8.8.1',
         # web
         'simple-websocket==0.4.0',
         'Flask-SocketIO==5.1.1',
