@@ -9,11 +9,6 @@ import numpy as np
 
 # Internal packages
 
-def filter_oil_painting(frame):
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (6,6))
-    morph = cv2.morphologyEx(frame, cv2.MORPH_OPEN, kernel)
-    result = cv2.normalize(morph, None, 20, 255, cv2.NORM_MINMAX)
-    return result
 
 def mosaic_filter(frame):
     width = frame.shape[1]
@@ -41,7 +36,7 @@ def mosaic_filter(frame):
     return frame
 
 def canvas_filter(frame):
-    tile = cv2.imread("struc.pgm")
+    tile = cv2.imread("smart_canvas/struc.pgm")
     width = frame.shape[1]
     height = frame.shape[0]
     x_count = int(width / tile.shape[0]) + 1
@@ -57,14 +52,8 @@ def canvas_filter(frame):
     return frame
 
 catalog = {
-    'oil_painting': lambda x: filter_oil_painting(x),
-    'watercolor': lambda x: cv2.stylization(x, sigma_s=60, sigma_r=0.6),
-    'gray': lambda x: cv2.cvtColor(x, cv2.COLOR_BGR2GRAY),
-    'bw_sketch': lambda x: cv2.pencilSketch(x, sigma_s=60, sigma_r=0.07, shade_factor=0.05)[0],
-    'color_sketch': lambda x: cv2.pencilSketch(x, sigma_s=60, sigma_r=0.07, shade_factor=0.05)[1],
-    'blur': lambda x: cv2.GaussianBlur(x, (21, 21), 0),
-    'mosaic': lambda x: mosaic_filter(x),
-    'canvas': lambda x: canvas_filter(x)
+    'mosaic': mosaic_filter,
+    'canvas': canvas_filter
 }
 
 carousel = itertools.cycle(catalog)
