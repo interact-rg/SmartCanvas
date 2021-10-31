@@ -1,6 +1,6 @@
 import cv2
 
-backSub = cv2.createBackgroundSubtractorMOG2(history=100, varThreshold=32, detectShadows=False)
+backSub = cv2.createBackgroundSubtractorMOG2(history=20, varThreshold=16, detectShadows=False)
 
 def foregroundMask(frame):
     fgMask = backSub.apply(frame)
