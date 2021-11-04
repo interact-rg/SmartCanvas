@@ -1,3 +1,3 @@
 """ __init__.py """
 
-from .core import process
+from .core import FrameProcessor

@@ -8,17 +8,16 @@ import argparse
 import cv2
 
 # Internal packages
-from .core import process
-from .core import create_background
+from .core import FrameProcessor
 
 def main():
+    frameProcessor = FrameProcessor()
     device = cv2.VideoCapture(0)
-    count = 0
     while(True):
         res, frame = device.read()
         if not res:
             break
-        processed_frame = process(frame)
+        processed_frame = frameProcessor.process(frame)
         cv2.imshow('output', processed_frame)
         key = cv2.waitKey(1)
         if key == ord('q'): 
