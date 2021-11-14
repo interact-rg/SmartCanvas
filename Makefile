@@ -18,9 +18,13 @@ init: $(VENV)/$(INT_PATH)/activate
 run: init
 	$(PYTHON) -m $(PACKAGE)
 
-.PHONY: run-web
-run-web: init
-	$(PYTHON) -m web
+.PHONY: web
+web: init
+	$(PYTHON) -m web.server
+
+.PHONY: web-local
+web-local: init
+	gunicorn --worker-class eventlet -w 1 'web.server:app'
 
 .PHONY: hl
 hl: init

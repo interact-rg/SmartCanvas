@@ -17,17 +17,23 @@ setup(
     packages=find_packages(include=['smart_canvas', 'smart_canvas.*']),
     install_requires=[
         # general
-        'numpy==1.21.2',
+        'numpy==1.21.3',
         'opencv-python-headless==4.5.3.56',
         'pylint==2.11.1',
         'pytest==5.4.2',
         'pytest-cov==2.8.0',
+        'pyparsing<3,>==2.0.2',
+        # render
+        'moderngl==5.6.4',
+        'moderngl-window==2.4.0',
         # gestureDetection
-        'mediapipe==0.8.8.1',
+        'mediapipe==0.8.9',
         # web
         'simple-websocket==0.4.0',
         'Flask-SocketIO==5.1.1',
         'gunicorn==20.1.0',
         'eventlet==0.30.2',
-    ]
+    ],
+    setup_requires=['wheel']
+    
 )
