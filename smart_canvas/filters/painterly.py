@@ -37,8 +37,9 @@ def makeSplineStroke(x, y, brush, img, canvas, gradients):
     f_c = 1.0
 
     for i in range(maxStrokeLength):
-        if i > minStrokeLength and np.abs(np.sum(img[y,x]) - np.sum(canvas[y,x])) < np.abs(np.sum(img[y,x]) - np.sum(stroke_color)):
-            return [stroke_points, stroke_color.tolist(), brush]
+        if i > minStrokeLength:
+            if np.abs(np.sum(img[y,x], dtype=np.int16) - np.sum(canvas[y,x], dtype=np.int16)) < np.abs(np.sum(img[y,x], dtype=np.int16) - np.sum(stroke_color, dtype=np.int16)):
+                return [stroke_points, stroke_color.tolist(), brush]
         if g_mag[y,x] == 0:
             return [stroke_points, stroke_color.tolist(), brush]
         gy, gx = grad_x[y,x], grad_y[y,x]
