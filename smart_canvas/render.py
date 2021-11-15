@@ -16,7 +16,7 @@ class SmartRender(Window):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.videoQueue = Queue()
+        self.videoQueue = Queue(maxsize=5)
         self.video = VideoRead(q_producer=self.videoQueue, src=0).start()
         self.core = CanvasCore(q_consumer=self.videoQueue).start()
 
