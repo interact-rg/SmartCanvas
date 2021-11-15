@@ -36,7 +36,7 @@ def get_id():
     id = uuid.uuid4().hex + uuid.uuid4().hex
     print('[INFO] Web client requested ID: {}'.format(id))
     register_handler_for(id)
-    core_queues.update({id: Queue()})
+    core_queues.update({id: Queue(maxsize=5)})
     core_threads.update({id: CanvasCore(q_consumer=core_queues[id]).start()})
     return id
 
