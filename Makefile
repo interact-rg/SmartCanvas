@@ -32,6 +32,10 @@ hl: init
 
 .PHONY: test
 test: init
+	$(PYTHON) -m pytest tests --disable-pytest-warnings
+
+.PHONY: test-w-warnings
+test-w-warnings: init
 	$(PYTHON) -m pytest tests
 
 .PHONY: test-cov
