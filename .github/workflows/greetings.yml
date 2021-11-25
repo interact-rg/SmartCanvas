@@ -1,0 +1,16 @@
+name: Greetings
+
+on: [pull_request, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: 'Hi, I saw that this is your first issue, each issue represents a topic that should be worked on.'
+        pr-message: 'Hi, Is this your first time issuing PR? Please check ISSUE #9 to see how to format your commits.'
