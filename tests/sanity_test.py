@@ -1,8 +1,18 @@
 """ sanity_test.py """
 
-from .context import smart_canvas
 import pytest
 
-def test_hmm():
-    import smart_canvas
-    assert True == True
+class TestPackageImports:
+    def test_smart_canvas(self):
+        from smart_canvas.core import CanvasCore
+        from queue import Queue
+        q_producer = Queue(maxsize=1)
+        core = CanvasCore(q_producer)
+        core.start()
+        core.stop()
+        q_producer.put(None)
+        assert True == True
+    
+    def test_web(self):
+        from web.server import app
+        assert True == True
