@@ -14,7 +14,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/CumbersomePack/SmartCanvas',
-    packages=find_packages(include=['smart_canvas', 'smart_canvas.*']),
+    packages=find_packages(include=['smart_canvas', 'smart_canvas.*', 'web']),
     install_requires=[
         # general
         'numpy==1.21.3',

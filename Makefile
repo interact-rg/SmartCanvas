@@ -20,11 +20,11 @@ run: init
 
 .PHONY: web
 web: init
-	$(PYTHON) -m web.server
+	export FLASK_APP=web; $(PYTHON) -m flask run
 
 .PHONY: web-local
 web-local: init
-	gunicorn --worker-class eventlet -w 1 'web.server:app'
+	gunicorn --worker-class eventlet -w 1 'web:create_app()'
 
 .PHONY: hl
 hl: init

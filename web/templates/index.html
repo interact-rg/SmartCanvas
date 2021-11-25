@@ -141,19 +141,11 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", async function (event) {
-
-    const clientID_res = await fetch("/id");
-    const clientID = await clientID_res.text();
-    console.log("clientID:", clientID);
-    
     const clientFeed = document.getElementById("clientFeed");
     const serverFeed = document.getElementById("serverFeed");
     const canvas = document.getElementById("canvas");
 
-    const socket = io.connect(
-      "/web/" + clientID,
-      { reconnection: false }
-    );
+    const socket = io.connect({ reconnection: false });
 
     socket.on("connect", () => {
       console.log("Connected");
@@ -175,8 +167,7 @@
       console.log("Error! " + error);
     });
 
-    // Update image and text data based on incoming data messages
-    socket.on("server2web", (msg) => {
+    socket.on("consume", (msg) => {
       var img = new Image;
 
       const serveFeedCtx = serverFeed.getContext("2d");
@@ -204,7 +195,7 @@
           .getContext("2d")
           .drawImage(clientFeed, 0, 0, canvas.width, canvas.height);
         const image_data_url = canvas.toDataURL("image/jpeg");
-        socket.emit("web2server", image_data_url);
+        socket.emit("produce", image_data_url)
       }, 1000/FPS);
     }
     

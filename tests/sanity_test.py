@@ -14,5 +14,5 @@ class TestPackageImports:
         assert True == True
     
     def test_web(self):
-        from web.server import app
+        from web import create_app
         assert True == True
