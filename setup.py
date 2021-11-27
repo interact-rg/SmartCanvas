@@ -23,6 +23,7 @@ setup(
         'pytest==5.4.2',
         'pytest-cov==2.8.0',
         'pyparsing<3,>==2.0.2',
+        'autopep8==1.6.0',
         # render
         'moderngl==5.6.4',
         'moderngl-window==2.4.0',
@@ -33,7 +34,9 @@ setup(
         'Flask-SocketIO==5.1.1',
         'gunicorn==20.1.0',
         'eventlet==0.30.2',
+        'Werkzeug==2.0.2',
+        'Flask-APScheduler==1.12.2',
+        'Flask-HTTPAuth==4.5.0',
     ],
     setup_requires=['wheel']
-    
 )
