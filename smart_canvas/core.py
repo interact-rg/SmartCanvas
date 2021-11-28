@@ -35,6 +35,9 @@ class CanvasCore:
         self.change_filter_freeze_time = self.tick
         self.create_background_freeze_time = self.tick + 5
 
+        self.countdown_timer = 0
+        self.take_pic_cnt = 0
+
     def change_filter(self):
         self.filters.next_filter()
         self.change_filter_freeze_time += 3
@@ -47,6 +50,7 @@ class CanvasCore:
 
     def process(self):
         finger_count = 0
+        start_countdown = False
         while not self.stopped:
             self.tick = time.time()
 
@@ -64,14 +68,46 @@ class CanvasCore:
 
             create_background = (
                 self.create_background_freeze_time - self.tick) > 0
-            if create_background:
-                self.fg_masker.create_background(frame)
-                continue
+            #if create_background:
+            #    self.fg_masker.create_background(frame)
+            #    continue
 
             finger_count = self.hand_detector.count_fingers(frame)
 
             cv2.putText(frame, str(finger_count), (45, 45),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+
+            cv2.putText(frame, "Show 5 fingers to take a picture!", (20,90), 
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+            cv2.putText(frame, "Show 2 fingers to change filter", (20,120), 
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+                
+            # Pic countdown
+            # 
+            if finger_count == 5:
+                self.take_pic_cnt += 1
+            elif self.take_pic_cnt > 0:
+                self.take_pic_cnt -= 2
+
+            if self.take_pic_cnt > 20:
+                start_countdown = True
+                self.countdown_timer = self.tick + 4
+                self.take_pic_cnt = 0
+
+            if self.take_pic_cnt > 0 and not start_countdown:
+                cv2.rectangle(frame,(50, 600),(250,670),(255,255,255),3)
+                cv2.rectangle(frame,(50, 600),(int(50 + 200 / 20 * self.take_pic_cnt),670),(255,255,255),cv2.FILLED)
+
+            if start_countdown:
+                countdown_time = self.countdown_timer - self.tick
+                cv2.putText(frame, str(int(countdown_time)), (640,360), cv2.FONT_HERSHEY_SIMPLEX, 
+                    3, (255, 255, 255), 3)
+                if countdown_time < 0:
+                    start_countdown = False
+                    self.take_pic_cnt = 0
+                    self.apply_filter(frame)
+                    continue
+
             self.out_frame = frame
 
             if apply_filter or change_filter or create_background:
@@ -81,9 +117,6 @@ class CanvasCore:
                 self.change_filter()
                 continue
 
-            if finger_count == 5:
-                self.apply_filter(frame)
-                continue
 
             self.apply_filter_freeze_time = self.tick
             self.change_filter_freeze_time = self.tick
