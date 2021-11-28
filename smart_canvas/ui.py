@@ -7,6 +7,7 @@ from moderngl_window.text.bitmapped import TextWriter2D
 from moderngl_window import resources
 from moderngl_window.meta import (
     ProgramDescription,
+    TextureDescription,
 )
 import moderngl_window
 import moderngl
@@ -250,6 +251,7 @@ class UI:
                 raise KeyError
 
     def draw(self):
+        #TODO: use same dict for both images and texts
         #copy new texts to buffer
         for k,v in self.texts.items():
             if self.elements[k].text is not v:

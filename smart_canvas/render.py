@@ -3,7 +3,6 @@ import time
 import moderngl
 import cv2
 from queue import Queue
-import numpy as np
 
 from smart_canvas.capture import VideoRead
 from smart_canvas.core import CanvasCore
