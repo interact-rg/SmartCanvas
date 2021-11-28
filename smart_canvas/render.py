@@ -16,9 +16,13 @@ class SmartRender(Window):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        vp = self.ctx.fbo.viewport
+        self.win_size = (vp[2] - vp[0], vp[3] - vp[1])
+
         self.videoQueue = Queue(maxsize=5)
         self.video = VideoRead(q_producer=self.videoQueue, src=0).start()
-        self.core = CanvasCore(q_consumer=self.videoQueue).start()
+        self.core = CanvasCore(q_consumer=self.videoQueue, screensize=self.win_size).start()
 
         # set texture to size from camera
         self.frame_texture = self.ctx.texture(
@@ -35,6 +39,10 @@ class SmartRender(Window):
     def close(self):
         self.video.stop()
         self.core.stop()
+    
+    def resized(self, width, height):
+        vp = self.ctx.fbo.viewport
+        self.win_size = (vp[2] - vp[0], vp[3] - vp[1])
 
 
 if __name__ == '__main__':
