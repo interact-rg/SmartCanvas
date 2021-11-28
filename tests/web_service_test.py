@@ -9,14 +9,22 @@ import pytest
 
 from web import create_app
 
+TOKEN = 'test-token-ea520c84'
 
-@pytest.fixture
+
+@pytest.fixture(scope='session')
 def client():
     '''
     based on http://flask.pocoo.org/docs/1.0/testing/
     '''
-    os.environ['CLIENT_TOKEN'] = 'test-token-ea520c84'
-    app = create_app()
+    config = {
+        "DEBUG": True,
+        "TESTING": True,
+        "TOKENS": {
+            TOKEN: "Client-1",
+        },
+    }
+    app = create_app(config)
     yield app.test_client()
 
 
@@ -39,7 +47,7 @@ class TestFileUpload(object):
         # Fail with token
         resp = client.get(
             self.RESOURCE_URL,
-            headers={'Authorization': f'Bearer {os.getenv("CLIENT_TOKEN")}'}
+            headers={'Authorization': f'Bearer {TOKEN}'}
         )
         assert resp.status_code == 405
 
@@ -68,7 +76,7 @@ class TestFileUpload(object):
             self.RESOURCE_URL,
             data=data,
             content_type='multipart/form-data',
-            headers={'Authorization': f'Bearer {os.getenv("CLIENT_TOKEN")}'}
+            headers={'Authorization': f'Bearer {TOKEN}'}
         )
         assert resp.status_code == 201
 
@@ -85,7 +93,7 @@ class TestFileDownload(object):
             self.UPLOAD_URL,
             data=data,
             content_type='multipart/form-data',
-            headers={'Authorization': f'Bearer {os.getenv("CLIENT_TOKEN")}'}
+            headers={'Authorization': f'Bearer {TOKEN}'}
         )
         picture_url = resp.data.decode("utf-8")
         picture_name = picture_url.split("/")[-1]
@@ -93,7 +101,7 @@ class TestFileDownload(object):
         resp = client.get(
             f'{self.RESOURCE_URL}/{picture_name}',
             follow_redirects=True,
-            headers={'Authorization': f'Bearer {os.getenv("CLIENT_TOKEN")}'}
+            headers={'Authorization': f'Bearer {TOKEN}'}
         )
         assert resp.status_code == 200
         assert resp.data == contents
@@ -112,7 +120,7 @@ class TestFileDownload(object):
         # Fail with token, invalid picture
         resp = client.get(
             f'{self.RESOURCE_URL}/not-going-to-work.jpeg',
-            headers={'Authorization': f'Bearer {os.getenv("CLIENT_TOKEN")}'},
+            headers={'Authorization': f'Bearer {TOKEN}'},
             follow_redirects=True
         )
         assert resp.status_code == 404
@@ -125,7 +133,7 @@ class TestFileDownload(object):
             self.UPLOAD_URL,
             data=data,
             content_type='multipart/form-data',
-            headers={'Authorization': f'Bearer {os.getenv("CLIENT_TOKEN")}'},
+            headers={'Authorization': f'Bearer {TOKEN}'},
         )
         picture_url = resp.data.decode("utf-8")
         picture_name = picture_url.split("/")[-1]
@@ -136,7 +144,7 @@ class TestFileDownload(object):
             follow_redirects=True,
             data=data,
             content_type='multipart/form-data',
-            headers={'Authorization': f'Bearer {os.getenv("CLIENT_TOKEN")}'}
+            headers={'Authorization': f'Bearer {TOKEN}'}
         )
         assert resp.status_code == 405
         # Fail without token, invalid picture
@@ -155,6 +163,6 @@ class TestFileDownload(object):
             follow_redirects=True,
             data=data,
             content_type='multipart/form-data',
-            headers={'Authorization': f'Bearer {os.getenv("CLIENT_TOKEN")}'}
+            headers={'Authorization': f'Bearer {TOKEN}'}
         )
         assert resp.status_code == 405
