@@ -173,10 +173,9 @@ class ShowPic(State):
         self.show_image_time = 0.0
 
     def enter(self, tick):
-        self.show_image_time = tick + 5
+        self.show_image_time = tick + 10
 
     def update(self, tick, frame):
-        if self.show_image_time - tick > 0:
-            self.core.out_frame = self.core.filtered_frame
-        else:
+        self.core.out_frame = self.core.filtered_frame
+        if self.show_image_time - tick < 0:
             self.core.set_state(Idle())
