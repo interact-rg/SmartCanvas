@@ -97,25 +97,26 @@ class Idle(State):
     def __init__(self):
         self.take_pic_cnt = 0
         self.change_filter_time = 0.0
+        self.finger_frame_interval = 0.0
     # Runs once on init
     def enter(self, tick):
         pass
     # Update is called on new frame
     def update(self, tick, frame):
-        finger_count = self.core.hand_detector.count_fingers(frame)
-
-        self.update_filter_trigger(finger_count)
-
-        self.update_filter_carousel(finger_count, tick)
-
-        cv2.putText(frame, self.core.filters.current_filter.__name__, 
-            (600,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        # Detect fingers 10 times in a second
+        # Using timer here because frame rate can differ
+        if self.finger_frame_interval - tick < 0:
+            finger_count = self.core.hand_detector.count_fingers(frame)
+            self.finger_frame_interval = tick + 0.1
+            self.update_filter_trigger(finger_count)
+            self.update_filter_carousel(finger_count, tick)
 
         # TODO: Draws will be removed in future
-
-        cv2.putText(frame, "Show 5 fingers to take a picture!", (20,90), 
+        cv2.putText(frame, 'Current filter is {}'.format(self.core.filters.current_name), 
+            (630,35), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        cv2.putText(frame, "Show 5 fingers to take a picture!", (20,100), 
             cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-        cv2.putText(frame, "Show 2 fingers to change filter", (20,120), 
+        cv2.putText(frame, "Show 2 fingers to change filter", (20,70), 
             cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
         if self.take_pic_cnt > 0:
@@ -126,15 +127,16 @@ class Idle(State):
         self.core.out_frame = frame
 
     def update_filter_carousel(self, finger_count, tick):
-        if finger_count == 2 and self.change_filter_time - tick <= 0 and self.take_pic_cnt <= 0:
-            self.change_filter_time = tick + 1.5
-            self.core.filters.next_filter()
+        if finger_count == 2:
+            if self.change_filter_time - tick <= 0 and self.take_pic_cnt <= 0:
+                self.change_filter_time = tick + 1.5
+                self.core.filters.next_filter()
 
     def update_filter_trigger(self, finger_count):
         if finger_count == 5:
             self.take_pic_cnt += 1
         elif self.take_pic_cnt > 0:
-            self.take_pic_cnt -= 2
+            self.take_pic_cnt -= 1
         if self.take_pic_cnt >= 20:
             self.core.set_state(Filter())
 

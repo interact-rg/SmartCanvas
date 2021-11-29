@@ -18,7 +18,10 @@ class FilterCarousel:
     carousel = itertools.cycle(catalog)
 
     def __init__(self, **kwargs):
-        self.current_filter = self.catalog[next(self.carousel)]
+        self.next_filter()
+
 
     def next_filter(self):
-        self.current_filter = self.catalog[next(self.carousel)]
+        self.current_name = next(self.carousel)
+        self.current_filter = self.catalog[self.current_name]
+
