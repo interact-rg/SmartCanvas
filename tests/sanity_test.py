@@ -7,7 +7,7 @@ class TestPackageImports:
         from smart_canvas.core import CanvasCore
         from queue import Queue
         q_producer = Queue(maxsize=1)
-        core = CanvasCore(q_producer)
+        core = CanvasCore(q_producer, screensize=(1280,720))
         core.start()
         core.stop()
         q_producer.put(None)
