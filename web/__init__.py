@@ -63,7 +63,7 @@ def create_app(test_config=None):
         return
 
     scheduler = APScheduler()
-    scheduler.api_enabled = True
+    scheduler.api_enabled = False
     scheduler.init_app(app)
     scheduler.add_job('cleaner', func=rm_old_files,
                       trigger="interval", seconds=30)
