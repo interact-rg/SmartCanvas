@@ -17,20 +17,28 @@ def create_app(test_config=None):
     """
     Based on http://flask.pocoo.org/docs/1.0/tutorial/factory/#the-application-factory
     """
-    if os.getenv('CLIENT_TOKEN') is None:
-        sys.exit("environment variable CLIENT_TOKEN must be set!")
-
     app = Flask(__name__)
-    app.config.from_mapping(
-        SCHEDULER_API_ENABLED=True,
-        UPLOAD_FOLDER=mkdtemp('_web_service_uploads'),
-        TOKENS={
-            os.getenv('CLIENT_TOKEN'): "Client-1",
-        }
-    )
+    config = {
+        "SCHEDULER_API_ENABLED": True,
+        "UPLOAD_FOLDER": mkdtemp('_web_service_uploads'),
+        "TOKENS": dict(),
+    }
+    app.config.from_mapping(config)
 
-    if test_config is not None:
+    if os.getenv('CLIENT_TOKEN'):
+        auth_token = os.getenv('CLIENT_TOKEN')
+        app.config["TOKENS"].update({auth_token: 'Client-1'})
+
+    if test_config:
         app.config.from_mapping(test_config)
+
+    if not app.config['TOKENS']:
+        sys.exit(
+            """
+            No TOKENS set!
+            atleast environment variable CLIENT_TOKEN must be set!
+            """
+        )
 
     def get_old_files(age=5, files_path=app.config["UPLOAD_FOLDER"]):
         """

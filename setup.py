@@ -24,6 +24,9 @@ setup(
         'pytest-cov==2.8.0',
         'pyparsing<3,>==2.0.2',
         'autopep8==1.6.0',
+        'qrcode==7.3.1',
+        'Pillow==8.4.0 ',
+        'requests==2.26.0 ',
         # render
         'moderngl==5.6.4',
         'moderngl-window==2.4.0',
