@@ -19,7 +19,7 @@ def create_app(test_config=None):
     """
     app = Flask(__name__)
     config = {
-        "SCHEDULER_API_ENABLED": True,
+        "SCHEDULER_API_ENABLED": False,
         "UPLOAD_FOLDER": mkdtemp('_web_service_uploads'),
         "TOKENS": dict(),
     }
@@ -63,7 +63,6 @@ def create_app(test_config=None):
         return
 
     scheduler = APScheduler()
-    scheduler.api_enabled = True
     scheduler.init_app(app)
     scheduler.add_job('cleaner', func=rm_old_files,
                       trigger="interval", seconds=30)
