@@ -166,3 +166,18 @@ class TestFileDownload(object):
             headers={'Authorization': f'Bearer {TOKEN}'}
         )
         assert resp.status_code == 405
+
+
+class TestAPSchedulerAPI(object):
+    RESOURCE_URL = "/scheduler"
+
+    def test_scheduler_info(self, client):
+        # Fail without token
+        resp = client.get(self.RESOURCE_URL)
+        assert resp.status_code == 404
+        # Fail with token
+        resp = client.get(
+            self.RESOURCE_URL,
+            headers={'Authorization': f'Bearer {TOKEN}'}
+        )
+        assert resp.status_code == 404
