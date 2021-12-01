@@ -77,5 +77,6 @@ def create_app(test_config=None):
     app.register_blueprint(main_blueprint)
 
     socketio.init_app(app)
+    app.config["socketio"] = socketio
 
     return app

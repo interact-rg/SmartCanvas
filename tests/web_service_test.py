@@ -1,18 +1,71 @@
 """ web_service_test.py """
-
-import json
-import os
 from io import BytesIO
 from tempfile import mkdtemp
 
+import cv2
 import pytest
+from flask_socketio import SocketIOTestClient
+import numpy as np
 
 from web import create_app
+from web.main.events import cv_to_b64, b64_to_cv
 
 TOKEN = 'test-token-ea520c84'
+FINGER_IMAGE_FOLDER_PATH = "tests/test_assets/finger_pictures"
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
+def sio_client():
+    '''
+    https://flask-socketio.readthedocs.io/en/latest/api.html?highlight=test#flask_socketio.SocketIO.test_client
+    '''
+    config = {
+        "DEBUG": True,
+        "TESTING": True,
+        "TOKENS": {
+            TOKEN: "Client-1",
+        },
+    }
+    app = create_app(config)
+    sio_client = SocketIOTestClient(app, app.config["socketio"])
+    yield sio_client
+
+class TestSocketIO(object):
+    RESOURCE_URL = "/"
+
+    def test_connection(self, sio_client):
+        sio_client.connect()
+        connection_state = sio_client.is_connected()
+        assert connection_state is True
+        sio_client.disconnect()
+        connection_state = sio_client.is_connected()
+        assert connection_state is False
+
+    def test_emit(self, sio_client):
+        sio_client.connect()
+        frame = cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/1.jpeg")
+        w, h, c = frame.shape
+        answers = []
+        max_tries = 5000
+        while not answers and max_tries:
+            sio_client.emit(
+                "produce", f'data:image/jpeg;base64,{cv_to_b64(frame)}')
+            answers = sio_client.get_received()
+            max_tries -= 1
+        first_answer = answers[0]
+        first_arg = first_answer["args"][0]
+        b64_frame = first_arg.split(",")[1]
+        processed_frame = b64_to_cv(b64_frame)
+        p_w, p_h, p_c = frame.shape
+        assert w == p_w
+        assert h == p_h
+        assert c == p_c
+        sio_client.disconnect()
+        connection_state = sio_client.is_connected()
+        assert connection_state is False
+
+
+@pytest.fixture()
 def client():
     '''
     based on http://flask.pocoo.org/docs/1.0/testing/

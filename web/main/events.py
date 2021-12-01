@@ -35,6 +35,7 @@ def disconnect_web():
     sid = request.sid
     core = core_threads[sid]
     core.stop()
+    core_queues[sid].put(None)
     core_threads.pop(sid)
     core_queues.pop(sid)
 
