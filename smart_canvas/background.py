@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
-
+import mediapipe as mp
+mp_drawing = mp.solutions.drawing_utils
+mp_selfie_segmentation = mp.solutions.selfie_segmentation
 
 class ForegroundMask:
     """
@@ -8,13 +10,9 @@ class ForegroundMask:
     """
 
     def __init__(self):
-        self.back_sub = cv2.createBackgroundSubtractorMOG2(
-            history=100, varThreshold=30, detectShadows=False)
-        self.fg_mask = None
-        self.frame_list = []
-
-    def create_background(self, frame):
-        self.frame_list.append(frame)
+        self.selfie_segmentation = mp_selfie_segmentation.SelfieSegmentation(model_selection=1)
+        self.bg_image = None
+        self.output_image = None
 
     def fill_holes(self, mask):
         contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -29,15 +27,24 @@ class ForegroundMask:
         return out
 
     def remove_isolated_pixels(self, mask):
-        kernel = np.ones((7, 7), np.uint8)
-        opening = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-        closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel)
-        return closing
+        kernel = np.ones((5, 5), np.uint8)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_ERODE, kernel)
+        return mask
 
     def apply(self, frame):
-        for f in self.frame_list:
-            self.back_sub.apply(f)
-        self.fg_mask = self.back_sub.apply(frame)
-        self.fg_mask = self.remove_isolated_pixels(self.fg_mask)
-        self.fg_mask = self.fill_holes(self.fg_mask)
-        return self.fg_mask
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame.flags.writeable = False
+
+        results = self.selfie_segmentation.process(frame)
+
+        frame.flags.writeable = True
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
+        results.segmentation_mask = self.remove_isolated_pixels(results.segmentation_mask)
+
+        condition = np.stack((results.segmentation_mask,) * 3, axis=-1) > 0.1
+        self.bg_image = np.zeros(frame.shape, dtype=np.uint8)
+        self.output_image = np.where(condition, frame, self.bg_image)
+        return self.output_image
