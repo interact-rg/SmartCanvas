@@ -26,7 +26,7 @@ def connect_web():
     print('[INFO] Web client connected: {}'.format(request.sid))
     sid = request.sid
     core_queues.update({sid: Queue()})
-    core_threads.update({sid: CanvasCore(q_consumer=core_queues[sid]).start()})
+    core_threads.update({sid: CanvasCore(q_consumer=core_queues[sid], screensize=(0, 0)).start()})
 
 
 @socketio.on('disconnect')
