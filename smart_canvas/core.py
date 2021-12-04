@@ -133,7 +133,6 @@ class Idle(State):
                 self.core.filters.next_filter()
                 self.core.ui.set_text("filter_name", 'Current filter is {}'.format(self.core.filters.current_name))
 
-
     def update_filter_trigger(self, finger_count):
         if finger_count == 5:
             self.take_pic_cnt += 0.05
