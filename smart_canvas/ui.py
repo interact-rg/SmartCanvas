@@ -161,12 +161,8 @@ class Progressbar():
         )
 
         vertices = np.array([
-                      #-0.9,  -0.7, -0.6, -0.7,  # upper left
-                      #-0.9, -0.8, -0.6, -0.8,  # lower left
-                      0.4,  -0.7, 0, -0.7,  # upper right
-                      0.4, -0.8, 0, -0.8,  # lower right
-                      #200, 400, 200, 400,
-                      #400, 200, 400, 200
+                      0.4,  -0.7, 0, -0.7,  
+                      0.4, -0.8, 0, -0.8,  
         ]
         )
         self.vbo = self.ctx.buffer(vertices.astype('f4').tobytes())
