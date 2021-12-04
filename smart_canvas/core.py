@@ -31,7 +31,7 @@ class CanvasCore():
 
         self.filtered_frame = None
         # This is initial state
-        self.set_state(Startup())
+        self.set_state(Idle())
 
     def set_state(self, state: State):
         self._state = state
@@ -83,7 +83,8 @@ class Startup(State):
 
     def update(self, tick, frame):
         if self.collect_frames_time - tick > 0:
-            self.core.fg_masker.create_background(frame)
+            pass
+            #self.core.fg_masker.create_background(frame)
         else:
             self.core.set_state(Idle())
 
@@ -161,8 +162,7 @@ class Filter(State):
             self.core.set_state(ShowPic())
 
     def apply_filter(self, frame):
-        fg_mask = self.core.fg_masker.apply(frame)
-        masked_frame = cv2.bitwise_and(frame, frame, mask=fg_mask)
+        masked_frame = self.core.fg_masker.apply(frame)
         self.core.filtered_frame = self.core.filters.current_filter(masked_frame)
 
 class ShowPic(State):
