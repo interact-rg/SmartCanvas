@@ -21,7 +21,7 @@ class SmartRender(Window):
         self.win_size = (vp[2] - vp[0], vp[3] - vp[1])
 
         self.videoQueue = Queue(maxsize=5)
-        self.video = VideoRead(q_producer=self.videoQueue, src=0).start()
+        self.video = VideoRead(q_producer=self.videoQueue, src=self.camera).start()
         self.core = CanvasCore(q_consumer=self.videoQueue, screensize=self.win_size).start()
 
         # set texture to size from camera
