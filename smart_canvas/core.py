@@ -31,25 +31,9 @@ class CanvasCore:
         self.ui = UI()
         self.win_size = screensize
 
-<<<<<<< HEAD
         self.filtered_frame = None
         # This is initial state
         self.set_state(Startup())
-=======
-        self.ui.create("finger_count", pos=(vp[0]/1.2,vp[1]/8), size=50.0)
-        self.ui.set_text("finger_count", "0")
-        self.ui.visible("finger_count", True)
-
-        self.ui.create("smartcanvas", pos=(vp[0]/1.2,vp[1]/1.02), size=25.0)
-        self.ui.set_text("smartcanvas", "SmartCanvas 2021")
-        self.ui.visible("smartcanvas", True)
-
-        self.ui.create_image("hand.png", pos=(100,100), size=(256,256))
-
-    def change_filter(self):
-        self.filters.next_filter()
-        self.change_filter_freeze_time += 3
->>>>>>> a427fd7 (ISSUE-49: Boilerplate image drawing)
 
     def set_state(self, state: State):
         self._state = state
