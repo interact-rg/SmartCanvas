@@ -33,7 +33,7 @@ class CanvasCore:
 
         self.filtered_frame = None
         # This is initial state
-        self.set_state(Idle())
+        self.set_state(Startup())
 
     def set_state(self, state: State):
         self._state = state
