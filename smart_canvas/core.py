@@ -91,7 +91,6 @@ class Startup(State):
         self.ui.set_text("help_1", "Show 5 fingers to take a picture!")
         self.ui.set_text("help_2", "Show 2 fingers to change filter")
         self.ui.set_text("filter_name", 'Current filter is {}'.format(self.core.filters.current_name))
-
         self.ui.create_progressbar("bar")
 
     def update(self, tick, frame):
@@ -112,6 +111,7 @@ class Idle(State):
     def enter(self, tick):
         self.core.ui.show("help_1", "help_2", "filter_name", "bar")
         self.core.ui.set_prog("bar", 0.0)
+
     # Update is called on new frame
     def update(self, tick, frame):
         # Now we update UI elements to Opengl so no need to wait for slow functions to finish
@@ -179,8 +179,9 @@ class ShowPic(State):
     def enter(self, tick):
         self.core.ui.hide("countdown")
         self.show_image_time = tick + 10
+        # Frame does not change so update only once
+        self.core.out_frame = self.core.filtered_frame
 
     def update(self, tick, frame):
-        self.core.out_frame = self.core.filtered_frame
         if self.show_image_time - tick < 0:
             self.core.set_state(Idle())
