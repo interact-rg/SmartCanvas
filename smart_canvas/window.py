@@ -18,6 +18,8 @@ class Window(mglw.WindowConfig):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        self.camera = self.argv.camera
         self.fbo = self.ctx.framebuffer(
             color_attachments=[self.ctx.texture(Window.window_size, 3)]
         )
@@ -65,7 +67,15 @@ class Window(mglw.WindowConfig):
             ]
         )
         # TODO/TOCHECK: internal parameter format. Might get better performance when using shorter format bc default includes alpha
-
+    @classmethod
+    def add_arguments(cls, parser):
+        # Select camera source. Input as int
+        parser.add_argument(
+            '--camera',
+            type=int,
+            default=0,
+            help="Select camera source for OpenCV. Value as int from 0.",
+        )
 
     @classmethod
     def run(cls):
