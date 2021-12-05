@@ -4,16 +4,14 @@ import numpy as np
 from pathlib import Path
 
 from moderngl_window.text.bitmapped import TextWriter2D
-from moderngl_window import resources
+from moderngl_window import (resources, ContextRefs)
 from moderngl_window.meta import (
     ProgramDescription,
-    TextureDescription,
+    TextureDescription
 )
-import moderngl_window
-import moderngl
+from moderngl import TRIANGLE_STRIP
 
 resources.register_dir(Path(__file__).parent.resolve())
-
 
 class TextWriterTest(TextWriter2D):
     """
@@ -23,7 +21,7 @@ class TextWriterTest(TextWriter2D):
         super().__init__()
         # load custom glsl
         self._program = resources.programs.load(
-            ProgramDescription(path="text.glsl")
+            ProgramDescription(path="shaders/text.glsl")
         )
         self.pos = position
         self.size = size
@@ -62,8 +60,8 @@ class TextWriterTest(TextWriter2D):
         projection = matrix44.create_orthogonal_projection_matrix(
             0,  # left
             w,  # right
-            0,  # bottom
-            h,  # top
+            h,  # bottom
+            0,  # top
             1,  # near
             -1.0,  # far
             dtype=np.float32,
@@ -84,9 +82,9 @@ class Image2D():
     """
     def __init__(self, pos: tuple, size: tuple, path: str):
         # get context for this class
-        self.ctx = moderngl_window.ContextRefs.CONTEXT
+        self.ctx = ContextRefs.CONTEXT
         self._program = resources.programs.load(
-            ProgramDescription(path="image.glsl")
+            ProgramDescription(path="shaders/image.glsl")
         )
         pos = self.ctx.buffer(
             array('f',
@@ -125,7 +123,6 @@ class Image2D():
         )
 
         self.visible = True
-
         self._image = resources.textures.load(TextureDescription(
             path, midmap=False,))
 
@@ -146,7 +143,7 @@ class Image2D():
         )
         #self.pos = (1.0, 1.0)
         self._image.use(location=0)
-        self.vao.render(moderngl.TRIANGLE_STRIP)
+        self.vao.render(TRIANGLE_STRIP)
 
 class Progressbar():
     """
@@ -155,9 +152,9 @@ class Progressbar():
     """
     def __init__(self):
 
-        self.ctx = moderngl_window.ContextRefs.CONTEXT
+        self.ctx = ContextRefs.CONTEXT
         self._program = resources.programs.load(
-            ProgramDescription(path="progressbar.glsl")
+            ProgramDescription(path="shaders/progressbar.glsl")
         )
 
         vertices = np.array([
@@ -189,7 +186,7 @@ class Progressbar():
 
     def draw(self):
         self._program["scale"] = self._scale 
-        self.vao.render(mode=moderngl.TRIANGLE_STRIP)
+        self.vao.render(mode=TRIANGLE_STRIP)
 
 class UI:
     """
@@ -207,7 +204,7 @@ class UI:
         if(self._initialized): return
         self._initialized = True
 
-        super(UI, self).__setattr__('elements', dict())
+        self.elements = dict()
         self.texts = dict()
         self.images = dict()
 
@@ -247,7 +244,6 @@ class UI:
                 raise KeyError
 
     def draw(self):
-        #TODO: use same dict for both images and texts
         #copy new texts to buffer
         for k,v in self.texts.items():
             if self.elements[k].text is not v:

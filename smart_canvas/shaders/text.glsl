@@ -43,25 +43,25 @@ void main() {
     // upper right
     uv = vec2(1.0, 1.0);
     gs_char_id = vs_char_id[0];
-    gl_Position = m_proj * vec4(pos + (right + up), 1.0);
+    gl_Position = m_proj * vec4(pos + (right - up), 1.0);
     EmitVertex();
 
     // upper left
     uv = vec2(0.0, 1.0);
     gs_char_id = vs_char_id[0];
-    gl_Position = m_proj * vec4(pos + (-right + up), 1.0);
+    gl_Position = m_proj * vec4(pos + (-right - up), 1.0);
     EmitVertex();
 
     // lower right
     uv = vec2(1.0, 0.0);
     gs_char_id = vs_char_id[0];
-    gl_Position = m_proj * vec4(pos + (right - up), 1.0);
+    gl_Position = m_proj * vec4(pos + (right + up), 1.0);
     EmitVertex();
 
     // lower left
     uv = vec2(0.0, 0.0);
     gs_char_id = vs_char_id[0];
-    gl_Position = m_proj * vec4(pos + (-right - up), 1.0);
+    gl_Position = m_proj * vec4(pos + (-right + up), 1.0);
     EmitVertex();
 
     EndPrimitive();

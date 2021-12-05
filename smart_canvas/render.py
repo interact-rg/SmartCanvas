@@ -1,6 +1,6 @@
 import time
 
-import moderngl
+from moderngl import TRIANGLE_STRIP
 from queue import Queue
 
 from smart_canvas.capture import VideoRead
@@ -22,10 +22,6 @@ class SmartRender(Window):
         self.video = VideoRead(q_producer=self.videoQueue, src=0).start()
         self.core = CanvasCore(q_consumer=self.videoQueue, screensize=self.win_size).start()
 
-        # viewport (window) size here!
-        vp = self.ctx.fbo.viewport
-        self.win_size = (vp[2] - vp[0], vp[3] - vp[1])
-
         # set texture to size from camera
         self.frame_texture = self.ctx.texture(
             (self.video.width, self.video.height), 3)  # , internal_format=0x8C41)
@@ -36,7 +32,7 @@ class SmartRender(Window):
 
         self.frame_texture.write(self.core.out_frame)
         self.frame_texture.use(0)
-        self.quad.render(mode=moderngl.TRIANGLE_STRIP)
+        self.quad.render(mode=TRIANGLE_STRIP)
 
         self.core.ui.draw()
 
