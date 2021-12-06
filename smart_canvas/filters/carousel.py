@@ -4,8 +4,6 @@
 import itertools
 
 # Internal modules
-from smart_canvas.filters.canvas import canvas_filter
-from smart_canvas.filters.mosaic import mosaic_filter
 from smart_canvas.filters.painterly import painterly_filter
 from smart_canvas.filters.watercolor import watercolor
 from smart_canvas.filters.oil_painting import oil_painting
@@ -13,8 +11,6 @@ from smart_canvas.filters.oil_painting import oil_painting
 
 class FilterCarousel:
     catalog = {
-        #'canvas': canvas_filter,
-        #'mosaic': mosaic_filter,
         'painterly': painterly_filter,
         'watercolor': watercolor,
         'oil painting': oil_painting
