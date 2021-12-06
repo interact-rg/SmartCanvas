@@ -177,7 +177,7 @@ class ShowPic(State):
 
     def enter(self, tick):
         self.core.ui.hide("countdown")
-        self.show_image_time = tick + 10
+        self.show_image_time = time.time() + 15
         # Frame does not change so update only once
         self.core.out_frame = self.core.filtered_frame
 

@@ -188,6 +188,16 @@ class Progressbar():
         self._program["scale"] = self._scale 
         self.vao.render(mode=TRIANGLE_STRIP)
 
+class DummyElement:
+    def __init__(self):
+        self.visible = False
+        self.pos = (0,0)
+        self.size = 0
+        self.text = ""
+
+    def draw(self):
+        pass
+
 class UI:
     """
     Class for managing UI elements
@@ -210,38 +220,42 @@ class UI:
 
     # add new element
     def create_text(self, name: str, pos: tuple, size: float):
-        self.elements[name] = TextWriterTest(pos,size)
+        if ContextRefs.CONTEXT:
+            self.elements[name] = TextWriterTest(pos,size)
+        else:
+            self.elements[name] = DummyElement()
 
     def create_image(self, path: str, pos: tuple, size: tuple):
         self.images[path] = Image2D(pos, size, path)
 
     def create_progressbar(self, name: str):
-        self.elements[name] = Progressbar()
+        if ContextRefs.CONTEXT:
+            self.elements[name] = Progressbar()
+        else:
+            self.elements[name] = DummyElement()
 
     def set_text(self, name: str, text: str):
         if name not in self.elements:
-            raise KeyError
+            raise KeyError("Element not found. Check name or element not created!")
         self.texts[name] = text
 
     def set_prog(self, name: str, value: float):
         if name not in self.elements:
-            raise KeyError
-        
+            raise KeyError("Element not found. Check name or element not created!")
         self.elements[name].scale = value
-
+        
     def show(self, *names: str):
         for name in names:
-            if name in self.elements:
-                self.elements[name].visible = True
-            else:
-                raise KeyError
+            if name not in self.elements:
+                raise KeyError("Element not found. Check name or element not created!")
+            self.elements[name].visible = True
 
     def hide(self, *names: str):
         for name in names:
-            if name in self.elements:
-                self.elements[name].visible = False
-            else:
-                raise KeyError
+            if name not in self.elements:
+                raise KeyError("Element not found. Check name or element not created!")
+            self.elements[name].visible = False
+
 
     def draw(self):
         #copy new texts to buffer

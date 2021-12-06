@@ -1,7 +1,6 @@
-import time
-
 from moderngl import TRIANGLE_STRIP
 from queue import Queue
+
 
 from smart_canvas.capture import VideoRead
 from smart_canvas.core import CanvasCore
@@ -35,6 +34,7 @@ class SmartRender(Window):
         self.quad.render(mode=TRIANGLE_STRIP)
 
         self.core.ui.draw()
+
 
     def close(self):
         self.video.stop()
