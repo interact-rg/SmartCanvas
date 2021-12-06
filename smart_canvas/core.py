@@ -163,7 +163,8 @@ class Filter(State):
 
     def apply_filter(self, frame):
         masked_frame = self.core.fg_masker.apply(frame)
-        self.core.filtered_frame = self.core.filters.current_filter(masked_frame)
+        filtered_frame = self.core.filters.current_filter(masked_frame)
+        self.core.filtered_frame = self.core.fg_masker.changeBackground(filtered_frame)
 
 class ShowPic(State):
     """
