@@ -31,7 +31,7 @@ class Window(mglw.WindowConfig):
                 in vec2 in_uv;
                 out vec2 uv;
                 void main() {
-                    gl_Position = vec4(in_vert, 0.0, 1.0);
+                    gl_Position = vec4(in_vert * vec2(1,-1), 0.0, 1.0);
                     uv = in_uv;
                 }
             ''',
@@ -66,7 +66,7 @@ class Window(mglw.WindowConfig):
                 (self.vertices, '2f 2f', 'in_vert', 'in_uv'),
             ]
         )
-        # TODO/TOCHECK: internal parameter format. Might get better performance when using shorter format bc default includes alpha
+
     @classmethod
     def add_arguments(cls, parser):
         # Select camera source. Input as int
