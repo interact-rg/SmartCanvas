@@ -11,7 +11,7 @@ class TestFilters(object):
         filters = FilterCarousel()
         frame = cv2.imread(f"tests/test_assets/small_image/image.png")
         w, h, c = frame.shape
-        for i in range(0, 5):
+        for i in filters.catalog:
             filtered_frame = filters.current_filter(frame)
             p_w, p_h, p_c = filtered_frame.shape
             assert w == p_w
