@@ -25,7 +25,7 @@ class TestFilters(object):
             carousel.next_filter()
 
     def test_filter_with_black_image(self, carousel):
-        frame = np.zeros((50,50,3), np.uint8)
+        frame = np.zeros((50, 50, 3), np.uint8)
         w, h, c = frame.shape
         for _ in carousel.catalog:
             filtered_frame = carousel.current_filter(frame)
@@ -34,9 +34,9 @@ class TestFilters(object):
             assert h == p_h
             assert c == p_c
             carousel.next_filter()
-    
+
     def test_filter_with_white_image(self, carousel):
-        frame = np.zeros((50,50,3), np.uint8)
+        frame = np.zeros((50, 50, 3), np.uint8)
         frame[:] = 255
         w, h, c = frame.shape
         for _ in carousel.catalog:
