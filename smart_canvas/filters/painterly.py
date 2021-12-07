@@ -99,8 +99,13 @@ def calcImageGradients(img):
     grad_y = cv2.Sobel(img, ddepth=cv2.CV_32F, dx=0, dy=1, ksize=5)
 
     # code breaks if we don't include these, "index -1072 is out of bounds for axis 1 with size 490" at "if g_mag[y,x] == 0:" in makeSplineStroke()
-    grad_x = grad_x / np.max(grad_x)
-    grad_y = grad_y / np.max(grad_y)
+    
+    if np.max(grad_y) == 0.0 or np.max(grad_x) == 0.0:
+        grad_x = np.array([0])
+        grad_y = np.array([0])
+    else:
+        grad_x = grad_x / np.max(grad_x)
+        grad_y = grad_y / np.max(grad_y)
     grad_magnitude = np.sqrt((grad_x ** 2) + (grad_y ** 2))
     return grad_magnitude, grad_x, grad_y
 
@@ -112,6 +117,9 @@ def painterly_filter(image):
     height = image.shape[0]
     canvas = np.zeros((height, width,3), dtype=np.uint8)
     gradients = calcImageGradients(image)
+
+    if gradients[1].ndim == 1 or gradients[2].ndim == 1:
+        return canvas 
 
     # f_s controls the blur amount of the reference image
     f_s = 1.0

@@ -4,7 +4,6 @@ from __future__ import annotations
 # Default packages
 
 # External packages
-import cv2
 from threading import Thread
 import time
 from abc import ABC, abstractmethod
@@ -82,10 +81,10 @@ class Startup(State):
 
     def enter(self, tick):
         self.ui = self.core.ui
-        self.ui.create_text("help_1", (20,50), 35.0)
-        self.ui.create_text("help_2", (20,80), 35.0)
-        self.ui.create_text("countdown", (self.core.win_size[0]/2-20, self.core.win_size[1]/2), 70.0)
-        self.ui.create_text("filter_name", (800,50), 35.0)
+        self.ui.create_text("help_1", (20,40), 40.0)
+        self.ui.create_text("help_2", (20,80), 40.0)
+        self.ui.create_text("countdown", (self.core.win_size[0]/2, self.core.win_size[1]/2), 80.0)
+        self.ui.create_text("filter_name", (750,50), 37.0)
 
         self.ui.set_text("countdown", "0")
         self.ui.set_text("help_1", "Show 5 fingers to take a picture!")
