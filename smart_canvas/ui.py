@@ -7,9 +7,12 @@ from moderngl_window.text.bitmapped import TextWriter2D
 from moderngl_window import (resources, ContextRefs)
 from moderngl_window.meta import (
     ProgramDescription,
-    TextureDescription
+    TextureDescription,
+    DataDescription,
 )
 from moderngl import TRIANGLE_STRIP
+from moderngl_window.text.bitmapped.base import FontMeta
+
 
 resources.register_dir(Path(__file__).parent.resolve())
 
@@ -19,6 +22,17 @@ class TextWriterTest(TextWriter2D):
     """
     def __init__(self, position, size=24.0):
         super().__init__()
+
+        meta = FontMeta(resources.data.load(DataDescription(path="backgrounds/meta.json")))
+
+        self._texture = resources.textures.load(
+            TextureDescription(
+                path="backgrounds/VeraMonoBorder.png",
+                kind="array",
+                mipmap=True,
+                layers=meta.characters,
+            )
+        )
         # load custom glsl
         self._program = resources.programs.load(
             ProgramDescription(path="shaders/text.glsl")
