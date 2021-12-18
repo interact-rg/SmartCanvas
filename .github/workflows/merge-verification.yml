@@ -19,6 +19,8 @@ jobs:
     - name: Install dependencies
       run: |
         make
+        sudo apt-get update -y -qq
+        sudo apt-get install -y -qq libegl1-mesa libegl1-mesa-dev
     - name: Test with pytest
       run: |
         make test-cov
