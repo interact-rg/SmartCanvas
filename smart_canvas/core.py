@@ -83,12 +83,21 @@ class Startup(State):
         self.ui = self.core.ui
         self.ui.create_text("help_1", (20,40), 40.0)
         self.ui.create_text("help_2", (20,80), 40.0)
+
+        self.ui.create_text("idle_text_1", (550, 300), 40.0)
+        self.ui.create_text("idle_text_2", (230, 400), 40.0)
+
         self.ui.create_text("countdown", (self.core.win_size[0]/2, self.core.win_size[1]/2), 80.0)
         self.ui.create_text("filter_name", (750,50), 37.0)
 
         self.ui.set_text("countdown", "0")
+
         self.ui.set_text("help_1", "Show 5 fingers to take a picture!")
         self.ui.set_text("help_2", "Show 2 fingers to change filter")
+
+        self.ui.set_text("idle_text_1", "SmartCanvas")
+        self.ui.set_text("idle_text_2", "Wave your hand and start your artistic experience")
+
         self.ui.set_text("filter_name", 'Current filter is {}'.format(self.core.filters.current_name))
         self.ui.create_progressbar("bar")
 
@@ -99,7 +108,7 @@ class Startup(State):
 class Idle(State):
     """
     Waiting or idle function for smartcanvas, waiting for commands from fingers. 
-    Next state is Filter. Handles filter change and starts filtering
+    Next state is Active.
     """
     # State holds its own variables and these are not persistent after a state change
     def __init__(self):
@@ -108,8 +117,63 @@ class Idle(State):
         self.finger_frame_interval = 0.0
     # Runs once on init
     def enter(self, tick):
+        self.core.ui.hide("help_1", "help_2", "filter_name", "bar")
+        self.core.ui.show("idle_text_1", "idle_text_2", "bar")
+        self.core.ui.set_prog("bar", 1.1)
+
+        #masked_frame = self.core.fg_masker.apply(frame)
+        #filtered_frame = self.core.filters.current_filter(masked_frame)
+        #self.core.filtered_frame = self.core.fg_masker.changeBackground(filtered_frame)
+        #self.core.out_frame = self.core.filtered_frame
+
+        #self.core.ui.show("help_1", "help_2", "filter_name", "bar")
+        #self.core.ui.set_prog("bar", 0.0)
+
+    # Update is called on new frame
+    def update(self, tick, frame):
+        # Now we update UI elements to Opengl so no need to wait for slow functions to finish
+
+        #masked_frame = self.core.fg_masker.apply(frame)
+        #filtered_frame = self.core.filters.current_filter(masked_frame)
+        #self.core.filtered_frame = self.core.fg_masker.changeBackground(filtered_frame)
+        #self.core.out_frame = self.core.filtered_frame
+
+        self.core.out_frame = frame
+        # Detect fingers 10 times in a second
+        # Using timer here because frame rate can differ
+        if self.finger_frame_interval - tick < 0:
+            finger_count = self.core.hand_detector.count_fingers(frame)
+            self.finger_frame_interval = tick + 0.1
+            self.update_filter_trigger(finger_count)
+
+            self.core.ui.set_prog("bar", self.take_pic_cnt)
+
+    def update_filter_trigger(self, finger_count):
+        if finger_count == 5:
+            self.take_pic_cnt += 0.05
+        elif self.take_pic_cnt > 0.0:
+            self.take_pic_cnt -= 0.1
+        if self.take_pic_cnt >= 0.1:
+            self.core.set_state(Active())
+
+class Active(State):
+    """
+    State class for active on waiting for fingers.
+    Next state is Filter. Handles filter change and starts filtering
+    """
+
+    # State holds its own variables and these are not persistent after a state change
+    def __init__(self):
+        self.take_pic_cnt = 0.0
+        self.change_filter_time = 0.0
+        self.finger_frame_interval = 0.0
+        self.waiting_time = 0.0
+    # Runs once on init
+    def enter(self, tick):
+        self.core.ui.hide("idle_text_1", "idle_text_2", "bar")
         self.core.ui.show("help_1", "help_2", "filter_name", "bar")
         self.core.ui.set_prog("bar", 0.0)
+        self.waiting_time = time.time() + 20
 
     # Update is called on new frame
     def update(self, tick, frame):
@@ -124,6 +188,10 @@ class Idle(State):
             self.update_filter_carousel(finger_count, tick)
 
             self.core.ui.set_prog("bar", self.take_pic_cnt)
+
+        if self.waiting_time - tick < 0:
+            self.core.out_frame = self.core.filtered_frame
+            self.core.set_state(Idle())
 
     def update_filter_carousel(self, finger_count, tick):
         if finger_count == 2:
@@ -150,6 +218,7 @@ class Filter(State):
 
     def enter(self, tick):
         self.countdown_time = tick + 4
+        self.core.ui.hide("idle_text_1", "idle_text_2", "bar")
         self.core.ui.hide("help_1", "help_2", "filter_name", "bar")
         self.core.ui.set_text("countdown", "3")
         self.core.ui.show("countdown")
@@ -183,4 +252,4 @@ class ShowPic(State):
 
     def update(self, tick, frame):
         if self.show_image_time - tick < 0:
-            self.core.set_state(Idle())
+            self.core.set_state(Active())
