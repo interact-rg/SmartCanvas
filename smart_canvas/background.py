@@ -57,5 +57,6 @@ class ForegroundMask:
         condition = np.stack((self.mask,) * 3, axis=-1) > 0.1
 
         self.bg_image = self.switchBackground(current_filter)
+
         self.output_image = np.where(condition, frame, self.bg_image)
         return self.output_image

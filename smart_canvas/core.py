@@ -90,6 +90,8 @@ class Startup(State):
         self.ui.create_text("countdown", (self.core.win_size[0]/2, self.core.win_size[1]/2), 80.0)
         self.ui.create_text("filter_name", (750,50), 37.0)
 
+        self.ui.create_text("image_showing_promote", (550, 80), 40.0)
+
         self.ui.set_text("countdown", "0")
 
         self.ui.set_text("help_1", "Show 5 fingers to take a picture!")
@@ -100,6 +102,8 @@ class Startup(State):
 
         self.ui.set_text("filter_name", 'Current filter is {}'.format(self.core.filters.current_name))
         self.ui.create_progressbar("bar")
+
+        self.ui.set_text("image_showing_promote", 'Wave hand to create another artwork')
 
     def update(self, tick, frame):
         self.core.set_state(Idle())
@@ -117,7 +121,7 @@ class Idle(State):
         self.finger_frame_interval = 0.0
     # Runs once on init
     def enter(self, tick):
-        self.core.ui.hide("help_1", "help_2", "filter_name", "bar")
+        self.core.ui.hide("help_1", "help_2", "filter_name", "bar", "image_showing_promote")
         self.core.ui.show("idle_text_1", "idle_text_2", "bar")
         self.core.ui.set_prog("bar", 1.1)
 
@@ -170,7 +174,7 @@ class Active(State):
         self.waiting_time = 0.0
     # Runs once on init
     def enter(self, tick):
-        self.core.ui.hide("idle_text_1", "idle_text_2", "bar")
+        self.core.ui.hide("idle_text_1", "idle_text_2", "bar", "image_showing_promote")
         self.core.ui.show("help_1", "help_2", "filter_name", "bar")
         self.core.ui.set_prog("bar", 0.0)
         self.waiting_time = time.time() + 20
@@ -219,7 +223,7 @@ class Filter(State):
     def enter(self, tick):
         self.countdown_time = tick + 4
         self.core.ui.hide("idle_text_1", "idle_text_2", "bar")
-        self.core.ui.hide("help_1", "help_2", "filter_name", "bar")
+        self.core.ui.hide("help_1", "help_2", "filter_name", "image_showing_promote")
         self.core.ui.set_text("countdown", "3")
         self.core.ui.show("countdown")
 
@@ -244,13 +248,38 @@ class ShowPic(State):
     """
     def __init__(self):
         self.show_image_time = 0.0
+        self.take_pic_cnt = 0.0
+        self.change_filter_time = 0.0
+        self.finger_frame_interval = 0.0
 
     def enter(self, tick):
         self.core.ui.hide("countdown")
+        self.core.ui.set_text("filter_name", 'Current filter is {}'.format(self.core.filters.current_name))
+        self.core.ui.show("filter_name")
+        self.core.ui.show("image_showing_promote")
+
         self.show_image_time = time.time() + 15
         # Frame does not change so update only once
         self.core.out_frame = self.core.filtered_frame
 
     def update(self, tick, frame):
         if self.show_image_time - tick < 0:
+            self.core.set_state(Active())
+
+        # self.core.out_frame = frame
+        # Detect fingers 10 times in a second
+        # Using timer here because frame rate can differ
+        if self.finger_frame_interval - tick < 0:
+            finger_count = self.core.hand_detector.count_fingers(frame)
+            self.finger_frame_interval = tick + 0.1
+            self.update_filter_trigger(finger_count)
+
+            self.core.ui.set_prog("bar", self.take_pic_cnt)
+
+    def update_filter_trigger(self, finger_count):
+        if finger_count == 5:
+            self.take_pic_cnt += 0.05
+        elif self.take_pic_cnt > 0.0:
+            self.take_pic_cnt -= 0.1
+        if self.take_pic_cnt >= 0.1:
             self.core.set_state(Active())
