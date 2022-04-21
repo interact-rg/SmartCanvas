@@ -84,7 +84,7 @@ class Startup(State):
         self.ui.create_text("help_1", (20,40), 40.0)
         self.ui.create_text("help_2", (20,80), 40.0)
         self.ui.create_text("countdown", (self.core.win_size[0]/2, self.core.win_size[1]/2), 80.0)
-        self.ui.create_text("filter_name", (750,50), 37.0)
+        self.ui.create_text("filter_name", (850,40), 40.0)
 
         self.ui.set_text("countdown", "0")
         self.ui.set_text("help_1", "Show 5 fingers to take a picture!")
