@@ -88,7 +88,7 @@ class Startup(State):
         self.ui.create_text("idle_text_2", (230, 400), 40.0)
 
         self.ui.create_text("countdown", (self.core.win_size[0]/2, self.core.win_size[1]/2), 80.0)
-        self.ui.create_text("filter_name", (750,50), 37.0)
+        self.ui.create_text("filter_name", (850,40), 40.0)
 
         self.ui.create_text("image_showing_promote", (550, 80), 40.0)
 
