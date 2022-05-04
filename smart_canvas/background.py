@@ -16,6 +16,20 @@ class ForegroundMask:
         self.output_image = None
         self.mask = None
 
+    def switchBackground(self, current_filter):
+        filterImagesLib = {
+            'painterly': 'painterly_forest.jpg',
+            'watercolor': 'IMG_2826-paint10.jpg',
+            'oil painting': 'IMG_0254-paint10.jpg'
+        }
+        filterImage = filterImagesLib[current_filter]
+        imageFullPath = 'smart_canvas/backgrounds/' + filterImage
+
+        self.bg_image = cv2.imread(imageFullPath)
+        dim = (1280,720)
+        self.bg_image = cv2.resize(self.bg_image, dim, interpolation = cv2.INTER_AREA)
+        return self.bg_image
+
     def remove_isolated_pixels(self, mask):
         kernel = np.ones((5, 5), np.uint8)
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
@@ -39,7 +53,10 @@ class ForegroundMask:
         self.output_image = np.where(condition, frame, emptyBg)
         return self.output_image
 
-    def changeBackground(self, frame):
+    def changeBackground(self, frame, current_filter):
         condition = np.stack((self.mask,) * 3, axis=-1) > 0.1
+
+        self.bg_image = self.switchBackground(current_filter)
+
         self.output_image = np.where(condition, frame, self.bg_image)
         return self.output_image
