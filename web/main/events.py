@@ -71,3 +71,9 @@ def handle_client_message(message):
         return
     mod_message = header + "," + cv_to_b64(core.out_frame)
     socketio.emit('consume', mod_message, to=sid, broadcast=False)
+
+@socketio.on('update_ui_request')
+def update_ui():
+    sid = request.sid
+    core = core_threads[sid]
+    socketio.emit('update_ui_response', core.get_ui_state(), to=sid, broadcast=False)

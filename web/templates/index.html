@@ -9,6 +9,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>SmartCanvas Video Streamer</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
     <!-- Socket IO
   ================================================== -->
@@ -135,15 +136,20 @@
         </div>
 
       </div>
+      <div>
+        <h2 id="ui_msgs">UI status here</h2>
+      </div>
     </div>
   </body>
 </html>
+
 
 <script>
   document.addEventListener("DOMContentLoaded", async function (event) {
     const clientFeed = document.getElementById("clientFeed");
     const serverFeed = document.getElementById("serverFeed");
     const canvas = document.getElementById("canvas");
+    const ui_msgs = document.getElementById("ui_msgs");
 
     const socket = io.connect({ reconnection: false });
 
@@ -178,6 +184,11 @@
       img.src = msg;
     });
 
+    socket.on("update_ui_response", (msg) => {
+      console.log(msg)
+      ui_msgs.textContent = msg
+    });
+
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       let stream = await navigator.mediaDevices.getUserMedia({
         video: true,
@@ -189,7 +200,7 @@
         .getContext("2d")
         .drawImage(clientFeed, 0, 0, canvas.width, canvas.height);
       
-      const FPS = 6;
+      const FPS = 30;
       let interval = setInterval(() => {
         canvas
           .getContext("2d")
@@ -197,6 +208,12 @@
         const image_data_url = canvas.toDataURL("image/jpeg");
         socket.emit("produce", image_data_url)
       }, 1000/FPS);
+    }
+
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      let interval = setInterval(() => {
+        socket.emit("update_ui_request")
+      }, 500);
     }
     
   });
