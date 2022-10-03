@@ -26,7 +26,11 @@ class ForegroundMask:
         imageFullPath = 'smart_canvas/backgrounds/' + filterImage
 
         self.bg_image = cv2.imread(imageFullPath)
-        dim = (1280,720)
+
+        cap = cv2.VideoCapture(0)
+        width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+        height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        dim = (int(width), int(height))
         self.bg_image = cv2.resize(self.bg_image, dim, interpolation = cv2.INTER_AREA)
         return self.bg_image
 
@@ -57,6 +61,5 @@ class ForegroundMask:
         condition = np.stack((self.mask,) * 3, axis=-1) > 0.1
 
         self.bg_image = self.switchBackground(current_filter)
-
         self.output_image = np.where(condition, frame, self.bg_image)
         return self.output_image

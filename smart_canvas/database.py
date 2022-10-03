@@ -93,6 +93,37 @@ class Database:
                 cursor.close()
                 connection.close()
                 print("MySQL connection is closed")
+    def access(self, image_id):
+        #function to delete image when its accessed in the database
+        #work in prog
+        try:
+            # establish connection
+            connection = mysql.connector.connect(host='localhost',
+                                                database='smartcanvas',
+                                                user='root',
+                                                password='SmartCanvasV')
+            cursor = connection.cursor()
+            # getting data by id value
+            sql_delete_query = f""" DELETE FROM images WHERE image_id = {image_id}"""
+
+
+        
+            cursor.execute(sql_delete_query, (image_id,))
+            result = cursor.fetchall()
+            for row in result:
+                print("image Id = ", row[0])
+                image = row[1]
+                print("date  = ", row[2])
+                # Pass path with filename where we want to save our file
+            self.convert_binary_to_image(image, r"C:\Users\anssi\Pictures\testimages\image.png")
+            # Pass path with filename where we want to save our file
+        
+            print("Successfully Retrieved Values from database")
+        
+        except mysql.connector.Error as error:
+            print(format(error))
+        pass
+
 
 base = Database()
 

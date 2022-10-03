@@ -13,7 +13,6 @@ from smart_canvas.background import ForegroundMask
 from smart_canvas.gesture_detection import HandDetect
 from smart_canvas.filters.carousel import FilterCarousel
 from smart_canvas.ui import UI
-from smart_canvas.upload_to_database import insert_blob
 
 class CanvasCore:
     """
