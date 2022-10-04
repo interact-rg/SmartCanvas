@@ -86,8 +86,6 @@ class Database:
             self.convert_binary_to_image(
                 image, r"C:\Users\anssi\Pictures\testimages\image.png"
             )
-            # Pass path with filename where we want to save our file
-
             print("Successfully Retrieved Values from database")
 
         except mysql.connector.Error as error:
