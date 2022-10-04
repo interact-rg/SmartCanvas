@@ -56,11 +56,14 @@ class CanvasCore:
         self.stopped = True
 
     def get_ui_state(self):
-        #return all text that shall be visible on ui
-        ui_texts=""
+        #return all things that should be visible on ui
+        ui_state = {}
         for k, v in self.ui.texts.items():
-            ui_texts += v + "\n"
-        return ui_texts
+            eval = self.ui.elements[k]
+            if eval.visible:
+                ui_state[k] = v
+        ui_state["hold_timer"] = self.ui.get_prog("bar")
+        return ui_state
         
 
 class State(ABC):
@@ -144,7 +147,7 @@ class Idle(State):
     # Update is called on new frame
     def update(self, tick, frame):
         # Now we update UI elements to Opengl so no need to wait for slow functions to finish
-        
+
         #masked_frame = self.core.fg_masker.apply(frame)
         #filtered_frame = self.core.filters.current_filter(masked_frame)
         #self.core.filtered_frame = self.core.fg_masker.changeBackground(filtered_frame)

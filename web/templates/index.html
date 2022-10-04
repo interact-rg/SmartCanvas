@@ -106,6 +106,16 @@
         <h2>Mind what is visible!</h2>
       </div>
 
+      <div id="ui", style="margin-top: 100px;">
+        <a id="idle_text_1", style="font-size: 20px; font-weight: bold;"></a><br>
+        <a id="idle_text_2"></a>
+        <a id="help_2"></a><a>    </a>
+        <a id="filter_name"></a><br>
+        <a id="help_1"></a>
+        <br><a id="countdown"></a>
+        <br><a id="hold_timer"></a>
+      </div>
+
       <div class="card-deck">
 
         <div class="card" id="clientCard">
@@ -128,16 +138,12 @@
 
         <div class="card" id="serverCard">
           <div class="card-body">
-            <h5 class="card-title">serverFeed</h5>
+            <!--<h5 class="card-title">serverFeed</h5>-->
             <div style="width: 70%">
               <canvas id="serverFeed" width="640" height="480"></canvas>
             </div>
           </div>
         </div>
-
-      </div>
-      <div>
-        <h2 id="ui_msgs">UI status here</h2>
       </div>
     </div>
   </body>
@@ -149,7 +155,6 @@
     const clientFeed = document.getElementById("clientFeed");
     const serverFeed = document.getElementById("serverFeed");
     const canvas = document.getElementById("canvas");
-    const ui_msgs = document.getElementById("ui_msgs");
 
     const socket = io.connect({ reconnection: false });
 
@@ -186,7 +191,40 @@
 
     socket.on("update_ui_response", (msg) => {
       console.log(msg)
-      ui_msgs.textContent = msg
+      var visibles = []
+      //visible messages visible
+      for (var key in msg){
+        var html_item = document.getElementById(key);
+        if (key != "hold_timer") {
+          html_item.textContent = msg[key];
+          visibles.push(key);
+        }
+        else {
+          if (msg[key] <= 0 || msg[key] >= 1) {
+            html_item.textContent = null;
+          }
+          else if (0 < msg[key] && msg[key] < 1) {
+            console.log("setting hold");
+            html_item.textContent = msg[key];
+          }
+        }
+      }
+      console.log(visibles)
+      //hidden messages invisible
+      var childas = document.getElementById('ui').getElementsByTagName('a');
+      for( var i=0; i< childas.length; i++ ) {
+        var childa = childas[i];
+        if (!visibles.includes(childa.id)) {
+          if (key != "hold_timer") {
+            html_item = document.getElementById(childa.id);
+            try {
+              html_item.textContent = null;
+            } catch (error) {
+              //console.log("error with", childa.id, error)
+            }
+          }
+        }
+      }
     });
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -213,7 +251,7 @@
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       let interval = setInterval(() => {
         socket.emit("update_ui_request")
-      }, 500);
+      }, 200);
     }
     
   });
