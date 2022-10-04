@@ -12,8 +12,10 @@ class Database:
             binaryData = file.read()
         return binaryData
 
-    def insert_blob(self, image_id, image, date_added):
+    def insert_blob(self, image):
         print("Inserting BLOB into images table")
+        image_id = 1
+        date_added = datetime.datetime.now()
         # maybe add information of database from configuration file for safety.............
         # need checker for if id exists, increment by one until id does not exist etc etc.
         try:
@@ -131,5 +133,5 @@ class Database:
 
 base = Database()
 
-base.insert_blob(2, r"tests\test_assets\small_image\image.png", datetime.datetime.now())
+base.insert_blob(r"tests\test_assets\small_image\image.png")
 base.download(17)

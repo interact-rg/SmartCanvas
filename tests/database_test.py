@@ -3,7 +3,17 @@ import datetime
 
 
 @pytest.fixture()
-def test_database_upload():
-    #smart_canvas.insert_blob(2, r"tests\test_assets\small_image\image.png", datetime.datetime.now())
-    print(datetime.datetime.now())
-test_database_upload()
+def test_database_upload(monkeypatch):
+
+    def mock_upload():
+        pass
+
+
+    base = Database()
+    base.insert_blob(r"assets\logo.png")
+
+@pytest.fixture()
+def test_database_download(monkeypatch):
+    base = Database()
+    #download image with image_id = 1
+    base.download(1)
