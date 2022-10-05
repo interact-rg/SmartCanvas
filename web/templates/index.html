@@ -25,6 +25,10 @@
 
       .container {
         max-width: 1024px;
+        position: relative;
+        /*TODO: Rezise container div through JS after camera view has loaded*/
+        width: 640px;
+        height: 480px;
       }
 
       .navbar-light .navbar-nav .nav-link,
@@ -95,6 +99,30 @@
         background-color: rgba(0, 0, 0, 0.5);
         -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
       }
+
+      #hold_bar, #serverFeedDiv, #countdown {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      #hold_bar {
+        z-index: 1;
+      }
+      #serverFeedDiv {
+        z-index: 0;
+      }
+      #hold_progress {
+        color: aqua;
+        transform: translate(140%,2800%);
+      }
+      #countdown_value {
+        display: inline-block;
+        transform: translate(350%, 100%);
+        font-size: 150px;
+      }
+
     </style>
   </head>
 
@@ -112,7 +140,6 @@
         <a id="help_2"></a><a>    </a>
         <a id="filter_name"></a><br>
         <a id="help_1"></a>
-        <br><a id="countdown"></a>
         <br><a id="hold_timer"></a>
       </div>
 
@@ -137,10 +164,16 @@
         </div>
 
         <div class="card" id="serverCard">
-          <div class="card-body">
+          <div class="container">
             <!--<h5 class="card-title">serverFeed</h5>-->
-            <div style="width: 70%">
+            <div id="serverFeedDiv" style="width: 100%">
               <canvas id="serverFeed" width="640" height="480"></canvas>
+              <div id="hold_bar">
+                <progress id="hold_progress" value="32" max="100"></progress>
+              </div>
+              <div id="countdown" style="visibility: hidden;">
+                <a id="countdown_value">0</a>
+              </div>
             </div>
           </div>
         </div>
@@ -195,17 +228,30 @@
       //visible messages visible
       for (var key in msg){
         var html_item = document.getElementById(key);
-        if (key != "hold_timer") {
+        if (key != "hold_timer" && key != "countdown") {
           html_item.textContent = msg[key];
           visibles.push(key);
         }
-        else {
+        else if (key == "hold_timer") {
+          html_item = document.getElementById("hold_progress");
+          html_item.value = msg[key] * 100;
           if (msg[key] <= 0 || msg[key] >= 1) {
-            html_item.textContent = null;
+            html_item.style.visibility = 'hidden';
           }
-          else if (0 < msg[key] && msg[key] < 1) {
-            console.log("setting hold");
-            html_item.textContent = msg[key];
+          else {
+            html_item.style.visibility = 'visible';
+          }
+        }
+        else if (key == "countdown") {
+          if (msg[key] == "0") {
+            html_item = document.getElementById("countdown");
+            html_item.style.visibility = "hidden";
+          }
+          else {
+            html_item = document.getElementById("countdown");
+            html_item.style.visibility = "visible";
+            html_item = document.getElementById("countdown_value");
+            html_item.textContent = msg[key]
           }
         }
       }
