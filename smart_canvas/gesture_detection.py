@@ -19,48 +19,45 @@ class HandDetect:
             min_tracking_confidence=0.8
         )
 
-    def findHandLandMarks(self, image, handNumber=0, draw=False):
-        originalImage = image
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        results = self.hands.process(image)
-        landMarkList = []
-
-        if results.multi_hand_landmarks is None:
-            return landMarkList
-
-        if results.multi_handedness:
-            # label gives if hand is left or right
-            label = results.multi_handedness[handNumber].classification[0].label
-            # account for inversion in webcams
-            if label == "Left":
-                label = "Right"
-            elif label == "Right":
-                label = "Left"
-
-        hand = results.multi_hand_landmarks[handNumber]
-        for id, landMark in enumerate(hand.landmark):
-            imgH, imgW, imgC = originalImage.shape
-            xPos, yPos = int(landMark.x * imgW), int(landMark.y * imgH)
-            landMarkList.append([id, xPos, yPos, label])
-
-        return landMarkList
-
     def count_fingers(self, frame):
-        handLandmarks = self.findHandLandMarks(image=frame, draw=False)
-        count = 0
-        if(len(handLandmarks) != 0):
-            # Right Thumb
-            if handLandmarks[4][3] == "Right" and handLandmarks[4][1] > handLandmarks[3][1]:
-                count = count+1
-            # Left Thumb
-            elif handLandmarks[4][3] == "Left" and handLandmarks[4][1] < handLandmarks[3][1]:
-                count = count+1
-            if handLandmarks[8][2] < handLandmarks[6][2]:  # Index finger
-                count = count+1
-            if handLandmarks[12][2] < handLandmarks[10][2]:  # Middle finger
-                count = count+1
-            if handLandmarks[16][2] < handLandmarks[14][2]:  # Ring finger
-                count = count+1
-            if handLandmarks[20][2] < handLandmarks[18][2]:  # Little finger
-                count = count+1
-        return count
+        image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        results = self.hands.process(image)
+        # hand landmark positions (x and y)
+        handLandmarks = []
+
+        # Draw the hand annotations on the image.
+        image.flags.writeable = True
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+        # Initially set finger count to 0 for each cap
+        fingerCount = 0
+
+        if results.multi_hand_landmarks:
+
+            for hand_landmarks in results.multi_hand_landmarks:
+                # Get hand index to check label (left or right)
+                handIndex = results.multi_hand_landmarks.index(hand_landmarks)
+                handLabel = results.multi_handedness[handIndex].classification[0].label
+
+                # Fill list with x and y positions of each landmark
+                for landmarks in hand_landmarks.landmark:
+                    handLandmarks.append([landmarks.x, landmarks.y])
+
+                if handLabel == "Left" and handLandmarks[4][0] > handLandmarks[3][0]:   # Left thumb
+                    fingerCount = fingerCount+1
+                elif handLabel == "Right" and handLandmarks[4][0] < handLandmarks[3][0]:    # Right thumb
+                    fingerCount = fingerCount+1
+
+                # Other fingers: TIP y position must be lower than PIP y position, 
+                #   as image origin is in the upper left corner.
+                if handLandmarks[8][1] < handLandmarks[6][1]:       #Index finger
+                    fingerCount = fingerCount+1
+                if handLandmarks[12][1] < handLandmarks[10][1]:     #Middle finger
+                    fingerCount = fingerCount+1
+                if handLandmarks[16][1] < handLandmarks[14][1]:     #Ring finger
+                    fingerCount = fingerCount+1
+                if handLandmarks[20][1] < handLandmarks[18][1]:     #Pinky
+                    fingerCount = fingerCount+1
+            # Display finger count
+            cv2.putText(frame, str(fingerCount), (50, 450), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0), 10)
+        return fingerCount

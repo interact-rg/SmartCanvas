@@ -14,6 +14,7 @@ class TestFingerCounter(object):
         hand_detector = HandDetect()
         frame = cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/{test_input}.jpeg")
         count = hand_detector.count_fingers(frame)
+        print(count)
         assert count is expected
         assert count is not (expected + 1)
         assert count is not (expected - 1)
