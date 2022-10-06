@@ -246,7 +246,7 @@ class Filter(State):
         self.core.filtered_frame = self.core.fg_masker.changeBackground(filtered_frame, self.core.filters.current_name)
 
         #upload image to database
-        self.database.insert_blob(self.output_image)
+        self.core.database.insert_blob(self.core.filtered_frame)
         
 
 class ShowPic(State):

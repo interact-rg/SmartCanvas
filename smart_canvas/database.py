@@ -16,6 +16,8 @@ class Database:
         return binaryData
 
     def insert_blob(self, image):
+        print(f"tyyppi: {type(image)}")
+
         print("Inserting BLOB into images table")
         #create image object of numpy array
         data = im.fromarray(image)
@@ -95,7 +97,7 @@ class Database:
                 print("date  = ", row[2])
                 # Pass path with filename where we want to save our file
             self.convert_binary_to_image(
-                image, r"C:\Users\anssi\Pictures\testimages\image.png"
+                image, r"assets\downloadedimage.png"
             )
             print("Successfully Retrieved Values from database")
 
@@ -141,6 +143,4 @@ class Database:
 
 
 base = Database()
-
-base.insert_blob(r"tests\test_assets\small_image\image.png")
-base.download(17)
+base.download(38)
