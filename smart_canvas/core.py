@@ -13,6 +13,8 @@ from smart_canvas.background import ForegroundMask
 from smart_canvas.gesture_detection import HandDetect
 from smart_canvas.filters.carousel import FilterCarousel
 from smart_canvas.ui import UI
+from smart_canvas.database import Database
+
 
 class CanvasCore:
     """
@@ -27,6 +29,7 @@ class CanvasCore:
         self.filters = FilterCarousel()
         self.fg_masker = ForegroundMask()
         self.hand_detector = HandDetect()
+        self.database = Database()
         self.ui = UI()
         self.win_size = screensize
 
@@ -239,9 +242,12 @@ class Filter(State):
     def apply_filter(self, frame):
 
         masked_frame = self.core.fg_masker.apply(frame)
-        #!!!!!!!!!can call database upload here!!!!!!!!!!
         filtered_frame = self.core.filters.current_filter(masked_frame)
         self.core.filtered_frame = self.core.fg_masker.changeBackground(filtered_frame, self.core.filters.current_name)
+
+        #upload image to database
+        self.database.insert_blob(self.output_image)
+        
 
 class ShowPic(State):
     """

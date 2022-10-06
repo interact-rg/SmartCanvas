@@ -11,7 +11,10 @@ class ForegroundMask:
     def __init__(self):
         self.selfie_segmentation = mp_selfie_segmentation.SelfieSegmentation(model_selection=1)
         self.bg_image = cv2.imread('smart_canvas/backgrounds/painterly_forest.jpg')
-        dim = (640,480)
+        cap = cv2.VideoCapture(0)
+        width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+        height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        dim = (int(width), int(height))
         self.bg_image = cv2.resize(self.bg_image, dim, interpolation = cv2.INTER_AREA)
         self.output_image = None
         self.mask = None

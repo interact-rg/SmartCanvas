@@ -3,22 +3,26 @@
 import mysql.connector
 import datetime
 import typing
+from PIL import Image as im
+import os
 
 
 
 class Database:
-    def convert_image_to_binary(self, filename: str) -> bytes:
+    def convert_image_to_binary(self, filename) -> bytes:
         # Convert digital data to binary format
         with open(filename, "rb") as file:
             binaryData = file.read()
         return binaryData
 
-    def insert_blob(self, image: str):
+    def insert_blob(self, image):
         print("Inserting BLOB into images table")
+        #create image object of numpy array
+        data = im.fromarray(image)
+        data.save('assets\picwithcanvas.png') #remove this later, no need to save locally.
         image_id = 1
         date_added = datetime.datetime.now()
         # maybe add information of database from configuration file for safety.............
-        # need checker for if id exists, increment by one until id does not exist etc etc.
         try:
             connection = mysql.connector.connect(
                 host="localhost",
@@ -40,7 +44,7 @@ class Database:
             sql_insert_blob_query = """ INSERT INTO images
                             (image_id, image, date_added) VALUES (%s,%s,%s)"""
 
-            image = self.convert_image_to_binary(image)
+            image = self.convert_image_to_binary(r"assets\picwithcanvas.png")
 
             # Convert data into tuple format
             print(f"image_id is: {image_id}")
@@ -48,6 +52,10 @@ class Database:
             result = cursor.execute(sql_insert_blob_query, insert_blob_tuple)
             connection.commit()
             print("Image and file inserted successfully as a BLOB into images table")
+            if os.path.exists(r"assets\picwithcanvas.png"):
+                os.remove(r"assets\picwithcanvas.png")
+            else:
+                print("The file does not exist")
 
         except mysql.connector.Error as error:
             print("Failed inserting BLOB data into MySQL table {}".format(error))
