@@ -2,17 +2,18 @@
 
 import mysql.connector
 import datetime
+import typing
 
 
 
 class Database:
-    def convert_image_to_binary(self, filename):
+    def convert_image_to_binary(self, filename: str) -> bytes:
         # Convert digital data to binary format
         with open(filename, "rb") as file:
             binaryData = file.read()
         return binaryData
 
-    def insert_blob(self, image):
+    def insert_blob(self, image: str):
         print("Inserting BLOB into images table")
         image_id = 1
         date_added = datetime.datetime.now()
@@ -58,14 +59,14 @@ class Database:
                 print("MySQL connection is closed")
 
     #  function to convert binary to image
-    def convert_binary_to_image(self, data, file_name):
+    def convert_binary_to_image(self, data: bytes, file_name: str):
         # Convert binary format to images
         # or files data(with given file_name)
         with open(file_name, "wb") as file:
             file.write(data)
 
     # download image with given id
-    def download(self, image_id):
+    def download(self, image_id: int):
         try:
             # establish connection
             connection = mysql.connector.connect(
@@ -99,7 +100,7 @@ class Database:
                 connection.close()
                 print("MySQL connection is closed")
 
-    def access(self, image_id):
+    def access(self, image_id: int):
         # function to delete image when its accessed in the database
         # work in prog
         try:
