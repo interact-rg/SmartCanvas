@@ -26,6 +26,11 @@ def index():
     return render_template('index.html')
 
 
+@main.route('/fullscreen')
+def fs():
+    return render_template('fullscreen.html')
+
+
 @main.route('/upload', methods=['POST'])
 @auth.login_required
 def upload_file():

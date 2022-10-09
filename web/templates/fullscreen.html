@@ -9,7 +9,6 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>SmartCanvasV</title>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
     <!-- Socket IO -->
     <script
@@ -19,34 +18,29 @@
 
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
 
-    <a id="page_identifier" style="display: none;">normal</a>
+    <a id="page_identifier" style="display: none;">fullscreen</a>
   </head>
 
   <body class="tos-bg">
-    <div class="topnav">
-      <a class="logo">SmartCanvasV</a>
-      <a class="link active" href="">Home</a>
-      <a class="link" href="fullscreen">Fullscreen</a>
-      <a class="link" href="http://interact.oulu.fi/site/smart-canvas">About</a>
-    </div>
+
     <div id="mainContainer" class="container" min-width="1024px" width="100%">
       <div class="card-deck">
 
         <!--Not in use-->
-        <div hidden class="card" id="clientCard">
+        <div class="card" id="clientCard">
           <div class="card-body">
             <h5 class="card-title">clientFeed</h5>
-            <div style="width: 70%">
+            <div style="width: 100%">
               <video id="clientFeed" width="1280" height="720" autoplay></video>
             </div>
           </div>
         </div>
         
         <!--Not in use-->
-        <div hidden class="card" id="canvasCard">
+        <div class="card" id="canvasCard">
           <div class="card-body">
             <h5 class="card-title">canvas</h5>
-            <div style="width: 70%">
+            <div style="width: 100%">
               <canvas id="canvas" width="1280" height="720"></canvas>
             </div>
           </div>
@@ -63,18 +57,24 @@
               <div id="countdown" style="visibility: hidden;">
                 <a id="countdown_value">0</a>
               </div>
+              <div id="fs_ui">
+                <a>UI text placeholder</a>
+                <a>UI text placeholder</a>
+                <a>UI text placeholder</a>
+                <a>UI text placeholder</a>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div id="ui", style="margin-top: 660px; z-index: 0;">
+    <div id="ui", style="margin-top: 100px;">
       <a hidden id="idle_text_1", style="font-size: 20px; font-weight: bold;"></a><br>
-      <a id="idle_text_2"></a><br>
-      <a id="help_2"></a><br>
+      <a id="idle_text_2"></a>
+      <a id="help_2"></a><a>    </a>
       <a id="filter_name"></a><br>
-      <a id="help_1"></a><br>
+      <a id="help_1"></a>
       <br><a id="hold_timer"></a>
     </div>
   </body>
