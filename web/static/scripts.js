@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
             }
         });
     }
-    //Fullscreen with symbols instead of text (experimental)
+    //Fullscreen with symbols instead of text (more logical system for showing/hiding UI elements)
     else if (page_identifier.textContent == "fullscreen_symbol") {
         socket.on("update_ui_response", (msg) => {
             console.log(msg);
@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
       }, 200);
     }
 
-    //Once camera is initialized, adjust offsets of UI items based on resolution (TODO: on fullscreen resize to fit window)
+    //Once camera is initialized, adjust offsets of UI items based on resolution (currently will only work at 720/480p but should probably somehow made automatic)
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !itemsResized) {
         const canvass = document.getElementById("canvas");
         const hold = document.getElementById("hold_progress");
@@ -235,6 +235,24 @@ document.addEventListener("DOMContentLoaded", async function (event) {
             hold.style['transform'] = 'translate(350%,4000%)';
             ctr.style['transform'] = 'translate(820%, 150%)';
         }
+
+        //"Stretch" everything to fit window (TODO: Redo in some more sensible way)
+        body.style.zoom = getWidth() / canvass.width;
     }
-    
+
+    function getWidth() {
+        return Math.max(
+          //document.body.scrollWidth,
+          //document.documentElement.scrollWidth,
+          //document.body.offsetWidth,
+          //document.documentElement.offsetWidth,
+          document.documentElement.clientWidth
+        );
+      }
+      
+    //Redo zooming on window size change
+    addEventListener('resize', (event) => {
+        const canvass = document.getElementById("canvas");
+        body.style.zoom = getWidth() / canvass.width;
+    });
 });
