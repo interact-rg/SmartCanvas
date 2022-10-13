@@ -138,7 +138,53 @@ document.addEventListener("DOMContentLoaded", async function (event) {
               else {
                 children[i].style.display = 'none';
               }
-                
+            }
+        });
+    }
+    //Fullscreen with symbols instead of text (experimental)
+    else if (page_identifier.textContent == "fullscreen_symbol") {
+        socket.on("update_ui_response", (msg) => {
+            console.log(msg);
+            var used_keys = [];
+            for (var key in msg){
+                if (key != "hold_timer" && key != "countdown" && key !="idle_text_1") {
+                  used_keys.push(key)
+                  ui_element_div = document.getElementById(key);
+                  ui_element_div.style.display = "block";
+                  if (key == "filter_name") {
+                    ui_element_div.children[0].textContent = msg[key];
+                  }
+                }
+                else if (key == "hold_timer") {
+                  var html_item = document.getElementById("hold_progress");
+                  html_item.value = msg[key] * 100;
+                  if (msg[key] <= 0 || msg[key] >= 1) {
+                    html_item.style.visibility = 'hidden';
+                  }
+                  else {
+                    html_item.style.visibility = 'visible';
+                  }
+                }
+                else if (key == "countdown") {
+                  if (msg[key] == "0") {
+                    var html_item = document.getElementById("countdown");
+                    html_item.style.visibility = "hidden";
+                  }
+                  else {
+                    var html_item = document.getElementById("countdown");
+                    html_item.style.visibility = "visible";
+                    html_item = document.getElementById("countdown_value");
+                    html_item.textContent = msg[key]
+                  }
+                }
+            }
+            var children = document.getElementById("fs_ui").children;
+            var to_hide_element = null;
+            for (var i = 0; i < children.length; i++) {
+              if (children[i].tagName == "DIV" && !(used_keys.includes(children[i].id))) {
+                to_hide_element = document.getElementById(children[i].id);
+                to_hide_element.style.display = "none";
+              }
             }
         });
     }
