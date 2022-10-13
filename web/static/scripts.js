@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
                   used_keys.push(key)
                   ui_element_div = document.getElementById(key);
                   ui_element_div.style.display = "block";
-                  if (key == "filter_name") {
+                  if (key == "filter_name" || key == "image_showing_promote") {
                     ui_element_div.children[0].textContent = msg[key];
                   }
                 }
@@ -181,11 +181,21 @@ document.addEventListener("DOMContentLoaded", async function (event) {
             var children = document.getElementById("fs_ui").children;
             var to_hide_element = null;
             for (var i = 0; i < children.length; i++) {
-              if (children[i].tagName == "DIV" && !(used_keys.includes(children[i].id))) {
+              if (children[i].tagName == "DIV" && !(used_keys.includes(children[i].id)) && children[i].id != "image_processing") {
                 to_hide_element = document.getElementById(children[i].id);
                 to_hide_element.style.display = "none";
               }
             }
+        });
+        socket.on("imgage_processing_started", (msg) => {
+            console.log("image processing started")
+            var processing_element = document.getElementById("image_processing");
+            processing_element.style.display = "block";
+        });
+        socket.on("imgage_processing_finished", (msg) => {
+            console.log("image processing finished")
+            var processing_element = document.getElementById("image_processing");
+            processing_element.style.display = "none";
         });
     }
     
@@ -216,7 +226,8 @@ document.addEventListener("DOMContentLoaded", async function (event) {
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       let interval = setInterval(() => {
-        socket.emit("update_ui_request")
+        socket.emit("update_ui_request");
+        socket.emit("check_image_processing");
       }, 200);
     }
 
@@ -225,15 +236,18 @@ document.addEventListener("DOMContentLoaded", async function (event) {
         const canvass = document.getElementById("canvas");
         const hold = document.getElementById("hold_progress");
         const ctr = document.getElementById("countdown_value");
+        const processing_anim = document.getElementById("image_processing");
         if (canvass.width == 640 && canvas.height == 480) {
             console.log("setting UI to 480p")
             hold.style['transform'] = 'translate(140%,2800%)';
             ctr.style['transform'] = 'transform: translate(350%, 100%)';
+            //processing_anim.style['transform'] = 'translate(25%,25%)' //TODO
         }
         else if (canvass.width == 1280 && canvas.height == 720) {
             console.log("setting UI to 720p")
             hold.style['transform'] = 'translate(350%,4000%)';
             ctr.style['transform'] = 'translate(820%, 150%)';
+            processing_anim.style['transform'] = 'translate(80%,25%)'
         }
 
         //"Stretch" everything to fit window (TODO: Redo in some more sensible way)
@@ -249,7 +263,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
           document.documentElement.clientWidth
         );
       }
-      
+
     //Redo zooming on window size change
     addEventListener('resize', (event) => {
         const canvass = document.getElementById("canvas");

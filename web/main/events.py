@@ -20,6 +20,8 @@ from .. import socketio
 core_threads = {}
 core_queues = {}
 
+IMAGE_PROCESSING = False
+
 
 @socketio.on('connect')
 def connect_web():
@@ -77,3 +79,20 @@ def update_ui():
     sid = request.sid
     core = core_threads[sid]
     socketio.emit('update_ui_response', core.get_ui_state(), to=sid, broadcast=False)
+
+@socketio.on('check_image_processing')
+def check_image_processing():
+    global IMAGE_PROCESSING
+    print("checking started")
+    sid = request.sid
+    core = core_threads[sid]
+    ui_state = core.get_ui_state()
+    print(ui_state.get("countdown"))
+    if ui_state.get("countdown") == "0" and not IMAGE_PROCESSING:
+        print("emitting start")
+        IMAGE_PROCESSING = True
+        socketio.emit('imgage_processing_started', '', to=sid, broadcast=False)
+    if not ui_state.get("countdown") and len(ui_state.keys()) > 1 and IMAGE_PROCESSING:
+        print("emitting finished")
+        IMAGE_PROCESSING = False
+        socketio.emit('imgage_processing_finished', '', to=sid, broadcast=False)
