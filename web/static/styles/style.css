@@ -6,12 +6,17 @@ body {
   position: relative;
   display: flex;
   align-items: center;
-  padding-top: 50px;
+  padding-top: 30px;
   width: 100%;
   align-content: center;
-  /*TODO: Rezise container div through JS after camera view has loaded
-  width: 640px;
-  height: 480px;*/
+}
+.container_fs {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-top: 0px;
+  width: 100%;
+  align-content: center;
 }
 
 .navbar-light .navbar-nav .nav-link,
@@ -114,10 +119,15 @@ h5 {
   position: absolute;
   top: 10px;
   left: 10px;
+  height: 700px;
 }
 #fs_ui a {
   font-size: 30px;
   width: 1280px;
+}
+
+#ui a {
+  font-size: 30px;
 }
 
 .topnav {
@@ -154,4 +164,8 @@ h5 {
   height: 100%;
 }
 
-
+#dl_qr_div {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+}

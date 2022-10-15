@@ -14,6 +14,7 @@ from smart_canvas.core import CanvasCore
 
 # Internal modules
 from .. import socketio
+from smart_canvas.qr_code import *
 
 
 # Global dicts
@@ -83,11 +84,9 @@ def update_ui():
 @socketio.on('check_image_processing')
 def check_image_processing():
     global IMAGE_PROCESSING
-    print("checking started")
     sid = request.sid
     core = core_threads[sid]
     ui_state = core.get_ui_state()
-    print(ui_state.get("countdown"))
     if ui_state.get("countdown") == "0" and not IMAGE_PROCESSING:
         print("emitting start")
         IMAGE_PROCESSING = True
@@ -96,3 +95,10 @@ def check_image_processing():
         print("emitting finished")
         IMAGE_PROCESSING = False
         socketio.emit('imgage_processing_finished', '', to=sid, broadcast=False)
+
+@socketio.on('get_dl_link')
+def get_dl_qr(message):
+    print("requested dl qr")
+    header = message.split(",")[0]
+    mod_message = header + "," + cv_to_b64(create_qr_code("127.0.0.1/dl_latest")) #Todo add actual full address to downlaod from
+    socketio.emit('dl_qr', mod_message, to=request.sid, broadcast=False)

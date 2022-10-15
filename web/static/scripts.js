@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
             }
         });
     }
-    //Fullscreen mode
+    //Original fullscreen mode, to be deleted
     else if (page_identifier.textContent == "fullscreen") {
         console.log("DO fs stuffs")
         socket.on("update_ui_response", (msg) => {
@@ -180,10 +180,16 @@ document.addEventListener("DOMContentLoaded", async function (event) {
             }
             var children = document.getElementById("fs_ui").children;
             var to_hide_element = null;
+            console.log(used_keys)
             for (var i = 0; i < children.length; i++) {
               if (children[i].tagName == "DIV" && !(used_keys.includes(children[i].id)) && children[i].id != "image_processing") {
-                to_hide_element = document.getElementById(children[i].id);
-                to_hide_element.style.display = "none";
+                if(children[i].id == "dl_qr_div" && !(used_keys.includes("image_showing_promote"))) {
+                    to_hide_element = document.getElementById(children[i].id);
+                    to_hide_element.style.display = "none";
+                } else if (children[i].id != "dl_qr_div") {
+                    to_hide_element = document.getElementById(children[i].id);
+                    to_hide_element.style.display = "none";
+                }
               }
             }
         });
@@ -196,12 +202,22 @@ document.addEventListener("DOMContentLoaded", async function (event) {
             console.log("image processing finished")
             var processing_element = document.getElementById("image_processing");
             processing_element.style.display = "none";
+
+            //Request download link (TODO: make condinational based on wheter user allowed for saving)
+            socket.emit("get_dl_link", "");
         });
     }
     
+    socket.on("dl_qr", (msg) => {
+        var dl_qr_div = document.getElementById("dl_qr_div");
+        var dl_qr_img = document.getElementById("dl_qr_img");
+        dl_qr_div.style.display = "block";
+        dl_qr_img.src = "data:image/png;base64 ".concat(msg)
+    });
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       let stream = await navigator.mediaDevices.getUserMedia({
+        //480p will also work fine but other resolutions might cause unexpected behaviour
         video: {
             width: { ideal: 1280 },
             height: { ideal: 720 } 
@@ -241,7 +257,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
             console.log("setting UI to 480p")
             hold.style['transform'] = 'translate(140%,2800%)';
             ctr.style['transform'] = 'transform: translate(350%, 100%)';
-            //processing_anim.style['transform'] = 'translate(25%,25%)' //TODO
+            processing_anim.style['transform'] = 'translate(25%,25%)'
         }
         else if (canvass.width == 1280 && canvas.height == 720) {
             console.log("setting UI to 720p")
@@ -250,10 +266,13 @@ document.addEventListener("DOMContentLoaded", async function (event) {
             processing_anim.style['transform'] = 'translate(80%,25%)'
         }
 
-        //"Stretch" everything to fit window (TODO: Redo in some more sensible way)
-        body.style.zoom = getWidth() / canvass.width;
+        //"Stretch" everything to fit window (TODO?: Redo in some more sensible way)
+        const widthZoom = getWidth() / (canvass.width + 20);
+        const heightZoom = getHeight() / (canvass.height + 20);
+        body.style.zoom = Math.min(widthZoom, heightZoom);
     }
 
+    //Technically width/height should be the max of possible values but seems to work best with just clientHeight/clientWidth
     function getWidth() {
         return Math.max(
           //document.body.scrollWidth,
@@ -262,11 +281,23 @@ document.addEventListener("DOMContentLoaded", async function (event) {
           //document.documentElement.offsetWidth,
           document.documentElement.clientWidth
         );
-      }
+    }
+    function getHeight() {
+        return Math.max(
+          //document.body.scrollHeight,
+          //document.documentElement.scrollHeight,
+          //document.body.offsetHeight,
+          //document.documentElement.offsetHeight,
+          document.documentElement.clientHeight
+        );
+    }
 
     //Redo zooming on window size change
     addEventListener('resize', (event) => {
+        console.log("resizing");
         const canvass = document.getElementById("canvas");
-        body.style.zoom = getWidth() / canvass.width;
+        const widthZoom = getWidth() / (canvass.width + 20);
+        const heightZoom = getHeight() / (canvass.height + 20);
+        body.style.zoom = Math.min(widthZoom, heightZoom);
     });
 });
