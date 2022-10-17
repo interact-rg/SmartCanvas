@@ -14,11 +14,14 @@ from smart_canvas.core import CanvasCore
 
 # Internal modules
 from .. import socketio
+from smart_canvas.qr_code import *
 
 
 # Global dicts
 core_threads = {}
 core_queues = {}
+
+IMAGE_PROCESSING = False
 
 
 @socketio.on('connect')
@@ -71,3 +74,31 @@ def handle_client_message(message):
         return
     mod_message = header + "," + cv_to_b64(core.out_frame)
     socketio.emit('consume', mod_message, to=sid, broadcast=False)
+
+@socketio.on('update_ui_request')
+def update_ui():
+    sid = request.sid
+    core = core_threads[sid]
+    socketio.emit('update_ui_response', core.get_ui_state(), to=sid, broadcast=False)
+
+@socketio.on('check_image_processing')
+def check_image_processing():
+    global IMAGE_PROCESSING
+    sid = request.sid
+    core = core_threads[sid]
+    ui_state = core.get_ui_state()
+    if ui_state.get("countdown") == "0" and not IMAGE_PROCESSING:
+        print("emitting start")
+        IMAGE_PROCESSING = True
+        socketio.emit('imgage_processing_started', '', to=sid, broadcast=False)
+    if not ui_state.get("countdown") and len(ui_state.keys()) > 1 and IMAGE_PROCESSING:
+        print("emitting finished")
+        IMAGE_PROCESSING = False
+        socketio.emit('imgage_processing_finished', '', to=sid, broadcast=False)
+
+@socketio.on('get_dl_link')
+def get_dl_qr(message):
+    print("requested dl qr")
+    header = message.split(",")[0]
+    mod_message = header + "," + cv_to_b64(create_qr_code("127.0.0.1/dl_latest")) #Todo add actual full address to downlaod from
+    socketio.emit('dl_qr', mod_message, to=request.sid, broadcast=False)

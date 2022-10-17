@@ -26,6 +26,16 @@ def index():
     return render_template('index.html')
 
 
+@main.route('/fullscreen_old')
+def fs():
+    return render_template('fullscreen_old.html')
+
+
+@main.route('/fullscreen')
+def fs_sym():
+    return render_template('fullscreen.html')
+
+
 @main.route('/upload', methods=['POST'])
 @auth.login_required
 def upload_file():
@@ -54,10 +64,7 @@ def upload_file():
         return Response(url_for('main.download_file', name=filename), status=201)
 
 
-@main.route('/uploads/<name>', methods=['GET'])
-@auth.login_required
-def download_file(name):
-    """
-    https://flask.palletsprojects.com/en/2.0.x/patterns/fileuploads/
-    """
-    return send_from_directory(current_app.config['UPLOAD_FOLDER'], name)
+@main.route('/dl_latest', methods=['GET'])
+def download_latest():
+    #Implement database fetching and downloading here
+    pass
