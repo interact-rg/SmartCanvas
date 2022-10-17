@@ -26,14 +26,14 @@ def index():
     return render_template('index.html')
 
 
-@main.route('/fullscreen')
+@main.route('/fullscreen_old')
 def fs():
-    return render_template('fullscreen.html')
+    return render_template('fullscreen_old.html')
 
 
-@main.route('/fullscreen_symbol')
+@main.route('/fullscreen')
 def fs_sym():
-    return render_template('fullscreen_symbol.html')
+    return render_template('fullscreen.html')
 
 
 @main.route('/upload', methods=['POST'])
