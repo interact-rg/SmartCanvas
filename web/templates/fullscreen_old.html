@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>SmartCanvasV</title>
+
+    <!-- Socket IO -->
+    <script
+      type="text/javascript"
+      src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"
+    ></script>
+
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+
+    <a id="page_identifier" style="display: none;">fullscreen</a>
+  </head>
+
+  <body class="tos-bg" id="body">
+    <!--THIS PAGE SHOULD BE DELETED AT SOME POINT AND 'fullscreen_symbol' SHALL BE MADE TO BE THE ACTUAL FULLSCREEN IMPLEMENTATION-->
+    <div>
+        <a style="font-size: 60px; font-weight: bold; color: white">DO NOT USE! GO TO '/fullscreen_symbol' FOR UP-TO-DATE VERSION</a>
+    </div>
+    <div id="mainContainer" class="container_fs" min-width="1024px" width="100%">
+      <div class="card-deck">
+
+        <!--Not in use-->
+        <div class="card" id="clientCard">
+          <div class="card-body">
+            <h5 class="card-title">clientFeed</h5>
+            <div style="width: 100%">
+              <video id="clientFeed" width="1280" height="720" autoplay></video>
+            </div>
+          </div>
+        </div>
+        
+        <!--Not in use-->
+        <div class="card" id="canvasCard">
+          <div class="card-body">
+            <h5 class="card-title">canvas</h5>
+            <div style="width: 100%">
+              <canvas id="canvas" width="1280" height="720"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <!--Server feed-->
+        <div class="card" id="serverCard">
+          <div class="container_fs">
+            <div id="serverFeedDiv" style="width: 100%">
+              <canvas id="serverFeed" width="1280" height="720"></canvas>
+              <div id="hold_bar">
+                <progress id="hold_progress" value="32" max="100"></progress>
+              </div>
+              <div id="countdown" style="visibility: hidden;">
+                <a id="countdown_value">0</a>
+              </div>
+              <div id="fs_ui">
+                <a>UI text placeholder</a>
+                <a>UI text placeholder</a>
+                <a>UI text placeholder</a>
+                <a>UI text placeholder</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="ui", style="margin-top: 100px;">
+      <a hidden id="idle_text_1", style="font-size: 20px; font-weight: bold;"></a><br>
+      <a id="idle_text_2"></a>
+      <a id="help_2"></a><a>    </a>
+      <a id="filter_name"></a><br>
+      <a id="help_1"></a>
+      <br><a id="hold_timer"></a>
+    </div>
+  </body>
+</html>
+
+
+<script src="{{ url_for('static', filename='scripts.js') }}"></script>
