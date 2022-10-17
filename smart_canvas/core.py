@@ -8,6 +8,8 @@ from threading import Thread
 import time
 from abc import ABC, abstractmethod
 
+from requests import delete
+
 # Internal packages
 from smart_canvas.background import ForegroundMask
 from smart_canvas.gesture_detection import HandDetect
@@ -152,7 +154,8 @@ class Idle(State):
             finger_count = self.core.hand_detector.count_fingers(frame)
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
-
+            thread = Thread(target=self.core.database.delete)
+            thread.start()
             self.core.ui.set_prog("bar", self.take_pic_cnt)
 
     def update_filter_trigger(self, finger_count):

@@ -7,7 +7,6 @@ from PIL import Image as im
 import os
 
 
-
 class Database:
     def convert_image_to_binary(self, filename) -> bytes:
         # Convert digital data to binary format
@@ -19,9 +18,11 @@ class Database:
         print(f"tyyppi: {type(image)}")
 
         print("Inserting BLOB into images table")
-        #create image object of numpy array
+        # create image object of numpy array
         data = im.fromarray(image)
-        data.save('assets\picwithcanvas.png') #remove this later, no need to save locally.
+        data.save(
+            "assets\picwithcanvas.png"
+        )  # remove this later, no need to save locally.
         image_id = 1
         date_added = datetime.datetime.now()
         # maybe add information of database from configuration file for safety.............
@@ -96,9 +97,7 @@ class Database:
                 image = row[1]
                 print("date  = ", row[2])
                 # Pass path with filename where we want to save our file
-            self.convert_binary_to_image(
-                image, r"assets\downloadedimage.png"
-            )
+            self.convert_binary_to_image(image, r"assets\downloadedimage.png")
             print("Successfully Retrieved Values from database")
 
         except mysql.connector.Error as error:
@@ -110,9 +109,9 @@ class Database:
                 connection.close()
                 print("MySQL connection is closed")
 
-    def access(self, image_id: int):
-        # function to delete image when its accessed in the database
-        # work in prog
+    def delete(self):
+        # function to check if database has items older than a week.
+        print("accessed through thread, lets try")
         try:
             # establish connection
             connection = mysql.connector.connect(
@@ -122,20 +121,14 @@ class Database:
                 password="SmartCanvasV",
             )
             cursor = connection.cursor()
-            # getting data by id value
-            sql_delete_query = f""" DELETE FROM images WHERE image_id = {image_id}"""
+            
+            sql_delete_query = f""" Delete from images where date_added < now() - interval 1 week;"""
 
-            cursor.execute(sql_delete_query, (image_id,))
+
+            cursor.execute(sql_delete_query)
             result = cursor.fetchall()
-            for row in result:
-                print("image Id = ", row[0])
-                image = row[1]
-                print("date  = ", row[2])
 
-            self.convert_binary_to_image(
-                image, r"C:\Users\anssi\Pictures\testimages\image.png"
-            )
-            print("Successfully Retrieved Values from database")
+            print("Successfully deleted Values from database")
 
         except mysql.connector.Error as error:
             print(format(error))
@@ -143,4 +136,4 @@ class Database:
 
 
 base = Database()
-base.download(38)
+#base.download(38)
