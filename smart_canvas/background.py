@@ -31,7 +31,6 @@ class ForegroundMask:
         height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
         dim = (int(width), int(height))
         self.bg_image = cv2.resize(self.bg_image, dim, interpolation = cv2.INTER_AREA)
-        self.bg_image = cv2.resize(self.bg_image, dim, interpolation = cv2.INTER_AREA)
         return self.bg_image
 
     def remove_isolated_pixels(self, mask):
