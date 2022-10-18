@@ -18,7 +18,7 @@ setup(
     install_requires=[
         # general
         'numpy==1.21.3',
-        'opencv-contrib-python-headless==4.5.5.64',
+        'opencv-contrib-python-headless==4.6.0.66',
         'pylint==2.11.1',
         'pytest==5.4.2',
         'pytest-cov==2.8.0',
