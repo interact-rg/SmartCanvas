@@ -26,10 +26,7 @@ class ForegroundMask:
         imageFullPath = 'smart_canvas/backgrounds/' + filterImage
 
         self.bg_image = cv2.imread(imageFullPath)
-        cap = cv2.VideoCapture(0)
-        width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-        height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
-        dim = (int(width), int(height))
+        dim = (640, 480)
         self.bg_image = cv2.resize(self.bg_image, dim, interpolation = cv2.INTER_AREA)
         return self.bg_image
 
