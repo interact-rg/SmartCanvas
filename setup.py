@@ -13,7 +13,7 @@ setup(
     description='SmartCanvas-project',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/CumbersomePack/SmartCanvas',
+    url='https://github.com/antilaanssi/SmartCanvasV',
     packages=find_packages(include=['smart_canvas', 'smart_canvas.*', 'web']),
     install_requires=[
         # general
