@@ -11,7 +11,7 @@ TOKEN = $(shell $(PYTHON) -c 'import uuid; print(uuid.uuid1())')
 
 $(VENV)/$(INT_PATH)/activate:
 	python -m venv venv
-	$(PIP) install .
+	$(PIP) install -r requirements.txt
 
 .PHONY: init
 init: $(VENV)/$(INT_PATH)/activate
