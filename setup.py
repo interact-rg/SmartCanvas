@@ -36,7 +36,7 @@ setup(
         'simple-websocket==0.4.0',
         'Flask-SocketIO==5.1.1',
         'gunicorn==20.1.0',
-        'eventlet==0.30.2',
+        'eventlet==0.30.1',
         'Werkzeug==2.0.2',
         'Flask-APScheduler==1.12.2',
         'Flask-HTTPAuth==4.5.0',
