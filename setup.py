@@ -29,9 +29,9 @@ setup(
         'requests==2.26.0 ',
         # render
         'moderngl==5.6.4',
-        'moderngl-window==2.4.0',
+        'moderngl-window==2.4.1',
         # gestureDetection
-        'mediapipe==0.8.9',
+        'mediapipe==0.8.11',
         # web
         'simple-websocket==0.4.0',
         'Flask-SocketIO==5.1.1',
