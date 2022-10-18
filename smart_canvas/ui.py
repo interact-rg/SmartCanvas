@@ -257,6 +257,11 @@ class UI:
         if name not in self.elements:
             raise KeyError("Element not found. Check name or element not created!")
         self.elements[name].scale = value
+
+    def get_prog(self, name: str):
+        if name not in self.elements:
+            raise KeyError("Element not found. Check name or element not created!")
+        return self.elements[name].scale
         
     def show(self, *names: str):
         for name in names:

@@ -55,6 +55,17 @@ class CanvasCore:
     def stop(self):
         self.stopped = True
 
+    def get_ui_state(self):
+        #return all things that should be visible on ui
+        ui_state = {}
+        for k, v in self.ui.texts.items():
+            eval = self.ui.elements[k]
+            if eval.visible:
+                ui_state[k] = v
+        ui_state["hold_timer"] = self.ui.get_prog("bar")
+        return ui_state
+        
+
 class State(ABC):
     @property
     def core(self) -> CanvasCore:
