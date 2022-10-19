@@ -29,9 +29,8 @@
         <!--Not in use-->
         <div class="card" id="clientCard">
           <div class="card-body">
-            <h5 class="card-title">clientFeed</h5>
             <div style="width: 100%">
-              <video id="clientFeed" width="1280" height="720" autoplay></video>
+              <video id="clientFeedmain" width="1280" height="720" autoplay></video>
             </div>
           </div>
         </div>
@@ -50,7 +49,8 @@
         <div class="card" id="serverCard">
           <div class="container">
             <div id="serverFeedDiv" style="width: 100%">
-              <canvas id="serverFeed" width="1280" height="720"></canvas>
+              <canvas id="serverFeed" width="1280" height="720" style="display: none"></canvas>
+              <video id="clientFeed" width="1280" height="720" autoplay style="display: block"></video>
               <div id="hold_bar">
                 <progress id="hold_progress" value="32" max="100"></progress>
               </div>
