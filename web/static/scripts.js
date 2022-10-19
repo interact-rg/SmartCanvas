@@ -143,8 +143,10 @@ document.addEventListener("DOMContentLoaded", async function (event) {
     }
     //Fullscreen with symbols instead of text (more logical system for showing/hiding UI elements)
     else if (page_identifier.textContent == "fullscreen_symbol") {
+        var server_feed_visible = false;
         socket.on("update_ui_response", (msg) => {
             console.log(msg);
+            console.log(server_feed_visible)
             var used_keys = [];
             for (var key in msg){
                 if (key != "hold_timer" && key != "countdown" && key !="idle_text_1") {
@@ -192,11 +194,26 @@ document.addEventListener("DOMContentLoaded", async function (event) {
                 }
               }
             }
+            if (used_keys.includes("help_1") && server_feed_visible) {
+              server_feed_visible = false
+            }
+
+            var serverfeed_su = document.getElementById("serverFeed");
+            var clientfeed_su = document.getElementById("clientFeed");
+            if (server_feed_visible) {
+              clientfeed_su.style.display = "none";
+              serverfeed_su.style.display = "block";
+            }
+            else {
+              clientfeed_su.style.display = "block";
+              serverfeed_su.style.display = "none";
+            }
         });
         socket.on("imgage_processing_started", (msg) => {
             console.log("image processing started")
             var processing_element = document.getElementById("image_processing");
             processing_element.style.display = "block";
+            server_feed_visible = true;
         });
         socket.on("imgage_processing_finished", (msg) => {
             console.log("image processing finished")
@@ -212,7 +229,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
         var dl_qr_div = document.getElementById("dl_qr_div");
         var dl_qr_img = document.getElementById("dl_qr_img");
         dl_qr_div.style.display = "block";
-        dl_qr_img.src = "data:image/png;base64 ".concat(msg)
+        dl_qr_img.src = "data:image/png;base64 ".concat(msg);
     });
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -230,7 +247,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
         .getContext("2d")
         .drawImage(clientFeed, 0, 0, canvas.width, canvas.height);
       
-      const FPS = 20;
+      const FPS = 10;
       let interval = setInterval(() => {
         canvas
           .getContext("2d")
