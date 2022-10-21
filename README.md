@@ -9,7 +9,7 @@ pip install .
 python -m smart_canvas
 ```
 
-You can also add extra options such as `--fullscreen` for fulscreen mode or `--camera 1` to change the camera source.
+You can also add extra options such as `--fullscreen` for fullscreen mode or `--camera 1` to change the camera source.
 
 
 ## Usage with Make

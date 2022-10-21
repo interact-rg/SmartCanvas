@@ -26,7 +26,7 @@ class ForegroundMask:
         imageFullPath = 'smart_canvas/backgrounds/' + filterImage
 
         self.bg_image = cv2.imread(imageFullPath)
-        dim = (640, 480)
+        dim = (1280, 720)
         self.bg_image = cv2.resize(self.bg_image, dim, interpolation = cv2.INTER_AREA)
         return self.bg_image
 
