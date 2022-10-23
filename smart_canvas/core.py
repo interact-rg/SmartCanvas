@@ -146,7 +146,7 @@ class Idle(State):
         # Detect fingers 10 times in a second
         # Using timer here because frame rate can differ
         if self.finger_frame_interval - tick < 0:
-            finger_count = self.core.hand_detector.count_fingers(frame)
+            finger_count, gesture = self.core.hand_detector.count_fingers(frame)
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
 
@@ -186,7 +186,7 @@ class Active(State):
         # Detect fingers 10 times in a second
         # Using timer here because frame rate can differ
         if self.finger_frame_interval - tick < 0:
-            finger_count = self.core.hand_detector.count_fingers(frame)
+            finger_count, gesture = self.core.hand_detector.count_fingers(frame)
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
             self.update_filter_carousel(finger_count, tick)
@@ -270,7 +270,7 @@ class ShowPic(State):
         # Detect fingers 10 times in a second
         # Using timer here because frame rate can differ
         if self.finger_frame_interval - tick < 0:
-            finger_count = self.core.hand_detector.count_fingers(frame)
+            finger_count, gesture = self.core.hand_detector.count_fingers(frame)
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
 
