@@ -21,6 +21,7 @@ class HandDetect:
         self.fingers_statuses = {}
         self.count = 0
 
+
     def findHandLandMarks(self, hand_landmark, label):
 
         # label gives if hand is left or right
@@ -38,6 +39,7 @@ class HandDetect:
 
         return landMarkList
 
+
     def check_thumbs_up(self, HandLabel, landmarks):
         #Check if thumb tip is higher than index tip
         if HandLabel == "Left" and landmarks[4][1] < landmarks[8][1]:   # Left thumb up
@@ -52,6 +54,7 @@ class HandDetect:
         
         if HandLabel == "Right" and landmarks[4][1] > landmarks[0][1]:    # Right thumb up
             self.fingers_statuses[landmarks[4][2].upper()+'_THUMB_DOWN'] = True
+
 
     def count_fingers(self, frame):
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -102,33 +105,27 @@ class HandDetect:
 
             self.count = fingerCount
             hand_gesture = self.recognizeGesture(hand_gesture)
+        
         return fingerCount, hand_gesture
     
+
     def recognizeGesture(self, hands_gestures):
         hands_labels = {'RIGHT', 'LEFT'}
-        #hands_gestures = {'RIGHT': "UNKNOWN", 'LEFT': "UNKNOWN"}
         
-            # Iterate over the left and right hand.
-        for hand_index, hand_label in enumerate(hands_labels):
-            
+        # Iterate over the left and right hand.
+        for hand_index, hand_label in enumerate(hands_labels):  
             # Check if the person is making the 'V' gesture with the hand.
-            # Check if the number of fingers up is 2 and the fingers that are up, are the index and the middle finger.
             if self.count == 2  and self.fingers_statuses[hand_label+'_MIDDLE'] and self.fingers_statuses[hand_label+'_INDEX']:
                 # Update the gesture value of the hand that we are iterating upon to V SIGN.
                 hands_gestures[hand_label] = "V SIGN"
-            
             # Check if the person is making the 'SPIDERMAN' gesture with the hand.
-            # Check if the number of fingers up is 3 and the fingers that are up, are the thumb, index and the pinky finger.
             elif self.count == 3 and self.fingers_statuses[hand_label+'_THUMB'] and self.fingers_statuses[hand_label+'_INDEX'] and self.fingers_statuses[hand_label+'_PINKY']:  
-                # Update the gesture value of the hand that we are iterating upon to SPIDERMAN SIGN.
                 hands_gestures[hand_label] = "SPIDERMAN SIGN"
             #Check if person is doing thumbs up
             elif self.fingers_statuses[hand_label+'_THUMB_UP']:
-                # Update the gesture value of the hand that we are iterating upon to THUMBS DOWN.
                 hands_gestures[hand_label] = "THUMBS UP"
             #Check if person is doing thumbs down
             elif self.fingers_statuses[hand_label+'_THUMB_DOWN']:  
-                # Update the gesture value of the hand that we are iterating upon to THUMBS DOWN.
                hands_gestures[hand_label] = "THUMBS DOWN"
 
         return hands_gestures
