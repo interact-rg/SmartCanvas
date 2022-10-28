@@ -191,7 +191,7 @@ class GPDR_consent(State):
         # Now we update UI elements to Opengl so no need to wait for slow functions to finish
 
         self.core.out_frame = frame
-        # Detect fingers 10 times in a second
+        # Detect gestures 10 times in a second
         # Using timer here because frame rate can differ
         if self.finger_frame_interval - tick < 0:
             finger_count, gesture = self.core.hand_detector.count_fingers(frame)

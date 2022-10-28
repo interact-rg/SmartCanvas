@@ -98,7 +98,9 @@ def check_image_processing():
 
 @socketio.on('get_dl_link')
 def get_dl_qr(message):
-    print("requested dl qr")
-    header = message.split(",")[0]
-    mod_message = header + "," + cv_to_b64(create_qr_code("127.0.0.1/dl_latest")) #Todo add actual full address to downlaod from
-    socketio.emit('dl_qr', mod_message, to=request.sid, broadcast=False)
+    core = core_threads[request.sid]
+    if core.gdpr_accepted:
+        header = message.split(",")[0]
+        cv_qr = cv2.resize(create_qr_code("127.0.0.1/dl_latest"), (200, 200), interpolation = cv2.INTER_AREA)
+        mod_message = header + "," + cv_to_b64(cv_qr) #Todo add actual full address to download from
+        socketio.emit('dl_qr', mod_message, to=request.sid, broadcast=False)
