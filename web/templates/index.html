@@ -32,23 +32,26 @@
     <div style="padding-top: 10px">
       <a href="fullscreen" style="color: white; font-size: large;">Visit Fullscreen for full experience (incl. possibility for download and better performance)</a>
     </div>
-    <div id="mainContainer" class="container" min-width="1024px" width="100%">
+    
+    
+    
+    <div id="mainContainer" class="container_fs" min-width="1024px" width="100%">
       <div class="card-deck">
 
         <!--Not in use-->
-        <div hidden class="card" id="clientCard">
+        <div class="card" id="clientCard">
           <div class="card-body">
-            <div style="width: 70%">
-              <video id="clientFeed" width="1280" height="720" autoplay></video>
+            <div style="width: 100%">
+              <video id="clientFeedmain" width="1280" height="720" autoplay></video>
             </div>
           </div>
         </div>
         
         <!--Not in use-->
-        <div hidden class="card" id="canvasCard">
+        <div class="card" id="canvasCard">
           <div class="card-body">
             <h5 class="card-title">canvas</h5>
-            <div style="width: 70%">
+            <div style="width: 100%">
               <canvas id="canvas" width="1280" height="720"></canvas>
             </div>
           </div>
@@ -58,27 +61,43 @@
         <div class="card" id="serverCard">
           <div class="container">
             <div id="serverFeedDiv" style="width: 100%">
-              <canvas id="serverFeed" width="1280" height="720"></canvas>
+              <canvas id="serverFeed" width="1280" height="720" style="display: none"></canvas>
+              <video id="clientFeed" width="1280" height="720" autoplay style="display: block"></video>
               <div id="hold_bar">
                 <progress id="hold_progress" value="32" max="100"></progress>
               </div>
               <div id="countdown" style="visibility: hidden;">
                 <a id="countdown_value">0</a>
               </div>
+              <div id="fs_ui" >
+                <div id="idle_text_2" style="width: 1260px; display: none;">
+                  <a>Wave your hand and start your artistic experience</a>
+                </div>
+                <div id="help_1" style="width: 1260px; display: none;">
+                  <img src="static/resources/five_fingers.png" width="30" height="30"></img><a>to take a picture</a>
+                </div>
+                <div id="help_2" style="width: 1260px; display: none;">
+                  <img src="static/resources/two_fingers.png" width="30" height="30"></img><a>to change the filter</a>
+                </div>
+                <div id="filter_name" style="width: 1260px; display: none;">
+                  <a>placeholder text</a>
+                </div>
+                <div id="image_showing_promote" style="width: 1260px; display: none;">
+                  <a>Wave your hand to create another artwork</a>
+                </div>
+                <div id="image_processing" style="display: none; width: fit-content;">
+                  <img src="static/resources/processing.gif"></img>
+                </div>
+                <div id="dl_qr_div" style="display: none;">
+                  <img id="dl_qr_img" src="" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-
-    <div id="ui", style="margin-top: 680px; z-index: 0;">
-      <a hidden id="idle_text_1", style="font-size: 20px; font-weight: bold;"></a><br>
-      <a id="idle_text_2"></a><br>
-      <a id="help_2"></a><br>
-      <a id="filter_name"></a><br>
-      <a id="help_1"></a><br>
-      <br><a id="hold_timer"></a>
-    </div>
+    
   </body>
 </html>
 
