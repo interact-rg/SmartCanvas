@@ -15,7 +15,6 @@ class Database:
         return binaryData
 
     def insert_blob(self, image):
-        print(f"tyyppi: {type(image)}")
 
         print("Inserting BLOB into images table")
         # create image object of numpy array
@@ -30,7 +29,7 @@ class Database:
             connection = mysql.connector.connect(
                 host="localhost",
                 database="smartcanvas",
-                user="root",
+                user="canvas",
                 password="SmartCanvasV",
             )
 
@@ -83,7 +82,7 @@ class Database:
             connection = mysql.connector.connect(
                 host="localhost",
                 database="smartcanvas",
-                user="root",
+                user="canvas",
                 password="SmartCanvasV",
             )
             cursor = connection.cursor()
@@ -117,7 +116,7 @@ class Database:
             connection = mysql.connector.connect(
                 host="localhost",
                 database="smartcanvas",
-                user="root",
+                user="canvas",
                 password="SmartCanvasV",
             )
             cursor = connection.cursor()
