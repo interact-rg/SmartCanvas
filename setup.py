@@ -40,6 +40,8 @@ setup(
         'Werkzeug==2.0.2',
         'Flask-APScheduler==1.12.2',
         'Flask-HTTPAuth==4.5.0',
+        'mysql-0.0.3',
+        'mysqlclient-2.1.1',
     ],
     setup_requires=['wheel']
 )
