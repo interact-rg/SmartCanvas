@@ -24,6 +24,7 @@ run: init
 web: init
 	export FLASK_APP=web; \
 	export CLIENT_TOKEN=$(TOKEN); \
+	$(PYTHON) -v
 	$(PYTHON) -m flask run
 
 .PHONY: web-local
