@@ -1,4 +1,5 @@
 """ web_service_test.py """
+import os
 from io import BytesIO
 from tempfile import mkdtemp
 
@@ -81,14 +82,33 @@ def client():
     yield app.test_client()
 
 
-class TestIndex(object):
-    RESOURCE_URL = "/"
+class TestPages(object):
+    MAIN_URL = "/"
+    FULLSCREEN = "/fullscreen"
 
-    def test_get(self, client):
-        resp = client.get(self.RESOURCE_URL)
+    def test_get_main(self, client):
+        resp = client.get(self.MAIN_URL)
         assert resp.status_code == 200
-        assert resp.data is not None
-
+        with open(os.getcwd() + "/web/templates/index.html", "r") as f:
+            response = resp.data.decode().split("\n")
+            template = f.read().strip("\r").split("\n")
+            diffs = 0
+            for i in range(len(response)):
+                if response[i] != template[i]:
+                    diffs += 1
+            assert diffs <= 2 #lines with 'url_for(x)' will differ
+    
+    def test_get_fullscreen(self, client):
+        resp = client.get(self.FULLSCREEN)
+        assert resp.status_code == 200
+        with open(os.getcwd() + "/web/templates/fullscreen.html", "r") as f:
+            response = resp.data.decode().split("\n")
+            template = f.read().strip("\r").split("\n")
+            diffs = 0
+            for i in range(len(response)):
+                if response[i] != template[i]:
+                    diffs += 1
+            assert diffs <= 2 #lines with 'url_for(x)' will differ
 
 class TestFileUpload(object):
     RESOURCE_URL = "/upload"
@@ -134,6 +154,7 @@ class TestFileUpload(object):
         assert resp.status_code == 201
 
 
+@pytest.mark.skip(reason="Needs to be reworked once new download functionality is made")
 class TestFileDownload(object):
     RESOURCE_URL = "/uploads"
     UPLOAD_URL = "/upload"

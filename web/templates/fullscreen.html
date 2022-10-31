@@ -9,7 +9,6 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>SmartCanvasV</title>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
     <!-- Socket IO -->
     <script
@@ -19,22 +18,11 @@
 
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
 
-    <a id="page_identifier" style="display: none;">normal</a>
+    <a id="page_identifier" style="display: none;">fullscreen_symbol</a>
   </head>
 
-  <body class="tos-bg">
-    <div class="topnav">
-      <a class="logo">SmartCanvasV</a>
-      <a class="link active" href="">Home</a>
-      <a class="link" href="fullscreen">Fullscreen</a>
-      <a class="link" href="http://interact.oulu.fi/site/smart-canvas">About</a>
-    </div>
-    <div style="padding-top: 10px">
-      <a href="fullscreen" style="color: white; font-size: large;">Visit Fullscreen for full experience (incl. possibility for download and better performance)</a>
-    </div>
-    
-    
-    
+  <body class="tos-bg" id="body">
+
     <div id="mainContainer" class="container_fs" min-width="1024px" width="100%">
       <div class="card-deck">
 
@@ -85,11 +73,11 @@
                 <div id="image_showing_promote" style="width: 1260px; display: none;">
                   <a>Wave your hand to create another artwork</a>
                 </div>
-                <div id="gdpr_concent" style="width: 1260px; display: none;">
-                  <a>Do you concent to having your images saved?</a>
-                </div>
                 <div id="image_processing" style="display: none; width: fit-content;">
                   <img src="static/resources/processing.gif"></img>
+                </div>
+                <div id="gdpr_concent" style="width: 1260px; display: none;">
+                  <a>Do you concent to having your images saved?</a>
                 </div>
                 <div id="dl_qr_div" style="display: none;">
                   <img id="dl_qr_img" src="" />
@@ -100,7 +88,7 @@
         </div>
       </div>
     </div>
-    
+
   </body>
 </html>
 

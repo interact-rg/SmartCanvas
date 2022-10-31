@@ -34,6 +34,7 @@ class CanvasCore:
         self.database = Database()
         self.ui = UI()
         self.win_size = screensize
+        self.gdpr_accepted = False
 
         self.filtered_frame = None
         # This is initial state
@@ -59,6 +60,17 @@ class CanvasCore:
 
     def stop(self):
         self.stopped = True
+
+    def get_ui_state(self):
+        #return all things that should be visible on ui
+        ui_state = {}
+        for k, v in self.ui.texts.items():
+            eval = self.ui.elements[k]
+            if eval.visible:
+                ui_state[k] = v
+        ui_state["hold_timer"] = self.ui.get_prog("bar")
+        return ui_state
+        
 
 class State(ABC):
     @property
@@ -91,6 +103,7 @@ class Startup(State):
 
         self.ui.create_text("idle_text_1", (550, 300), 40.0)
         self.ui.create_text("idle_text_2", (230, 400), 40.0)
+        self.ui.create_text("gdpr_concent", (250, 400), 40.0)
 
         self.ui.create_text("countdown", (self.core.win_size[0]/2, self.core.win_size[1]/2), 80.0)
         self.ui.create_text("filter_name", (750,50), 37.0)
@@ -104,6 +117,7 @@ class Startup(State):
 
         self.ui.set_text("idle_text_1", "SmartCanvas")
         self.ui.set_text("idle_text_2", "Wave your hand and start your artistic experience")
+        self.ui.set_text("gdpr_concent", "Do you allow for the saving of your pictures?")
 
         self.ui.set_text("filter_name", 'Current filter is {}'.format(self.core.filters.current_name))
         self.ui.create_progressbar("bar")
@@ -126,7 +140,7 @@ class Idle(State):
         self.finger_frame_interval = 0.0
     # Runs once on init
     def enter(self, tick):
-        self.core.ui.hide("help_1", "help_2", "filter_name", "bar", "image_showing_promote")
+        self.core.ui.hide("help_1", "help_2", "filter_name", "bar", "image_showing_promote", "gdpr_concent")
         self.core.ui.show("idle_text_1", "idle_text_2", "bar")
         self.core.ui.set_prog("bar", 1.1)
 
@@ -151,7 +165,7 @@ class Idle(State):
         # Detect fingers 10 times in a second
         # Using timer here because frame rate can differ
         if self.finger_frame_interval - tick < 0:
-            finger_count = self.core.hand_detector.count_fingers(frame)
+            finger_count, gesture = self.core.hand_detector.count_fingers(frame)
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
             thread = Thread(target=self.core.database.delete)
@@ -164,7 +178,48 @@ class Idle(State):
         elif self.take_pic_cnt > 0.0:
             self.take_pic_cnt -= 0.1
         if self.take_pic_cnt >= 0.1:
+            self.core.set_state(GPDR_consent())
+
+class GPDR_consent(State):
+    # State holds its own variables and these are not persistent after a state change
+    def __init__(self):
+        self.take_pic_cnt = 0.0
+        self.change_filter_time = 0.0
+        self.finger_frame_interval = 0.0
+    # Runs once on init
+    def enter(self, tick):
+        self.core.ui.hide("help_1", "help_2", "filter_name", "bar", "image_showing_promote", "idle_text_1", "idle_text_2")
+        self.core.ui.show("bar", "gdpr_concent")
+        self.core.ui.set_prog("bar", 1.1)
+
+    # Update is called on new frame
+    def update(self, tick, frame):
+        # Now we update UI elements to Opengl so no need to wait for slow functions to finish
+
+        self.core.out_frame = frame
+        # Detect gestures 10 times in a second
+        # Using timer here because frame rate can differ
+        if self.finger_frame_interval - tick < 0:
+            finger_count, gesture = self.core.hand_detector.count_fingers(frame)
+            self.finger_frame_interval = tick + 0.1
+            self.update_filter_trigger(gesture)
+
+            self.core.ui.set_prog("bar", self.take_pic_cnt)
+
+    def update_filter_trigger(self, gesture):
+        if gesture != {'RIGHT': 'UNKNOWN', 'LEFT': 'UNKNOWN'}:
+            self.take_pic_cnt += 0.05
+        elif self.take_pic_cnt > 0.0:
+            self.take_pic_cnt -= 0.1
+        if self.take_pic_cnt >= 0.1:
+            if "THUMBS UP" in gesture.values():
+                self.core.gdpr_accepted = True
+                print("GDPR accepted")
+            elif "THUMBS DOWN" in gesture.values():
+                self.core.gdpr_accepted = False
+                print("GDPR declined")
             self.core.set_state(Active())
+
 
 class Active(State):
     """
@@ -180,7 +235,7 @@ class Active(State):
         self.waiting_time = 0.0
     # Runs once on init
     def enter(self, tick):
-        self.core.ui.hide("idle_text_1", "idle_text_2", "bar", "image_showing_promote")
+        self.core.ui.hide("idle_text_1", "idle_text_2", "bar", "image_showing_promote", "gdpr_concent")
         self.core.ui.show("help_1", "help_2", "filter_name", "bar")
         self.core.ui.set_prog("bar", 0.0)
         self.waiting_time = time.time() + 20
@@ -192,7 +247,7 @@ class Active(State):
         # Detect fingers 10 times in a second
         # Using timer here because frame rate can differ
         if self.finger_frame_interval - tick < 0:
-            finger_count = self.core.hand_detector.count_fingers(frame)
+            finger_count, gesture = self.core.hand_detector.count_fingers(frame)
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
             self.update_filter_carousel(finger_count, tick)
@@ -228,7 +283,7 @@ class Filter(State):
 
     def enter(self, tick):
         self.countdown_time = tick + 4
-        self.core.ui.hide("idle_text_1", "idle_text_2", "bar")
+        self.core.ui.hide("idle_text_1", "idle_text_2", "bar", "gdpr_concent")
         self.core.ui.hide("help_1", "help_2", "filter_name", "image_showing_promote")
         self.core.ui.set_text("countdown", "3")
         self.core.ui.show("countdown")
@@ -263,7 +318,7 @@ class ShowPic(State):
         self.finger_frame_interval = 0.0
 
     def enter(self, tick):
-        self.core.ui.hide("countdown")
+        self.core.ui.hide("countdown", "gdpr_concent")
         self.core.ui.set_text("filter_name", 'Current filter is {}'.format(self.core.filters.current_name))
         self.core.ui.show("filter_name")
         self.core.ui.show("image_showing_promote")
@@ -271,6 +326,12 @@ class ShowPic(State):
         self.show_image_time = time.time() + 15
         # Frame does not change so update only once
         self.core.out_frame = self.core.filtered_frame
+
+        #TODO If gpdr was accepted, save image to db
+        if self.core.gdpr_accepted:
+            print("PICTURE SHOULD BE SAVED")
+        elif not self.core.gdpr_accepted:
+            print("PICTURE SHOULD NOT BE SAVED")
 
     def update(self, tick, frame):
         if self.show_image_time - tick < 0:
@@ -280,7 +341,7 @@ class ShowPic(State):
         # Detect fingers 10 times in a second
         # Using timer here because frame rate can differ
         if self.finger_frame_interval - tick < 0:
-            finger_count = self.core.hand_detector.count_fingers(frame)
+            finger_count, gesture = self.core.hand_detector.count_fingers(frame)
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
 
