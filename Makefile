@@ -5,7 +5,7 @@ INT_PATH = bin
 ifeq ($(OS), Windows_NT)
 	INT_PATH = scripts
 endif
-PYTHON = $(VENV)/$(INT_PATH)/python
+PYTHON = $(VENV)/$(INT_PATH)/python3.9
 PIP = $(VENV)/$(INT_PATH)/pip
 TOKEN = $(shell $(PYTHON) -c 'import uuid; print(uuid.uuid1())')
 
@@ -24,7 +24,7 @@ run: init
 web: init
 	export FLASK_APP=web; \
 	export CLIENT_TOKEN=$(TOKEN); \
-	$(python3.9) -m flask run
+	$(PYTHON) -m flask run
 
 .PHONY: web-local
 web-local: init
