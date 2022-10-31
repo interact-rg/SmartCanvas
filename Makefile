@@ -1,7 +1,7 @@
 SHELL:=/bin/bash
 VENV = venv
 PACKAGE = smart_canvas
-INT_PATH = bin/python3.9
+INT_PATH = bin/python
 ifeq ($(OS), Windows_NT)
 	INT_PATH = scripts
 endif
