@@ -42,6 +42,7 @@ setup(
         'Flask-HTTPAuth==4.5.0',
         'mysql==0.0.3',
         'mysqlclient==2.1.1',
+        'mysql-connector-python-rf == 2.2.2'
     ],
     setup_requires=['wheel']
 )
