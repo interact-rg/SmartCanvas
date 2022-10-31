@@ -10,7 +10,7 @@ PIP = $(VENV)/$(INT_PATH)/pip
 TOKEN = $(shell $(PYTHON) -c 'import uuid; print(uuid.uuid1())')
 
 $(VENV)/$(INT_PATH)/activate:
-	python3.9 -m venv venv
+	python -m venv venv
 	$(PIP) install .
 
 .PHONY: init
