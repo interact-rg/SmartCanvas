@@ -14,29 +14,29 @@ def test_get_mock():
     cache.get_status(1)
     executor.assert_called_once_with('SELECT image_id FROM images WHERE image_id=?', (1))
 
-    @pytest.mark.usefixtures("setup_db")
-    def test_get(cache):
-        existing = cache.get_status('1')
-        assert existing
+@pytest.mark.usefixtures("setup_db")
+def test_get(cache):
+    existing = cache.get_status('1')
+    assert existing
 
-    def test_get_unknown(session):
-        cache = CacheService(session)
-        assert cache.get_status('1') is None
+def test_get_unknown(session):
+    cache = CacheService(session)
+    assert cache.get_status('1') is None
 
-    def test_save(session):
-        number = '1'
-        cache = CacheService(session)
-        cache.save_status(number, True)
-        existing = cache.get_status(number)
-        assert existing
+def test_save(session):
+    number = 1
+    cache = CacheService(session)
+    cache.save_status(number, True)
+    existing = cache.get_status(number)
+    assert existing
 
-    def test_report(session):
-        cache = CacheService(session)
-        cache.save_status('1', True)
-        cache.save_status('1', False)
-        cache.save_status('1', False)
-        ratio = cache.generate_report()
-        assert ratio == 0.5
+def test_report(session):
+    cache = CacheService(session)
+    cache.save_status(1, True)
+    cache.save_status(1, False)
+    cache.save_status(1, False)
+    ratio = cache.generate_report()
+    assert ratio == 0.5
 
 
 class CacheService:
