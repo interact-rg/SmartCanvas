@@ -88,7 +88,6 @@ def test_get(cache): # 2
 class CacheService:
     def __init__(self, session): # 1
         self.session = session # 2
-        base = Database()
 
     def get_status(self, number):
         self.session.execute('SELECT image_id FROM images WHERE image_id=?', (number,))
@@ -125,5 +124,11 @@ class CacheService:
         self.session.execute(sqlite_delete_query, (image_id,))
 
         self.session.connection.commit()
+
+    def convert_image_to_binary(self, filename) -> bytes:
+        # Convert digital data to binary format
+        with open(filename, "rb") as file:
+            binaryData = file.read()
+        return binaryData
     
     
