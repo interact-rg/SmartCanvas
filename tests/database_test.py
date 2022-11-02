@@ -36,10 +36,11 @@ def test_get(session): # 1
     existing = cache.get_status('+3155512345') # 3
     assert existing
 
-'''def test_get_unknown(session):
+def test_get_unknown(session):
     cache = CacheService(session)
     assert cache.get_status('+315554444') is None
 
+'''
 def test_save(session):
     number = '+3155512346'
     cache = CacheService(session)
