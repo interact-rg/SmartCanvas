@@ -303,8 +303,9 @@ class Filter(State):
         filtered_frame = self.core.filters.current_filter(masked_frame)
         self.core.filtered_frame = self.core.fg_masker.changeBackground(filtered_frame, self.core.filters.current_name)
 
-        #upload image to database
-        self.core.database.insert_blob(self.core.filtered_frame)
+        #upload image to database if consent was given
+        if self.core.gdpr_accepted:
+            self.core.database.insert_blob(self.core.filtered_frame)
         
 
 class ShowPic(State):
