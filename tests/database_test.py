@@ -1,9 +1,9 @@
 from smart_canvas.database import Database
 import datetime
 import pytest
-import mysql.connector
 from unittest.mock import MagicMock
 import os
+import sqlite3
 
 
 def test_get_mock():
@@ -62,7 +62,7 @@ class CacheService:
 
 @pytest.fixture()
 def session():
-    connection = mysql.connector.connect(':memory:')
+    connection = sqlite3.connect(':memory:')
     db_session = connection.cursor()
     yield db_session
     connection.close()
