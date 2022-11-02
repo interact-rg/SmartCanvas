@@ -11,8 +11,8 @@ def test_get_mock():
     executor = MagicMock()
     session.execute = executor
     cache = CacheService(session)
-    cache.get_status('1')
-    executor.assert_called_once_with('SELECT existing FROM images WHERE image_id=?', ('1'))
+    cache.get_status(1)
+    executor.assert_called_once_with('SELECT existing FROM images WHERE image_id=?', (1))
 
 
 class CacheService:
