@@ -16,12 +16,12 @@ def test_get_mock():
 
 @pytest.mark.usefixtures("setup_db")
 def test_get(cache):
-    existing = cache.get_status('1')
+    existing = cache.get_status(1)
     assert existing
 
 def test_get_unknown(session):
     cache = CacheService(session)
-    assert cache.get_status('1') is None
+    assert cache.get_status(1) is None
 
 def test_save(session):
     number = 1
@@ -48,7 +48,7 @@ class CacheService:
         self.session.execute('SELECT image_id FROM images WHERE image_id=?', (number))
         return self.session.fetchone()
 
-    def save_status(self, number, existing):
+    def save_status(self, number):
         self.session.execute('INSERT INTO images image_id VALUES (?)', (number))
         self.session.connection.commit()
 
