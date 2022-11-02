@@ -10,17 +10,17 @@ class CacheService:
         self.session = session
 
     def get_status(self, number):
-        self.session.execute('SELECT existing FROM numbers WHERE number=?', (number,))
+        self.session.execute('SELECT existing FROM iamges WHERE image_id=?', (number,))
         return self.session.fetchone()
 
     def save_status(self, number, existing):
-        self.session.execute('INSERT INTO numbers VALUES (?, ?)', (number, existing))
+        self.session.execute('INSERT INTO images image_id VALUES (?)', (number))
         self.session.connection.commit()
 
     def generate_report(self):
-        self.session.execute('SELECT COUNT(*) FROM numbers')
+        self.session.execute('SELECT * FROM images')
         count = self.session.fetchone()
-        self.session.execute('SELECT COUNT(*) FROM numbers WHERE existing=1')
+        self.session.execute('SELECT * FROM images WHERE image_id=1')
         count_existing = self.session.fetchone()
         return count_existing[0]/count[0]
 
@@ -35,9 +35,19 @@ class CacheService:
 
     @pytest.fixture
     def setup_db(session):
-        session.execute('''CREATE TABLE numbers
-                            (number text, existing boolean)''')
-        session.execute('INSERT INTO numbers VALUES ("+3155512345", 1)')
+        session.execute('''CREATE TABLE images (
+        image_id int,
+        image mediumblob,
+        date_added date
+        );''')
+        image_id = 1
+        image = r"assets\logo.png"
+        date_added = datetime.datetime.now()
+        sql_insert_blob_query = """ INSERT INTO images
+                            (image_id, image, date_added) VALUES (%s,%s,%s)"""
+
+        session.execute(sql_insert_blob_query)
+        
         session.connection.commit()
 
     def test_get_mock():
@@ -45,8 +55,8 @@ class CacheService:
         executor = MagicMock()
         session.execute = executor
         cache = CacheService(session)
-        cache.get_status('+3155512345')
-        executor.assert_called_once_with('SELECT existing FROM numbers WHERE number=?', ('+3155512345',)) # 3
+        cache.get_status('1')
+        executor.assert_called_once_with('SELECT existing FROM numbers WHERE number=?', ('1',))
 
 
 
