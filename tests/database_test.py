@@ -25,7 +25,7 @@ class CacheService:
         return count_existing[0]/count[0]
 
 
-    @pytest.fixture
+    @pytest.fixture()
     def session():
         connection = mysql.connector.connect(':memory:')
         db_session = connection.cursor()
@@ -33,7 +33,7 @@ class CacheService:
         connection.close()
 
 
-    @pytest.fixture
+    @pytest.fixture()
     def setup_db(session):
         session.execute('''CREATE TABLE images (
         image_id int,
@@ -61,7 +61,7 @@ class CacheService:
 
 
 
-    @pytest.fixture
+    @pytest.fixture()
     def cache(session): 
         return CacheService(session)
 
@@ -83,8 +83,8 @@ class CacheService:
 
     def test_report(session):
         cache = CacheService(session)
-        cache.save_status('+3155512346', True)
-        cache.save_status('+3155512347', False)
-        cache.save_status('+3155512348', False)
+        cache.save_status('1', True)
+        cache.save_status('1', False)
+        cache.save_status('1', False)
         ratio = cache.generate_report()
         assert ratio == 0.5
