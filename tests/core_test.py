@@ -7,7 +7,7 @@ from queue import Queue
 import cv2
 import time
 
-FINGER_IMAGE_FOLDER_PATH = "test_assets\finger_pictures"
+FINGER_IMAGE_FOLDER_PATH = r"test_assets\finger_pictures"
 
 two_fingers = cv2.resize(cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/2.jpeg"), (1280,720), interpolation = cv2.INTER_AREA)
 five_fingers = cv2.resize(cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/5.jpeg"), (1280, 720), interpolation = cv2.INTER_AREA)
