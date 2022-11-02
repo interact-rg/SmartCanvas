@@ -16,7 +16,7 @@ def test_get_mock():
 
 @pytest.mark.usefixtures("setup_db")
 def test_get(cache):
-    existing = cache.get_status(1)
+    existing = cache.get_status()
     assert existing
 
 '''def test_get_unknown(session):
