@@ -16,7 +16,6 @@ def test_get_mock():
 
 @pytest.mark.usefixtures("setup_db")
 def test_get(cache):
-    cache = CacheService(session)
     existing = cache.get_status(1)
     assert existing
 
@@ -76,8 +75,8 @@ def setup_db(session):
     image mediumblob,
     date_added date
     );''')
+    print("DB HAS BEEN SET UP!!!!!!!!!")
     image_id = 1
-    image = r"assets\logo.png"
     script_dir = os.path.dirname(__file__)
     rel_path = r"assets\logo.png"
     image = os.path.join(script_dir, rel_path)
