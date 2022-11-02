@@ -19,7 +19,8 @@ class CacheService:
         self.session = session
 
     def get_status(self, number):
-        self.session.execute('SELECT existing FROM iamges WHERE image_id=?', (number,))
+        print("GETTING STATUS!!!!!!!!!!!!!!!!!!")
+        self.session.execute('SELECT existing FROM iamges WHERE image_id=?', (number))
         return self.session.fetchone()
 
     def save_status(self, number, existing):
