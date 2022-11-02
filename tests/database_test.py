@@ -73,7 +73,7 @@ def test_delete(session):
     cache = CacheService(session)
     cache.delete_item(number)
     id = cache.get_status(number)
-    assert id
+    assert id is None
 
 @pytest.fixture
 def cache(session): # 1
