@@ -6,6 +6,7 @@ import os
 import sqlite3
 
 
+
 @pytest.fixture
 def session(): # 1
     connection = sqlite3.connect(':memory:')
@@ -87,6 +88,7 @@ def test_get(cache): # 2
 class CacheService:
     def __init__(self, session): # 1
         self.session = session # 2
+        base = Database()
 
     def get_status(self, number):
         self.session.execute('SELECT image_id FROM images WHERE image_id=?', (number,))
@@ -99,13 +101,14 @@ class CacheService:
         script_dir = os.path.dirname(__file__)
         rel_path = r"test_assets/finger_pictures"
         image = os.path.join(script_dir, rel_path)
+        image_to_insert = self.convert_image_to_binary(image)
 
         sqlite_insert_blob_query = """ INSERT INTO images
                                   (image_id, image, date_added) VALUES (?, ?, ?)"""
 
         image = r"test_assets/finger_pictures"
         # Convert data into tuple format
-        data_tuple = (image_id, image, date_added)
+        data_tuple = (image_id, image_to_insert, date_added)
         self.session.execute(sqlite_insert_blob_query, data_tuple)
         self.session.connection.commit()
     
@@ -122,3 +125,5 @@ class CacheService:
         self.session.execute(sqlite_delete_query, (image_id,))
 
         self.session.connection.commit()
+    
+    
