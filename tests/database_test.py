@@ -3,6 +3,7 @@ import datetime
 import pytest
 import mysql.connector
 from unittest.mock import MagicMock
+import os
 
 
 def test_get_mock():
@@ -52,6 +53,9 @@ class CacheService:
         );''')
         image_id = 1
         image = r"assets\logo.png"
+        script_dir = os.path.dirname(__file__)
+        rel_path = r"assets\logo.png"
+        abs_file_path = os.path.join(script_dir, rel_path)
         date_added = datetime.datetime.now()
         sql_insert_blob_query = """ INSERT INTO images
                             (image_id, image, date_added) VALUES (%s,%s,%s)"""
