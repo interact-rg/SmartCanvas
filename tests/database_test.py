@@ -31,6 +31,7 @@ def test_get_mock():
     executor.assert_called_once_with('SELECT existing FROM numbers WHERE number=?', ('+3155512345',)) # 3
 
 def test_get(session): # 1
+    print("!!!!!!!!!!!!!!!!TESTING GET METHOD!!!!!!!!!!!")
     cache = CacheService(session) # 2
     existing = cache.get_status('+3155512345') # 3
     assert existing
