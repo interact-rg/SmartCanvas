@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 
 class CacheService:
-    def __init__(self, session):
+    def __init__(session):
         self.session = session
 
     def get_status(self, number):

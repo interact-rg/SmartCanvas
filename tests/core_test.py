@@ -8,12 +8,11 @@ import cv2
 import time
 import os
 
-script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
+script_dir = os.path.dirname(__file__)
 rel_path = r"test_assets/finger_pictures"
 abs_file_path = os.path.join(script_dir, rel_path)
 
 FINGER_IMAGE_FOLDER_PATH = abs_file_path
-print(F"FILE PATH: {FINGER_IMAGE_FOLDER_PATH}")
 
 
 two_fingers = cv2.resize(cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/2.jpeg"), (1280,720), interpolation = cv2.INTER_AREA)
