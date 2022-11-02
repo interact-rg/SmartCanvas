@@ -22,11 +22,21 @@ def setup_db(session): # 2
     date_added date
     );''')
     image_id = 1
+    date_added = datetime.datetime.now()
     
     script_dir = os.path.dirname(__file__)
     rel_path = r"test_assets/finger_pictures"
     image = os.path.join(script_dir, rel_path)
-    session.execute('INSERT INTO images (image_id, image, date_added) VALUES (%s,%s,%s)')
+
+    sqlite_insert_blob_query = """ INSERT INTO images
+                                  (image_id, image, date_added) VALUES (?, ?, ?)"""
+
+    image = r"test_assets/finger_pictures"
+    # Convert data into tuple format
+    data_tuple = (image_id, image, date_added)
+    session.execute(sqlite_insert_blob_query, data_tuple)
+
+
     session.connection.commit()
 
 @pytest.mark.usefixtures("setup_db")
@@ -36,7 +46,7 @@ def test_get_mock():
     session.execute = executor
     cache = CacheService(session) # 2
     cache.get_status('1')
-    executor.assert_called_once_with('SELECT image_id FROM numbers WHERE image_id=1')
+    executor.assert_called_once_with('SELECT image_id FROM numbers WHERE image_id=?', ('1',)) # 3
 
 '''@pytest.mark.usefixtures("setup_db")
 def test_get(session): # 1
