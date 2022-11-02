@@ -53,7 +53,7 @@ def test_get(session): # 1
     cache = CacheService(session) # 2
     existing = cache.get_status('1') # 3
     assert existing
-'''
+
 @pytest.mark.usefixtures("setup_db")
 def test_get_unknown(session):
     cache = CacheService(session)
@@ -75,7 +75,6 @@ def cache(session): # 1
 def test_get(cache): # 2
     existing = cache.get_status('1')
     assert existing
-    '''
 
 class CacheService:
     def __init__(self, session): # 1
