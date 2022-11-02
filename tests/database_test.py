@@ -82,14 +82,23 @@ class CacheService:
         self.session = session # 2
 
     def get_status(self, number):
-        self.session.execute('SELECT existing FROM numbers WHERE number=?', (number,))
+        self.session.execute('SELECT image_id FROM images WHERE image_id=?', (number,))
         return self.session.fetchone()
 
     def save_status(self, number, existing):
         image_id = number
+        date_added = datetime.datetime.now()
     
         script_dir = os.path.dirname(__file__)
         rel_path = r"test_assets/finger_pictures"
         image = os.path.join(script_dir, rel_path)
         self.session.execute('INSERT INTO images (image_id, image, date_added) VALUES (%s,%s,%s)')
+
+        sqlite_insert_blob_query = """ INSERT INTO images
+                                  (image_id, image, date_added) VALUES (?, ?, ?)"""
+
+        image = r"test_assets/finger_pictures"
+        # Convert data into tuple format
+        data_tuple = (image_id, image, date_added)
+
         self.session.connection.commit()
