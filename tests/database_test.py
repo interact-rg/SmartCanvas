@@ -98,7 +98,7 @@ class CacheService:
         date_added = datetime.datetime.now()
     
         script_dir = os.path.dirname(__file__)
-        rel_path = r"test_assets/finger_pictures"
+        rel_path = r"test_assets/finger_pictures/1.jpeg"
         image = os.path.join(script_dir, rel_path)
         image_to_insert = self.convert_image_to_binary(image)
 
