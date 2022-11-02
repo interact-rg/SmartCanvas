@@ -63,9 +63,17 @@ def test_get_unknown(session):
 def test_save(session):
     number = '2'
     cache = CacheService(session)
-    cache.save_status(number, True)
+    cache.save_status(number)
     existing = cache.get_status(number)
     assert existing
+
+@pytest.mark.usefixtures("setup_db")
+def test_delete(session):
+    number = '2'
+    cache = CacheService(session)
+    cache.delete_item(number)
+    id = cache.get_status(number)
+    assert id == '2'
 
 @pytest.fixture
 def cache(session): # 1
@@ -73,8 +81,8 @@ def cache(session): # 1
 
 @pytest.mark.usefixtures("setup_db")
 def test_get(cache): # 2
-    existing = cache.get_status('1')
-    assert existing
+    id = cache.get_status('1')
+    assert id == '1'
 
 class CacheService:
     def __init__(self, session): # 1
@@ -84,7 +92,7 @@ class CacheService:
         self.session.execute('SELECT image_id FROM images WHERE image_id=?', (number,))
         return self.session.fetchone()
 
-    def save_status(self, number, existing):
+    def save_status(self, number):
         image_id = number
         date_added = datetime.datetime.now()
     
@@ -99,4 +107,18 @@ class CacheService:
         # Convert data into tuple format
         data_tuple = (image_id, image, date_added)
         self.session.execute(sqlite_insert_blob_query, data_tuple)
+        self.session.connection.commit()
+    
+    def delete_item(self, number):
+        image_id = number
+    
+        script_dir = os.path.dirname(__file__)
+        rel_path = r"test_assets/finger_pictures"
+        image = os.path.join(script_dir, rel_path)
+
+        sqlite_delete_query = """DELETE FROM tasks WHERE id=?"""
+
+        # Convert data into tuple format
+        self.session.execute(sqlite_delete_query, (image_id,))
+
         self.session.connection.commit()
