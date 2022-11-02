@@ -22,6 +22,7 @@ def setup_db(session): # 2
     session.execute('Select * from "numbers"')
     session.connection.commit()
 
+@pytest.mark.usefixtures("setup_db")
 def test_get_mock():
     session = MagicMock() # 1
     executor = MagicMock()
@@ -30,17 +31,16 @@ def test_get_mock():
     cache.get_status('+3155512345')
     executor.assert_called_once_with('SELECT existing FROM numbers WHERE number=?', ('+3155512345',)) # 3
 
+@pytest.mark.usefixtures("setup_db")
 def test_get(session): # 1
     print("!!!!!!!!!!!!!!!!TESTING GET METHOD!!!!!!!!!!!")
     cache = CacheService(session) # 2
     existing = cache.get_status('+3155512345') # 3
     assert existing
 
+@pytest.mark.usefixtures("setup_db")
 def test_get_unknown(session):
-    session = MagicMock() # 1
-    executor = MagicMock()
-    session.execute = executor
-    cache = CacheService(session) # 2
+    cache = CacheService(session)
     assert cache.get_status('+315554444') is None
 
 '''
