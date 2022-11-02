@@ -98,5 +98,5 @@ class CacheService:
         image = r"test_assets/finger_pictures"
         # Convert data into tuple format
         data_tuple = (image_id, image, date_added)
-        session.execute(sqlite_insert_blob_query, data_tuple)
+        self.session.execute(sqlite_insert_blob_query, data_tuple)
         self.session.connection.commit()
