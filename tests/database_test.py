@@ -20,7 +20,7 @@ class CacheService:
 
     def get_status(self, number):
         print("GETTING STATUS!!!!!!!!!!!!!!!!!!")
-        self.session.execute('SELECT existing FROM images WHERE image_id=?', (number))
+        self.session.execute('SELECT image_id FROM images WHERE image_id=?', (number))
         return self.session.fetchone()
 
     def save_status(self, number, existing):
