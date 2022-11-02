@@ -13,6 +13,8 @@ rel_path = r"tests\test_assets\finger_pictures"
 abs_file_path = os.path.join(script_dir, rel_path)
 
 FINGER_IMAGE_FOLDER_PATH = abs_file_path
+print(FINGER_IMAGE_FOLDER_PATH)
+
 
 two_fingers = cv2.resize(cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/2.jpeg"), (1280,720), interpolation = cv2.INTER_AREA)
 five_fingers = cv2.resize(cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/5.jpeg"), (1280, 720), interpolation = cv2.INTER_AREA)
