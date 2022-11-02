@@ -56,7 +56,7 @@ class CacheService:
         script_dir = os.path.dirname(__file__)
         rel_path = r"assets\logo.png"
         image = os.path.join(script_dir, rel_path)
-        print(image)
+        print(f"image path: {image}")
         date_added = datetime.datetime.now()
         sql_insert_blob_query = """ INSERT INTO images
                             (image_id, image, date_added) VALUES (%s,%s,%s)"""
