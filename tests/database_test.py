@@ -5,6 +5,15 @@ import mysql.connector
 from unittest.mock import MagicMock
 
 
+def test_get_mock():
+    session = MagicMock()
+    executor = MagicMock()
+    session.execute = executor
+    cache = CacheService(session)
+    cache.get_status('1')
+    executor.assert_called_once_with('SELECT existing FROM images WHERE number=?', ('1',))
+
+
 class CacheService:
     def __init__(self, session):
         self.session = session
@@ -25,45 +34,34 @@ class CacheService:
         return count_existing[0]/count[0]
 
 
-@pytest.fixture()
-def session():
-    connection = mysql.connector.connect(':memory:')
-    db_session = connection.cursor()
-    yield db_session
-    connection.close()
+    @pytest.fixture()
+    def session():
+        connection = mysql.connector.connect(':memory:')
+        db_session = connection.cursor()
+        yield db_session
+        connection.close()
 
 
-@pytest.fixture()
-def setup_db(session):
-    session.execute('''CREATE TABLE images (
-    image_id int,
-    image mediumblob,
-    date_added date
-    );''')
-    image_id = 1
-    image = r"assets\logo.png"
-    date_added = datetime.datetime.now()
-    sql_insert_blob_query = """ INSERT INTO images
-                        (image_id, image, date_added) VALUES (%s,%s,%s)"""
+    @pytest.fixture()
+    def setup_db(session):
+        session.execute('''CREATE TABLE images (
+        image_id int,
+        image mediumblob,
+        date_added date
+        );''')
+        image_id = 1
+        image = r"assets\logo.png"
+        date_added = datetime.datetime.now()
+        sql_insert_blob_query = """ INSERT INTO images
+                            (image_id, image, date_added) VALUES (%s,%s,%s)"""
 
-    session.execute(sql_insert_blob_query)
-    
-    session.connection.commit()
+        session.execute(sql_insert_blob_query)
+        
+        session.connection.commit()
 
-def test_get_mock():
-    session = MagicMock()
-    executor = MagicMock()
-    session.execute = executor
-    cache = CacheService(session)
-    cache.get_status('1')
-    executor.assert_called_once_with('SELECT existing FROM images WHERE number=?', ('1',))
-
-
-
-
-@pytest.fixture()
-def cache(session): 
-    return CacheService(session)
+    @pytest.fixture()
+    def cache(session): 
+        return CacheService(session)
 
 @pytest.mark.usefixtures("setup_db")
 def test_get(cache):
