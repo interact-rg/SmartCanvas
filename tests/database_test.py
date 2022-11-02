@@ -91,7 +91,6 @@ class CacheService:
         script_dir = os.path.dirname(__file__)
         rel_path = r"test_assets/finger_pictures"
         image = os.path.join(script_dir, rel_path)
-        self.session.execute('INSERT INTO images (image_id, image, date_added) VALUES (%s,%s,%s)')
 
         sqlite_insert_blob_query = """ INSERT INTO images
                                   (image_id, image, date_added) VALUES (?, ?, ?)"""
@@ -99,5 +98,5 @@ class CacheService:
         image = r"test_assets/finger_pictures"
         # Convert data into tuple format
         data_tuple = (image_id, image, date_added)
-
+        session.execute(sqlite_insert_blob_query, data_tuple)
         self.session.connection.commit()
