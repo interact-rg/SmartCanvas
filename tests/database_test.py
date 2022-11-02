@@ -12,7 +12,7 @@ def test_get_mock():
     session.execute = executor
     cache = CacheService(session)
     cache.get_status('1')
-    executor.assert_called_once_with('SELECT existing FROM images WHERE number=?', ('1',))
+    executor.assert_called_once_with('SELECT existing FROM images WHERE number=?', ('1'))
 
 
 class CacheService:
