@@ -305,7 +305,6 @@ class Filter(State):
 
         #upload image to database
         self.core.database.insert_blob(self.core.filtered_frame)
-        self.core.database.download(2)
         
 
 class ShowPic(State):
