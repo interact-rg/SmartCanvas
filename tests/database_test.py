@@ -56,35 +56,35 @@ class CacheService:
         session.execute = executor
         cache = CacheService(session)
         cache.get_status('1')
-        executor.assert_called_once_with('SELECT existing FROM numbers WHERE number=?', ('1',))
+        executor.assert_called_once_with('SELECT existing FROM images WHERE number=?', ('1',))
 
 
 
 
-    @pytest.fixture()
-    def cache(session): 
-        return CacheService(session)
+@pytest.fixture()
+def cache(session): 
+    return CacheService(session)
 
-    @pytest.mark.usefixtures("setup_db")
-    def test_get(cache):
-        existing = cache.get_status('+3155512345')
-        assert existing
+@pytest.mark.usefixtures("setup_db")
+def test_get(cache):
+    existing = cache.get_status('+3155512345')
+    assert existing
 
-    def test_get_unknown(session):
-        cache = CacheService(session)
-        assert cache.get_status('+315554444') is None
+def test_get_unknown(session):
+    cache = CacheService(session)
+    assert cache.get_status('1') is None
 
-    def test_save(session):
-        number = '+3155512346'
-        cache = CacheService(session)
-        cache.save_status(number, True)
-        existing = cache.get_status(number)
-        assert existing
+def test_save(session):
+    number = '1'
+    cache = CacheService(session)
+    cache.save_status(number, True)
+    existing = cache.get_status(number)
+    assert existing
 
-    def test_report(session):
-        cache = CacheService(session)
-        cache.save_status('1', True)
-        cache.save_status('1', False)
-        cache.save_status('1', False)
-        ratio = cache.generate_report()
-        assert ratio == 0.5
+def test_report(session):
+    cache = CacheService(session)
+    cache.save_status('1', True)
+    cache.save_status('1', False)
+    cache.save_status('1', False)
+    ratio = cache.generate_report()
+    assert ratio == 0.5
