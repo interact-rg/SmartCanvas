@@ -38,7 +38,7 @@ def test_get_mock():
     cache.get_status('1')
     executor.assert_called_once_with('SELECT image_id FROM numbers WHERE image_id=?', ('1',)) # 3
 
-@pytest.mark.usefixtures("setup_db")
+'''@pytest.mark.usefixtures("setup_db")
 def test_get(session): # 1
     cache = CacheService(session) # 2
     existing = cache.get_status('1') # 3
@@ -64,7 +64,7 @@ def cache(session): # 1
 @pytest.mark.usefixtures("setup_db")
 def test_get(cache): # 2
     existing = cache.get_status('1')
-    assert existing
+    assert existing'''
 
 class CacheService:
     def __init__(self, session): # 1
