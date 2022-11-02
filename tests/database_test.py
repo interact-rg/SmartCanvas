@@ -19,6 +19,7 @@ def setup_db(session): # 2
     session.execute('''CREATE TABLE numbers
                           (number text, existing boolean)''')
     session.execute('INSERT INTO numbers VALUES ("+3155512345", 1)')
+    session.execute('Select * from "numbers"')
     session.connection.commit()
 
 def test_get_mock():
