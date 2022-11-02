@@ -9,7 +9,7 @@ import time
 import os
 
 script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
-rel_path = r"tests/test_assets/finger_pictures"
+rel_path = r"test_assets/finger_pictures"
 abs_file_path = os.path.join(script_dir, rel_path)
 
 FINGER_IMAGE_FOLDER_PATH = abs_file_path
