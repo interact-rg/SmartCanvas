@@ -43,7 +43,7 @@ def test_get_unknown(session):
     cache = CacheService(session)
     assert cache.get_status('+315554444') is None
 
-'''
+@pytest.mark.usefixtures("setup_db")
 def test_save(session):
     number = '+3155512346'
     cache = CacheService(session)
@@ -51,13 +51,14 @@ def test_save(session):
     existing = cache.get_status(number)
     assert existing
 
+@pytest.mark.usefixtures("setup_db")
 def test_report(session):
     cache = CacheService(session)
     cache.save_status('+3155512346', True)
     cache.save_status('+3155512347', False)
     cache.save_status('+3155512348', False)
     ratio = cache.generate_report()
-    assert ratio == 0.5'''
+    assert ratio == 0.5
 
 
 
