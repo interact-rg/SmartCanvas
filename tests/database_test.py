@@ -37,7 +37,10 @@ def test_get(session): # 1
     assert existing
 
 def test_get_unknown(session):
-    cache = CacheService(session)
+    session = MagicMock() # 1
+    executor = MagicMock()
+    session.execute = executor
+    cache = CacheService(session) # 2
     assert cache.get_status('+315554444') is None
 
 '''
