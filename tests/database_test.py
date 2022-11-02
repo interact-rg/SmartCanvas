@@ -5,6 +5,22 @@ from unittest.mock import MagicMock
 import os
 import sqlite3
 
+
+@pytest.fixture
+def session(): # 1
+    connection = sqlite3.connect(':memory:')
+    db_session = connection.cursor()
+    yield db_session
+    connection.close()
+
+
+@pytest.fixture
+def setup_db(session): # 2
+    session.execute('''CREATE TABLE numbers
+                          (number text, existing boolean)''')
+    session.execute('INSERT INTO numbers VALUES ("+3155512345", 1)')
+    session.connection.commit()
+
 def test_get_mock():
     session = MagicMock() # 1
     executor = MagicMock()
@@ -37,21 +53,6 @@ def test_report(session):
     ratio = cache.generate_report()
     assert ratio == 0.5
 
-
-@pytest.fixture
-def session(): # 1
-    connection = sqlite3.connect(':memory:')
-    db_session = connection.cursor()
-    yield db_session
-    connection.close()
-
-
-@pytest.fixture
-def setup_db(session): # 2
-    session.execute('''CREATE TABLE numbers
-                          (number text, existing boolean)''')
-    session.execute('INSERT INTO numbers VALUES ("+3155512345", 1)')
-    session.connection.commit()
 
 
 @pytest.fixture
