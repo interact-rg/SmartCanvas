@@ -181,9 +181,11 @@ document.addEventListener("DOMContentLoaded", async function (event) {
         }
 
         //"Stretch" everything to fit window (TODO?: Redo in some more sensible way)
-        const widthZoom = getWidth() / (canvass.width + 20);
-        const heightZoom = getHeight() / (canvass.height + 20);
-        body.style.zoom = Math.min(widthZoom, heightZoom);
+        if (document.getElementById("page_identifier").textContent == "fullscreen_symbol") {
+          const widthZoom = getWidth() / (canvass.width + 20);
+          const heightZoom = getHeight() / (canvass.height + 20);
+          body.style.zoom = Math.min(widthZoom, heightZoom);
+        }
     }
 
     //Technically width/height should be the max of possible values but seems to work best with just clientHeight/clientWidth
