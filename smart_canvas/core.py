@@ -205,7 +205,7 @@ class GPDR_consent(State):
             self.take_pic_cnt += 0.05
         elif self.take_pic_cnt > 0.0:
             self.take_pic_cnt -= 0.1
-        if self.take_pic_cnt >= 0.1:
+        if self.take_pic_cnt >= 0.8:
             if "THUMBS UP" in gesture.values():
                 self.core.gdpr_accepted = True
                 print("GDPR accepted")
