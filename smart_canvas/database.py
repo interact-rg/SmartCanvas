@@ -61,12 +61,15 @@ class Database:
 
         except mysql.connector.Error as error:
             print("Failed inserting BLOB data into MySQL table {}".format(error))
+            image_id = None
 
         finally:
             if connection.is_connected():
                 cursor.close()
                 connection.close()
                 print("MySQL connection is closed")
+
+        return image_id
 
     #  function to convert binary to image
     def convert_binary_to_image(self, data: bytes, file_name: str):
@@ -77,6 +80,7 @@ class Database:
 
     # download image with given id
     def download(self, image_id: int):
+        image, date = None, None
         try:
             # establish connection
             connection = mysql.connector.connect(
@@ -94,19 +98,23 @@ class Database:
             for row in result:
                 print("image Id = ", row[0])
                 image = row[1]
-                print("date  = ", row[2])
+                date = row[2]
+                print("date  =", date)
+
+            if image:
                 # Pass path with filename where we want to save our file
-            self.convert_binary_to_image(image, r"assets\downloadedimage.png")
-            print("Successfully Retrieved Values from database")
+                self.convert_binary_to_image(image, r"assets\downloadedimage.png")
+                print("Successfully Retrieved Values from database")
 
         except mysql.connector.Error as error:
             print(format(error))
-
+            
         finally:
             if connection.is_connected():
                 cursor.close()
                 connection.close()
                 print("MySQL connection is closed")
+            return image, date
 
     def delete(self):
         # function to check if database has items older than a week.
