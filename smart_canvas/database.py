@@ -72,10 +72,10 @@ class Database:
             print("The file does not exist")
 
 
-        if connection.is_connected():
-            cursor.close()
-            connection.close()
-            print("SQLITE connection is closed")
+        
+        cursor.close()
+        connection.close()
+        print("SQLITE connection is closed")
 
     #  function to convert binary to image
     def convert_binary_to_image(self, data: bytes, file_name: str):
@@ -102,10 +102,9 @@ class Database:
         self.convert_binary_to_image(image, r"assets\downloadedimage.png")
         print("Successfully Retrieved Values from database")
 
-        if connection.is_connected():
-            cursor.close()
-            connection.close()
-            print("SQLite connection is closed")
+        cursor.close()
+        connection.close()
+        print("SQLite connection is closed")
 
     def delete(self):
         # function to check if database has items older than a week.
