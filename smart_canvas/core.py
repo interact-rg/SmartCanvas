@@ -97,7 +97,6 @@ class Startup(State):
         pass
 
     def enter(self, tick):
-        self.core.database.create_database()
         self.ui = self.core.ui
         self.ui.create_text("help_1", (20,40), 40.0)
         self.ui.create_text("help_2", (20,80), 40.0)
@@ -144,6 +143,7 @@ class Idle(State):
         self.core.ui.hide("help_1", "help_2", "filter_name", "bar", "image_showing_promote", "gdpr_concent")
         self.core.ui.show("idle_text_1", "idle_text_2", "bar")
         self.core.ui.set_prog("bar", 1.1)
+        self.core.database.create_database()
 
         #masked_frame = self.core.fg_masker.apply(frame)
         #filtered_frame = self.core.filters.current_filter(masked_frame)
