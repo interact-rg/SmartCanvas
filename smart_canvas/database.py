@@ -85,9 +85,9 @@ class Database:
         connection = sqlite3.connect("database.db")
         cursor = connection.cursor()
         # getting data by id value
-        query = """ SELECT * from images where image_id = %s """
+        query = "SELECT image_id FROM images WHERE image_id=?", (image_id,)
 
-        cursor.execute(query, (image_id,))
+        cursor.execute(query)
         result = cursor.fetchall()
         for row in result:
             print("image Id = ", row[0])
