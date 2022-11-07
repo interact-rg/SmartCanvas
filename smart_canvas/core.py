@@ -145,6 +145,7 @@ class Idle(State):
         self.core.ui.show("idle_text_1", "idle_text_2", "bar")
         self.core.ui.set_prog("bar", 1.1)
         if os.path.exists(r"smart_canvas/database.db"):
+            print("DATABASE ALREADY EXISTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
             pass
         else:
             self.core.database.create_database()
