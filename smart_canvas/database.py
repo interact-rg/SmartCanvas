@@ -11,7 +11,7 @@ class Database:
     def create_database(self):
         print("Creating database...")
         connection = sqlite3.connect('database.db')
-        with open('smart_canvas\schema.sql') as f:
+        with open('smart_canvas/schema.sql') as f:
             connection.executescript(f.read())
         cursor = connection.cursor()
 
