@@ -97,6 +97,7 @@ class Startup(State):
         pass
 
     def enter(self, tick):
+        self.core.database.create_database()
         self.ui = self.core.ui
         self.ui.create_text("help_1", (20,40), 40.0)
         self.ui.create_text("help_2", (20,80), 40.0)
