@@ -145,7 +145,7 @@ class Idle(State):
         self.core.ui.show("idle_text_1", "idle_text_2", "bar")
         self.core.ui.set_prog("bar", 1.1)
         if os.path.exists(r"database.db"):
-            print("DATABASE ALREADY EXISTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print("Database already exists, don't create a new one")
             pass
         else:
             self.core.database.create_database()

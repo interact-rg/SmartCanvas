@@ -7,11 +7,10 @@ import os
 
 
 class Database:
-
     def create_database(self):
         print("Creating database...")
-        connection = sqlite3.connect('database.db')
-        with open('smart_canvas/schema.sql') as f:
+        connection = sqlite3.connect("database.db")
+        with open("smart_canvas/schema.sql") as f:
             connection.executescript(f.read())
         cursor = connection.cursor()
 
@@ -19,11 +18,9 @@ class Database:
         cursor.execute(sql_select_query)
         myresult = cursor.fetchall()
 
-
         cursor.close()
         connection.close()
         print("SQLite connection is closed")
-
 
     def convert_image_to_binary(self, filename) -> bytes:
         # Convert digital data to binary format
@@ -41,7 +38,7 @@ class Database:
         )  # remove this later, no need to save locally.
         image_id = 1
         date_added = datetime.datetime.now()
-        connection = sqlite3.connect('database.db')
+        connection = sqlite3.connect("database.db")
 
         cursor = connection.cursor()
 
@@ -65,14 +62,12 @@ class Database:
 
         connection.commit()
         print("Image inserted successfully as a BLOB into images table")
-        #delete image that was sent to database<
-        if os.path.exists(r"assets\picwithcanvas.png"): 
+        # delete image that was sent to database<
+        if os.path.exists(r"assets\picwithcanvas.png"):
             os.remove(r"assets\picwithcanvas.png")
         else:
             print("The file does not exist")
 
-
-        
         cursor.close()
         connection.close()
         print("SQLITE connection is closed")
@@ -87,7 +82,7 @@ class Database:
     # download image with given id
     def download(self, image_id: int):
         # establish connection
-        connection = sqlite3.connect('database.db')
+        connection = sqlite3.connect("database.db")
         cursor = connection.cursor()
         # getting data by id value
         query = """ SELECT * from images where image_id = %s """
@@ -109,18 +104,17 @@ class Database:
     def delete(self):
         # function to check if database has items older than a week.
         # establish connection
-        connection = sqlite3.connect('database.db')
+        connection = sqlite3.connect("database.db")
         cursor = connection.cursor()
-        sql_delete_query = f""" DELETE FROM images WHERE date_added <= date('now', '-10 day');"""
-
+        sql_delete_query = (
+            f""" DELETE FROM images WHERE date_added <= date('now', '-10 day');"""
+        )
 
         cursor.execute(sql_delete_query)
         result = cursor.fetchall()
-        #check if something was actually deleted:
+        # check if something was actually deleted:
         for x in result:
             print(x)
 
 
-
 base = Database()
-#base.download(38)
