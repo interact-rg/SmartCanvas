@@ -7,6 +7,7 @@ from __future__ import annotations
 from threading import Thread
 import time
 from abc import ABC, abstractmethod
+import os
 
 from requests import delete
 
@@ -144,6 +145,11 @@ class Idle(State):
         self.core.ui.hide("help_1", "help_2", "filter_name", "bar", "image_showing_promote", "gdpr_concent")
         self.core.ui.show("idle_text_1", "idle_text_2", "bar")
         self.core.ui.set_prog("bar", 1.1)
+        if os.path.exists(r"database.db"):
+            print("Database already exists, don't create a new one")
+            pass
+        else:
+            self.core.database.create_database()
 
         #masked_frame = self.core.fg_masker.apply(frame)
         #filtered_frame = self.core.filters.current_filter(masked_frame)
