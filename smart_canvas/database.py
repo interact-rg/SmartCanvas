@@ -109,7 +109,6 @@ class Database:
     def delete(self):
         # function to check if database has items older than a week.
         # establish connection
-        print("Deleting values older than week ")
         connection = sqlite3.connect('database.db')
         cursor = connection.cursor()
         sql_delete_query = f""" DELETE FROM images WHERE date_added <= date('now', '-10 day');"""
@@ -121,7 +120,6 @@ class Database:
         for x in result:
             print(x)
 
-        print("Successfully deleted Values from database")
 
 
 base = Database()
