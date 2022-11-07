@@ -16,10 +16,6 @@ class Database:
         cursor = connection.cursor()
 
         #check if database exists
-        cursor.execute("SHOW DATABASES")
-        for x in cursor:
-            #error if database doesn't exist
-            print(x)
         cursor.execute("CREATE DATABASE smartcanvas")
 
 
