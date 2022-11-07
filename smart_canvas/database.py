@@ -55,7 +55,6 @@ class Database:
 
         image = self.convert_image_to_binary(r"assets\picwithcanvas.png")
 
-        image = r"test_assets/finger_pictures"
         # Convert data into tuple format
         data_tuple = (image_id, image, date_added)
         cursor.execute(sql_insert_blob_query, data_tuple)
