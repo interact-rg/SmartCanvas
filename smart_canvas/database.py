@@ -15,16 +15,6 @@ class Database:
             connection.executescript(f.read())
         cursor = connection.cursor()
 
-        #check if database exists
-        cursor.execute("CREATE DATABASE smartcanvas")
-
-
-        cursor.execute('''CREATE TABLE images (
-        image_id int,
-        image mediumblob,
-        date_added date
-        );''')
-
         sql_select_query = """SELECT * from images"""
         cursor.execute(sql_select_query)
         myresult = cursor.fetchall()
