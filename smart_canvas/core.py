@@ -144,7 +144,7 @@ class Idle(State):
         self.core.ui.hide("help_1", "help_2", "filter_name", "bar", "image_showing_promote", "gdpr_concent")
         self.core.ui.show("idle_text_1", "idle_text_2", "bar")
         self.core.ui.set_prog("bar", 1.1)
-        if os.path.exists(r"smart_canvas/database.db"):
+        if os.path.exists(r"database.db"):
             print("DATABASE ALREADY EXISTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
             pass
         else:
