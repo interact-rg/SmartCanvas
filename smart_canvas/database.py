@@ -20,10 +20,9 @@ class Database:
         myresult = cursor.fetchall()
 
 
-        if connection.is_connected():
-            cursor.close()
-            connection.close()
-            print("SQLite connection is closed")
+        cursor.close()
+        connection.close()
+        print("SQLite connection is closed")
 
 
     def convert_image_to_binary(self, filename) -> bytes:
