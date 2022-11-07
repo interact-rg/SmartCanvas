@@ -128,7 +128,7 @@ class Database:
         print("Deleting values older than week ")
         connection = sqlite3.connect('database.db')
         cursor = connection.cursor()
-        sql_delete_query = f""" Delete from images where date_added < now() - interval 1 week;"""
+        sql_delete_query = f""" DELETE FROM images WHERE date_added <= date('now', '-10 day');"""
 
 
         cursor.execute(sql_delete_query)
