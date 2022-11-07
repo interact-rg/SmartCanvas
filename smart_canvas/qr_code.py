@@ -10,6 +10,7 @@ def create_qr_code(url):
     Creates QR code for url and outputs it as cv2 image
     """
     logo = Image.open('assets/logo.png')
+    print(f"Creating QR for {url}")
 
     # adjust logo size
     basewidth = 75
