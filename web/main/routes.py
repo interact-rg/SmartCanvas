@@ -69,11 +69,11 @@ def upload_file():
 
 
 @main.route('/dl_image/<img_id>', methods=['GET'])
-def download_latest(img_id):
+def download_image(img_id):
     print("Image download requested for", img_id)
     database = Database()
     #Should probably somehow check that the image to be downloaded is newish (aka just taken but currently only date information saved -> ignoring this issue for now)
-    image, date = database.download(int(img_id))
+    image, date = database.download(img_id)
 
     if image:
         #Image in DB has cursed colors but this numpy array thing seems to fix them
