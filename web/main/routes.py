@@ -10,6 +10,7 @@ from werkzeug.utils import secure_filename
 from smart_canvas.database import Database
 import io, cv2, numpy
 from PIL import Image
+from datetime import datetime
 
 from . import main
 
@@ -72,19 +73,19 @@ def upload_file():
 def download_image(img_id):
     print("Image download requested for", img_id)
     database = Database()
-    #Should probably somehow check that the image to be downloaded is newish (aka just taken but currently only date information saved -> ignoring this issue for now)
     image, date = database.download(img_id)
-
-    if image:
-        #Image in DB has cursed colors but this numpy array thing seems to fix them
-        converted_image = numpy.array(Image.open(io.BytesIO(image)))
-        is_success, cc_buffer = cv2.imencode(".png", converted_image)
-        if is_success:
-            return send_file(
-                io.BytesIO(cc_buffer),
-                mimetype = "image/png",
-                as_attachment = True,
-                download_name = "SmartCanvasV.png"
-            )
+    if image and date:
+        req_image_time = datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")
+        if (datetime.now() - req_image_time).total_seconds() < 120: #Only allow download if picture saved <20s ago
+            #Image in DB has cursed colors but this numpy array thing seems to fix them
+            converted_image = numpy.array(Image.open(io.BytesIO(image)))
+            is_success, cc_buffer = cv2.imencode(".png", converted_image)
+            if is_success:
+                return send_file(
+                    io.BytesIO(cc_buffer),
+                    mimetype = "image/png",
+                    as_attachment = True,
+                    download_name = "SmartCanvasV.png"
+                )
 
     return render_template("dl_failed.html")
