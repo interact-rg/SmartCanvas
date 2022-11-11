@@ -17,6 +17,8 @@ from . import main
 
 auth = HTTPTokenAuth(scheme='Bearer')
 
+MAX_IMAGE_AGE_DOWNLOAD = 120 #seconds
+
 
 @auth.verify_token
 def verify_token(token):
@@ -76,7 +78,7 @@ def download_image(img_id):
     image, date = database.download(img_id)
     if image and date:
         req_image_time = datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")
-        if (datetime.now() - req_image_time).total_seconds() < 120: #Only allow download if picture saved <20s ago
+        if (datetime.now() - req_image_time).total_seconds() < MAX_IMAGE_AGE_DOWNLOAD:
             #Image in DB has cursed colors but this numpy array thing seems to fix them
             converted_image = numpy.array(Image.open(io.BytesIO(image)))
             is_success, cc_buffer = cv2.imencode(".png", converted_image)
@@ -87,5 +89,8 @@ def download_image(img_id):
                     as_attachment = True,
                     download_name = "SmartCanvasV.png"
                 )
+        else:
+            return render_template("dl_failed.html", reason="Requested image too old")
 
-    return render_template("dl_failed.html")
+
+    return render_template("dl_failed.html", reason="Requested image id does not exist")
