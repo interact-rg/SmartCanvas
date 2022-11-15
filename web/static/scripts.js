@@ -210,10 +210,12 @@ document.addEventListener("DOMContentLoaded", async function (event) {
 
     //Redo zooming on window size change
     addEventListener('resize', (event) => {
+      if (document.getElementById("page_identifier").textContent == "fullscreen_symbol") {
         console.log("resizing");
         const canvass = document.getElementById("canvas");
         const widthZoom = getWidth() / (canvass.width + 20);
         const heightZoom = getHeight() / (canvass.height + 20);
         body.style.zoom = Math.min(widthZoom, heightZoom);
+      }
     });
 });

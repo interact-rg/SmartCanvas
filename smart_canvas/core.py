@@ -35,6 +35,7 @@ class CanvasCore:
         self.fg_masker = ForegroundMask()
         self.hand_detector = HandDetect()
         self.database = Database()
+        self.image_id = None
         self.ui = UI()
         self.win_size = screensize
         self.gdpr_accepted = False
@@ -338,8 +339,8 @@ class Filter(State):
 
         # upload image to database if consent was given
         if self.core.gdpr_accepted:
-            self.core.database.insert_blob(self.core.filtered_frame)
-
+            self.core.image_id = self.core.database.insert_blob(self.core.filtered_frame)
+        
 
 class ShowPic(State):
     """

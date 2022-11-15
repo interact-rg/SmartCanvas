@@ -55,7 +55,6 @@ class Database:
 
         image = self.convert_image_to_binary(r"assets\picwithcanvas.png")
 
-        image = r"test_assets/finger_pictures"
         # Convert data into tuple format
         data_tuple = (image_id, image, date_added)
         cursor.execute(sql_insert_blob_query, data_tuple)
@@ -72,6 +71,8 @@ class Database:
         connection.close()
         print("SQLITE connection is closed")
 
+        return image_id
+
     #  function to convert binary to image
     def convert_binary_to_image(self, data: bytes, file_name: str):
         # Convert binary format to images
@@ -80,26 +81,30 @@ class Database:
             file.write(data)
 
     # download image with given id
-    def download(self, image_id: int):
+    def download(self, image_id: str):
+        image, date = None, None
         # establish connection
         connection = sqlite3.connect("database.db")
         cursor = connection.cursor()
         # getting data by id value
-        query = """ SELECT * from images where image_id = %s """
+        query = f"SELECT * FROM images WHERE image_id={image_id}"
 
-        cursor.execute(query, (image_id,))
+        cursor.execute(query)
         result = cursor.fetchall()
         for row in result:
             print("image Id = ", row[0])
             image = row[1]
-            print("date  = ", row[2])
+            date = row[2]
+            print("date  = ", date)
             # Pass path with filename where we want to save our file
-        self.convert_binary_to_image(image, r"assets\downloadedimage.png")
-        print("Successfully Retrieved Values from database")
+        if image:
+            self.convert_binary_to_image(image, r"assets\downloadedimage.png")
+            print("Successfully Retrieved Values from database")
 
         cursor.close()
         connection.close()
         print("SQLite connection is closed")
+        return image, date
 
     def delete(self):
         # function to check if database has items older than a week.

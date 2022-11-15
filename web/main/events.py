@@ -22,7 +22,8 @@ core_threads = {}
 core_queues = {}
 
 IMAGE_PROCESSING = False
-
+HOST_IP = "86.50.168.39"
+#HOST_IP = "127.0.0.1"
 
 @socketio.on('connect')
 def connect_web():
@@ -101,6 +102,9 @@ def get_dl_qr(message):
     core = core_threads[request.sid]
     if core.gdpr_accepted:
         header = message.split(",")[0]
-        cv_qr = cv2.resize(create_qr_code("127.0.0.1/dl_latest"), (200, 200), interpolation = cv2.INTER_AREA)
-        mod_message = header + "," + cv_to_b64(cv_qr) #Todo add actual full address to download from
-        socketio.emit('dl_qr', mod_message, to=request.sid, broadcast=False)
+        if core.image_id:
+            cv_qr = cv2.resize(create_qr_code(f"{HOST_IP}:5000/dl_image/{core.image_id}"), (200, 200), interpolation = cv2.INTER_AREA)
+            mod_message = header + "," + cv_to_b64(cv_qr)
+            socketio.emit('dl_qr', mod_message, to=request.sid, broadcast=False)
+        else:
+            print("Missing image id -> cannot generate link")
