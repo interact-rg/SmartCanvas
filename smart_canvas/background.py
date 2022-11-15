@@ -12,20 +12,21 @@ class ForegroundMask:
         self.selfie_segmentation = mp_selfie_segmentation.SelfieSegmentation(model_selection=1)
         self.bg_image = cv2.imread('smart_canvas/backgrounds/painterly_forest.jpg')
         dim = (1280,720)
-        self.bg_image = cv2.resize(self.bg_image, dim, interpolation = cv2.INTER_AREA)
+        self.bg_image = cv2.resize(self.bg_image, dim, interpolation=cv2.INTER_AREA)
         self.output_image = None
         self.mask = None
 
     def switchBackground(self, current_filter):
-        filterImagesLib = {
+        filter_images_lib = {
             'painterly': 'painterly_forest.jpg',
             'watercolor': 'IMG_2826-paint10.jpg',
-            'oil painting': 'IMG_0254-paint10.jpg'
+            'oil painting': 'IMG_0254-paint10.jpg',
+            'mosaic': 'IMG_0254-paint10.jpg'
         }
-        filterImage = filterImagesLib[current_filter]
-        imageFullPath = 'smart_canvas/backgrounds/' + filterImage
+        filter_image = filter_images_lib[current_filter]
+        image_full_path = 'smart_canvas/backgrounds/' + filter_image
 
-        self.bg_image = cv2.imread(imageFullPath)
+        self.bg_image = cv2.imread(image_full_path)
         dim = (1280, 720)
         self.bg_image = cv2.resize(self.bg_image, dim, interpolation = cv2.INTER_AREA)
         return self.bg_image
