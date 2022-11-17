@@ -74,6 +74,7 @@ def handle_client_message(message):
     if core.out_frame is None:
         return
     mod_message = header + "," + cv_to_b64(core.out_frame)
+    socketio.emit('current_state', core.get_current_state(), to=sid, broadcast=False) #send current state
     socketio.emit('consume', mod_message, to=sid, broadcast=False)
 
 @socketio.on('update_ui_request')

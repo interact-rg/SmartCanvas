@@ -65,6 +65,71 @@ class TestSocketIO(object):
         connection_state = sio_client.is_connected()
         assert connection_state is False
 
+class TestWebappSWTest(object):
+    def test_workflow(self, sio_client, capsys):
+        sio_client.connect()
+        connection_state = sio_client.is_connected()
+        assert connection_state is True
+        if "database.db" in os.listdir():
+            os.remove("database.db")
+        
+        input_img = cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/dummy.jpg")
+        responses = []
+        max_tries = 5000
+        while not responses and max_tries:
+            sio_client.emit(
+                "produce", f'data:image/jpg;base64,{cv_to_b64(input_img)}')
+            responses = sio_client.get_received()
+            max_tries -= 1
+        assert max_tries
+        assert "current_state" == responses[0]["name"] and "Idle" in responses[0]["args"][0]
+
+
+        input_img = cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/5_720.jpg")
+        max_tries = 5000
+        while max_tries:
+            responses = []
+            sio_client.emit(
+                "produce", f'data:image/jpg;base64,{cv_to_b64(input_img)}')
+            responses = sio_client.get_received()
+            if "GPDR_consent" in responses[0]["args"][0]:
+                break
+            max_tries -= 1
+        assert max_tries
+
+        input_img = cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/thumbs_up_720.jpg")
+        max_tries = 5000
+        while max_tries:
+            responses = []
+            sio_client.emit(
+                "produce", f'data:image/jpg;base64,{cv_to_b64(input_img)}')
+            responses = sio_client.get_received()
+            if "Active" in responses[0]["args"][0]:
+                break
+            max_tries -= 1
+        assert max_tries
+
+        input_img = cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/5_720.jpg")
+        max_tries = 5000
+        while max_tries:
+            responses = []
+            sio_client.emit(
+                "produce", f'data:image/jpg;base64,{cv_to_b64(input_img)}')
+            responses = sio_client.get_received()
+            
+            try:
+                if "Filter" in responses[0]["args"][0]:
+                    break
+            except IndexError:
+                pass
+            
+            max_tries -= 1
+        assert max_tries
+
+        sio_client.disconnect()
+        connection_state = sio_client.is_connected()
+        assert connection_state is False
+
 
 @pytest.fixture()
 def client():
@@ -109,49 +174,6 @@ class TestPages(object):
                 if response[i] != template[i]:
                     diffs += 1
             assert diffs <= 2 #lines with 'url_for(x)' will differ
-
-class TestFileUpload(object):
-    RESOURCE_URL = "/upload"
-
-    def test_get(self, client):
-        # Fail without token
-        resp = client.get(self.RESOURCE_URL)
-        assert resp.status_code == 405
-        # Fail with token
-        resp = client.get(
-            self.RESOURCE_URL,
-            headers={'Authorization': f'Bearer {TOKEN}'}
-        )
-        assert resp.status_code == 405
-
-    def test_post(self, client):
-        # Fail without token
-        contents = b'test-file-contents'
-        data = dict(file=(BytesIO(contents), 'test-1.jpeg'))
-        resp = client.post(
-            self.RESOURCE_URL,
-            data=data,
-            content_type='multipart/form-data'
-        )
-        assert resp.status_code == 401
-        # Fail with wrong token
-        data = dict(file=(BytesIO(contents), 'test-2.jpeg'))
-        resp = client.post(
-            self.RESOURCE_URL,
-            data=data,
-            content_type='multipart/form-data',
-            headers={'Authorization': f'Bearer wrong-token-123'}
-        )
-        assert resp.status_code == 401
-        # Succeed with valid token
-        data = dict(file=(BytesIO(contents), 'test-3.jpeg'))
-        resp = client.post(
-            self.RESOURCE_URL,
-            data=data,
-            content_type='multipart/form-data',
-            headers={'Authorization': f'Bearer {TOKEN}'}
-        )
-        assert resp.status_code == 201
 
 
 @pytest.mark.skip(reason="Needs to be reworked once new download functionality is made")
