@@ -50,7 +50,10 @@ document.addEventListener("DOMContentLoaded", async function (event) {
                   used_keys.push(key)
                   ui_element_div = document.getElementById(key);
                   ui_element_div.style.display = "block";
-                  if (key == "filter_name" || key == "image_showing_promote") {
+                  if (key == "help_1" || key == "help_2") {
+                    ui_element_div.children[1].textContent = msg[key];
+                  }
+                  else {
                     ui_element_div.children[0].textContent = msg[key];
                   }
                 }
