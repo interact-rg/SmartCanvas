@@ -75,6 +75,9 @@ class CanvasCore:
         ui_state["hold_timer"] = self.ui.get_prog("bar")
         return ui_state
 
+    def get_current_state(self):
+        return(str(self._state))
+
     def set_text_messages(self):
         self.ui.set_text("help_1", self.instruction_language.current_instruction_set["help_1"])
         self.ui.set_text("help_2", self.instruction_language.current_instruction_set["help_2"])
