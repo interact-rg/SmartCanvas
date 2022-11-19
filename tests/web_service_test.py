@@ -7,6 +7,9 @@ import cv2
 import pytest
 from flask_socketio import SocketIOTestClient
 import numpy as np
+import shutil
+from PIL import Image as im
+import smart_canvas.database as db
 
 from web import create_app
 from web.main.events import cv_to_b64, b64_to_cv
@@ -53,11 +56,11 @@ class TestSocketIO(object):
                 "produce", f'data:image/jpeg;base64,{cv_to_b64(frame)}')
             answers = sio_client.get_received()
             max_tries -= 1
-        first_answer = answers[0]
+        first_answer = answers[1]
         first_arg = first_answer["args"][0]
         b64_frame = first_arg.split(",")[1]
         processed_frame = b64_to_cv(b64_frame)
-        p_w, p_h, p_c = frame.shape
+        p_w, p_h, p_c = processed_frame.shape
         assert w == p_w
         assert h == p_h
         assert c == p_c
@@ -70,9 +73,8 @@ class TestWebappSWTest(object):
         sio_client.connect()
         connection_state = sio_client.is_connected()
         assert connection_state is True
-        if "database.db" in os.listdir():
-            os.remove("database.db")
         
+        # Wait for idle state
         input_img = cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/dummy.jpg")
         responses = []
         max_tries = 5000
@@ -84,7 +86,7 @@ class TestWebappSWTest(object):
         assert max_tries
         assert "current_state" == responses[0]["name"] and "Idle" in responses[0]["args"][0]
 
-
+        # Show 5 fingers to start
         input_img = cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/5_720.jpg")
         max_tries = 5000
         while max_tries:
@@ -97,6 +99,7 @@ class TestWebappSWTest(object):
             max_tries -= 1
         assert max_tries
 
+        # Accept GDPR
         input_img = cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/thumbs_up_720.jpg")
         max_tries = 5000
         while max_tries:
@@ -109,6 +112,7 @@ class TestWebappSWTest(object):
             max_tries -= 1
         assert max_tries
 
+        # Take picture and make sure "final" state is filter
         input_img = cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/5_720.jpg")
         max_tries = 5000
         while max_tries:
@@ -116,13 +120,11 @@ class TestWebappSWTest(object):
             sio_client.emit(
                 "produce", f'data:image/jpg;base64,{cv_to_b64(input_img)}')
             responses = sio_client.get_received()
-            
             try:
                 if "Filter" in responses[0]["args"][0]:
                     break
             except IndexError:
                 pass
-            
             max_tries -= 1
         assert max_tries
 
@@ -176,92 +178,46 @@ class TestPages(object):
             assert diffs <= 2 #lines with 'url_for(x)' will differ
 
 
-@pytest.mark.skip(reason="Needs to be reworked once new download functionality is made")
+
 class TestFileDownload(object):
-    RESOURCE_URL = "/uploads"
-    UPLOAD_URL = "/upload"
-
-    def test_get(self, client):
-        contents = b'test-file-contents'
-        # Put valid file into the system
-        data = dict(file=(BytesIO(contents), 'valid-file.jpeg'))
-        resp = client.post(
-            self.UPLOAD_URL,
-            data=data,
-            content_type='multipart/form-data',
-            headers={'Authorization': f'Bearer {TOKEN}'}
-        )
-        picture_url = resp.data.decode("utf-8")
-        picture_name = picture_url.split("/")[-1]
-        # Succeed with token, valid picture
-        resp = client.get(
-            f'{self.RESOURCE_URL}/{picture_name}',
-            follow_redirects=True,
-            headers={'Authorization': f'Bearer {TOKEN}'}
-        )
+    URL_ID_1 = "/dl_image/1"
+    URL_ID_2 = "/dl_image/2"
+    
+    def test_dl_too_old(self, client):
+        if "database.db" in os.listdir():
+            os.remove("database.db")
+        shutil.copyfile("tests/test_assets/database/database.db", "database.db")
+        
+        resp = client.get(self.URL_ID_1)
         assert resp.status_code == 200
-        assert resp.data == contents
-        # Fail without token, valid picture
-        resp = client.get(
-            f'{self.RESOURCE_URL}/{picture_name}',
-            follow_redirects=True
-        )
-        assert resp.status_code == 401
-        # Fail without token, invalid picture
-        resp = client.get(
-            f'{self.RESOURCE_URL}/not-going-to-work.jpeg',
-            follow_redirects=True
-        )
-        assert resp.status_code == 401
-        # Fail with token, invalid picture
-        resp = client.get(
-            f'{self.RESOURCE_URL}/not-going-to-work.jpeg',
-            headers={'Authorization': f'Bearer {TOKEN}'},
-            follow_redirects=True
-        )
-        assert resp.status_code == 404
+        response = resp.data.decode()
+        assert "Download failed, please try again later" in response and "Requested image too old" in response
+        
 
-    def test_post(self, client):
-        contents = b'test-file-contents'
-        # Put valid file into the system
-        data = dict(file=(BytesIO(contents), 'valid-file.jpeg'))
-        resp = client.post(
-            self.UPLOAD_URL,
-            data=data,
-            content_type='multipart/form-data',
-            headers={'Authorization': f'Bearer {TOKEN}'},
-        )
-        picture_url = resp.data.decode("utf-8")
-        picture_name = picture_url.split("/")[-1]
-        # Fail with real picture, valid picture
-        data = dict(file=(BytesIO(contents), picture_name))
-        resp = client.post(
-            resp.data,
-            follow_redirects=True,
-            data=data,
-            content_type='multipart/form-data',
-            headers={'Authorization': f'Bearer {TOKEN}'}
-        )
-        assert resp.status_code == 405
-        # Fail without token, invalid picture
-        data = dict(file=(BytesIO(contents), 'test-1.jpeg'))
-        resp = client.post(
-            f'{self.RESOURCE_URL}/not-going-to-work.jpeg',
-            follow_redirects=True,
-            data=data,
-            content_type='multipart/form-data'
-        )
-        assert resp.status_code == 405
-        # Fail with token, invalid picture
-        data = dict(file=(BytesIO(contents), 'test-2.jpeg'))
-        resp = client.post(
-            f'{self.RESOURCE_URL}/not-going-to-work.jpeg',
-            follow_redirects=True,
-            data=data,
-            content_type='multipart/form-data',
-            headers={'Authorization': f'Bearer {TOKEN}'}
-        )
-        assert resp.status_code == 405
+    def test_dl_nonexistent_id(self, client):
+        if "database.db" in os.listdir():
+            os.remove("database.db")
+        shutil.copyfile("tests/test_assets/database/database.db", "database.db")
+
+        resp = client.get(self.URL_ID_2)
+        assert resp.status_code == 200
+        response = resp.data.decode()
+        assert "Download failed, please try again later" in response and "Requested image id does not exist" in response
+        
+
+    def test_dl_new(self, client):
+        if "database.db" in os.listdir():
+            os.remove("database.db")
+        shutil.copyfile("tests/test_assets/database/database.db", "database.db")
+
+        db_obj = db.Database()
+        dummy_img = np.asarray(im.open("tests/test_assets/finger_pictures/dummy.jpg"))
+        db_obj.insert_blob(dummy_img)
+        resp = client.get(self.URL_ID_2)
+        assert resp.status_code == 200
+        with open("tests/test_assets/database/dl_reference.png", "rb") as f:
+            ref = f.read()
+        assert ref == resp.data
 
 
 class TestAPSchedulerAPI(object):
