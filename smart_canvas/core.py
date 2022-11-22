@@ -205,6 +205,7 @@ class GPDR_consent(State):
         self.take_pic_cnt = 0.0
         self.change_filter_time = 0.0
         self.finger_frame_interval = 0.0
+        self.waiting_time = 0.0
 
     # Runs once on init
     def enter(self, tick):
@@ -212,6 +213,7 @@ class GPDR_consent(State):
                           "idle_text_2")
         self.core.ui.show("bar", "gdpr_consent")
         self.core.ui.set_prog("bar", 1.1)
+        self.waiting_time = time.time() + 20
 
     # Update is called on new frame
     def update(self, tick, frame):
@@ -226,6 +228,9 @@ class GPDR_consent(State):
             self.update_filter_trigger(gesture)
 
             self.core.ui.set_prog("bar", self.take_pic_cnt)
+
+        if self.waiting_time - tick < 0:
+            self.core.set_state(Idle())
 
     def update_filter_trigger(self, gesture):
         if gesture != {'RIGHT': 'UNKNOWN', 'LEFT': 'UNKNOWN'}:

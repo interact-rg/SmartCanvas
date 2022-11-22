@@ -122,12 +122,19 @@ h5 {
   height: 700px;
 }
 #fs_ui a {
-  font-size: 30px;
+  font-size: 40px;
   width: 1280px;
+  font-family: Tahoma;
 }
 
 #ui a {
-  font-size: 30px;
+  font-size: 40px;
+  font-family: Tahoma;
+}
+
+#idle_text_1 a {
+  font-size: 60px;
+  font-weight: bold;
 }
 
 .topnav {

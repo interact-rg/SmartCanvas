@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
     const clientFeed = document.getElementById("clientFeed");
     const serverFeed = document.getElementById("serverFeed");
     const canvas = document.getElementById("canvas");
-    const itemsResized = false;
+    var itemsResized = false;
 
     const socket = io.connect({ reconnection: false });
 
@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
             console.log(server_feed_visible)
             var used_keys = [];
             for (var key in msg){
-                if (key != "hold_timer" && key != "countdown" && key !="idle_text_1") {
+                if (key != "hold_timer" && key != "countdown") {
                   used_keys.push(key)
                   ui_element_div = document.getElementById(key);
                   ui_element_div.style.display = "block";
@@ -166,10 +166,18 @@ document.addEventListener("DOMContentLoaded", async function (event) {
 
     //Once camera is initialized, adjust offsets of UI items based on resolution (currently will only work at 720/480p but should probably somehow made automatic)
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !itemsResized) {
+        console.log("text moving functions")
         const canvass = document.getElementById("canvas");
         const hold = document.getElementById("hold_progress");
         const ctr = document.getElementById("countdown_value");
         const processing_anim = document.getElementById("image_processing");
+        const idle_t_1 = document.getElementById("idle_text_1");
+        const idle_t_2 = document.getElementById("idle_text_2");
+        const gdpr_t = document.getElementById("gdpr_consent");
+        const help_t_1 = document.getElementById("help_1");
+        const help_t_2 = document.getElementById("help_2");
+        const filter_name = document.getElementById("filter_name");
+        const take_new = document.getElementById("image_showing_promote");
         if (canvass.width == 640 && canvas.height == 480) {
             console.log("setting UI to 480p")
             hold.style['transform'] = 'translate(140%,2800%)';
@@ -180,7 +188,14 @@ document.addEventListener("DOMContentLoaded", async function (event) {
             console.log("setting UI to 720p")
             hold.style['transform'] = 'translate(350%,4000%)';
             ctr.style['transform'] = 'translate(820%, 150%)';
-            processing_anim.style['transform'] = 'translate(80%,25%)'
+            processing_anim.style['transform'] = 'translate(80%,25%)';
+            idle_t_1.style['transform'] = 'translate(429px, 326px)';
+            idle_t_2.style['transform'] = 'translate(186px, 380px)';
+            gdpr_t.style['transform'] = 'translate(256px, 326px)';
+            help_t_1.style['transform'] = 'translate(640px, 0px)';
+            help_t_2.style['transform'] = 'translate(670px, 0px)';
+            filter_name.style['transform'] = 'translate(0px, -95px)';
+            take_new.style['transform'] = 'translate(0px, -52px)';
         }
 
         //"Stretch" everything to fit window (TODO?: Redo in some more sensible way)
@@ -189,6 +204,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
           const heightZoom = getHeight() / (canvass.height + 20);
           body.style.zoom = Math.min(widthZoom, heightZoom);
         }
+        itemsResized = true;
     }
 
     //Technically width/height should be the max of possible values but seems to work best with just clientHeight/clientWidth
