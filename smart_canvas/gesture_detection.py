@@ -49,10 +49,10 @@ class HandDetect:
             self.fingers_statuses[landmarks[4][2].upper()+'_THUMB_UP'] = True
         
         #Check if thumb tip lower than wrist point
-        if HandLabel == "Left" and landmarks[4][1] > landmarks[0][1]:   # Left thumb up
+        if HandLabel == "Left" and landmarks[4][1] > landmarks[0][1]:   # Left thumb down
             self.fingers_statuses[landmarks[4][2].upper()+'_THUMB_DOWN'] = True
         
-        if HandLabel == "Right" and landmarks[4][1] > landmarks[0][1]:    # Right thumb up
+        if HandLabel == "Right" and landmarks[4][1] > landmarks[0][1]:    # Right thumb down
             self.fingers_statuses[landmarks[4][2].upper()+'_THUMB_DOWN'] = True
 
 
