@@ -220,7 +220,6 @@ document.addEventListener("DOMContentLoaded", async function (event) {
 
     function resizeItem(item) {
       console.log("resizeItem called", item)
-      //test if ready for resizing by checking if some random element has existing width
       
       const center_texts = ["idle_text_1", "idle_text_2", "gdpr_consent"]
       const custom_texts = ["help_1", "help_2", "filter_name", "take_new"]
@@ -275,7 +274,6 @@ document.addEventListener("DOMContentLoaded", async function (event) {
         temp_element.style['transform'] = offsets[key]
       }
       
-      //temp_element.style['transform'] = offsets[key]
     }
 
     //Redo zooming on window size change
