@@ -43,11 +43,6 @@ def fs_sym():
     return render_template('fullscreen.html')
 
 
-@main.route('/settings')
-def settings():
-    """ Settings """
-    return render_template('settings.html')
-
 @main.route('/dl_image/<img_id>', methods=['GET'])
 def download_image(img_id):
     """ Image download"""

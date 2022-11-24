@@ -232,16 +232,6 @@ document.addEventListener("DOMContentLoaded", async function (event) {
         adjustCustomText(item)
       }
 
-      //const help_t_1 = document.getElementById("help_1");
-      //const help_t_2 = document.getElementById("help_2");
-      //const filter_name = document.getElementById("filter_name");
-      //const take_new = document.getElementById("image_showing_promote");
-//
-      //help_t_1.style['transform'] = 'translate(640px, 0px)';
-      //help_t_2.style['transform'] = 'translate(670px, 0px)';
-      //filter_name.style['transform'] = 'translate(0px, -95px)';
-      //take_new.style['transform'] = 'translate(0px, -52px)';
-
       return (true);
     }
 
