@@ -21,7 +21,6 @@ from smart_canvas.qr_code import *
 core_threads = {}
 core_queues = {}
 
-IMAGE_PROCESSING = False
 HOST_IP = "86.50.168.39"
 #HOST_IP = "127.0.0.1"
 
@@ -85,17 +84,11 @@ def update_ui():
 
 @socketio.on('check_image_processing')
 def check_image_processing():
-    global IMAGE_PROCESSING
     sid = request.sid
     core = core_threads[sid]
-    ui_state = core.get_ui_state()
-    if ui_state.get("countdown") == "0" and not IMAGE_PROCESSING:
-        print("emitting start")
-        IMAGE_PROCESSING = True
+    if core.image_processing_active:
         socketio.emit('imgage_processing_started', '', to=sid, broadcast=False)
-    if not ui_state.get("countdown") and len(ui_state.keys()) > 1 and IMAGE_PROCESSING:
-        print("emitting finished")
-        IMAGE_PROCESSING = False
+    if not core.image_processing_active and "ShowPic" in core.get_current_state():
         socketio.emit('imgage_processing_finished', '', to=sid, broadcast=False)
 
 @socketio.on('get_dl_link')
