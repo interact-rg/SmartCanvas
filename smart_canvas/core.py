@@ -39,6 +39,7 @@ class CanvasCore:
         self.ui = UI()
         self.win_size = screensize
         self.gdpr_accepted = False
+        self.image_processing_active = False
         self.instruction_language = InstructionsLanguage()
         self.filtered_frame = None
         # This is initial state
@@ -336,6 +337,7 @@ class Filter(State):
             self.core.out_frame = frame
         else:
             self.core.ui.hide("countdown")
+            self.core.image_processing_active = True
             self.apply_filter(frame)
             self.core.set_state(ShowPic())
 
@@ -366,6 +368,7 @@ class ShowPic(State):
         self.core.ui.set_text("filter_name", 'Current filter is {}'.format(self.core.filters.current_name))
         self.core.ui.show("filter_name")
         self.core.ui.show("image_showing_promote")
+        self.core.image_processing_active = False
 
         self.show_image_time = time.time() + 15
         # Frame does not change so update only once

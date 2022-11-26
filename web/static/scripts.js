@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
     //Normal and fullscreen modes use the same logic for canvas
     if (page_identifier.textContent == "fullscreen_symbol" || page_identifier.textContent == "normal") {
         var server_feed_visible = false;
+        var countdownStarted = false;
         socket.on("update_ui_response", (msg) => {
             console.log(msg);
             console.log("server feed visibile", server_feed_visible)
@@ -73,17 +74,28 @@ document.addEventListener("DOMContentLoaded", async function (event) {
                   }
                 }
                 else if (key == "countdown") {
-                  if (msg[key] == "0") {
-                    var html_item = document.getElementById("countdown");
-                    html_item.style.visibility = "hidden";
-                  }
-                  else {
-                    var html_item = document.getElementById("countdown");
-                    html_item.style.visibility = "visible";
-                    html_item = document.getElementById("countdown_value");
-                    html_item.textContent = msg[key]
+                  if (!countdownStarted) {
+                    countdownStarted = true;
                   }
                 }
+
+                console.log("countrdownstarted", countdownStarted)
+                console.log("in msg ", "countdown" in msg)
+                console.log("msg len", Object.keys(msg).length)
+                if (countdownStarted && Object.keys(msg).length == 1) {
+                  console.log("making hidden")
+                  var html_item = document.getElementById("countdown");
+                  html_item.style.visibility = "hidden";
+                  countdownStarted = false;
+                }
+                else if (key == "countdown" && countdownStarted && Object.keys(msg).length != 1) {
+                  console.log("making visible")
+                  var html_item = document.getElementById("countdown");
+                  html_item.style.visibility = "visible";
+                  html_item = document.getElementById("countdown_value");
+                  html_item.textContent = msg[key]
+                }
+                
             }
             var children = document.getElementById("fs_ui").children;
             var to_hide_element = null;
@@ -195,7 +207,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
           const heightZoom = getHeight() / (canvass.height + 20);
           body.style.zoom = Math.min(widthZoom, heightZoom);
         }
-        //itemsResized = true;
+
     }
 
     //Technically width/height should be the max of possible values but seems to work best with just clientHeight/clientWidth
