@@ -82,13 +82,13 @@ document.addEventListener("DOMContentLoaded", async function (event) {
                 console.log("countrdownstarted", countdownStarted)
                 console.log("in msg ", "countdown" in msg)
                 console.log("msg len", Object.keys(msg).length)
-                if (countdownStarted && Object.keys(msg).length == 1) {
-                  console.log("making hidden")
-                  var html_item = document.getElementById("countdown");
-                  html_item.style.visibility = "hidden";
-                  countdownStarted = false;
-                }
-                else if (key == "countdown" && countdownStarted && Object.keys(msg).length != 1) {
+                //if (countdownStarted && Object.keys(msg).includes("image_showing_promote")) {
+                //  console.log("making hidden")
+                //  var html_item = document.getElementById("countdown");
+                //  html_item.style.visibility = "hidden";
+                //  countdownStarted = false;
+                //}
+                if (key == "countdown" && countdownStarted && Object.keys(msg).length != 1) {
                   console.log("making visible")
                   var html_item = document.getElementById("countdown");
                   html_item.style.visibility = "visible";
@@ -131,6 +131,9 @@ document.addEventListener("DOMContentLoaded", async function (event) {
             var processing_element = document.getElementById("image_processing");
             processing_element.style.display = "block";
             server_feed_visible = true;
+            var html_item = document.getElementById("countdown");
+            html_item.style.visibility = "hidden";
+            countdownStarted = false;
         });
         socket.on("imgage_processing_finished", (msg) => {
             console.log("image processing finished")
@@ -176,7 +179,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       let interval = setInterval(() => {
-        socket.emit("update_ui_request");
+        //socket.emit("update_ui_request");
         socket.emit("check_image_processing");
       }, 200);
     }
