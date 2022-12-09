@@ -39,7 +39,7 @@ setup(
         'eventlet==0.30.2',
         'Werkzeug==2.0.2',
         'Flask-APScheduler==1.12.2',
-        'Flask-HTTPAuth==4.5.0',
+        'Flask-HTTPAuth==4.5.0'
     ],
     setup_requires=['wheel']
 )
