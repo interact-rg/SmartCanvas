@@ -24,7 +24,7 @@ make web
 To keep the server running after exiting the terminal you can use screen or nohup when starting the application.
 
 ```console
-nohup make web
+nohup make web &
 ```
 
 or alternatively
