@@ -19,4 +19,4 @@ make init
 make web
 ```
 
-# The server should now work and is accessed via the <floating ip>:<port> combination. 
+# The server should now work and is accessed via the floatingip:port combination. 
