@@ -19,4 +19,24 @@ make init
 make web
 ```
 
-# The server should now work and is accessed via the floatingip:port combination. 
+# The server should now work and is accessed via the floatingip:port combination.
+
+To keep the server running after exiting the terminal you can use screen or nohup when starting the application.
+
+```console
+nohup make web
+```
+
+or alternatively
+
+```console
+nohup make web
+```
+
+```console
+sudo apt update
+sudo apt install screen
+screen
+screen -S session_name
+```
+and then start the application with make web.
