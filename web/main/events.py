@@ -10,7 +10,6 @@ from flask_socketio import SocketIO, send, emit
 from flask import request
 import numpy as np
 import cv2
-#from smart_canvas.core import CanvasCore
 import smart_canvas.core
 
 # Internal modules
