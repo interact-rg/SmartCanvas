@@ -27,7 +27,7 @@ class TestUI(object):
         ui.draw()
         assert True == True
 
-    def test_ui_context(self, ui, ctx):
+    def test_ui_context(self, ui):
         text_name = "text_test"
         prog_name = "progress_test"
         ui.create_text(text_name, (0,0), 0.0)

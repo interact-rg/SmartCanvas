@@ -14,7 +14,7 @@ TOKEN = 'test-token-ea520c84'
 def session():
     yield requests.Session()
 
-
+@pytest.mark.skip(reason="mock_server.py not currently used for anything")
 class TestMockServer(object):
     def test_config_with_token(self, session):
         config = {
