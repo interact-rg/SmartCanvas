@@ -76,13 +76,6 @@ def handle_client_message(message):
     socketio.emit('current_state', core.get_current_state(), to=sid, broadcast=False) #send current state
     socketio.emit('consume', mod_message, to=sid, broadcast=False)
 
-#Not used atm
-#@socketio.on('update_ui_request')
-#def update_ui():
-#    sid = request.sid
-#    core = core_threads[sid]
-#    socketio.emit('update_ui_response', core.get_ui_state(), to=sid, broadcast=False)
-
 @socketio.on('check_image_processing')
 def check_image_processing():
     sid = request.sid
