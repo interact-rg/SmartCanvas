@@ -51,7 +51,7 @@ class TestSocketIO(object):
         w, h, c = frame.shape
         answers = []
         max_tries = 5000
-        while not answers and max_tries:
+        while len(answers) < 2 and max_tries:
             sio_client.emit(
                 "produce", f'data:image/jpeg;base64,{cv_to_b64(frame)}')
             answers = sio_client.get_received()
@@ -78,7 +78,7 @@ class TestWebappSWTest(object):
         input_img = cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/dummy.jpg")
         responses = []
         max_tries = 5000
-        while not responses and max_tries:
+        while len(responses) < 2 and max_tries:
             sio_client.emit(
                 "produce", f'data:image/jpg;base64,{cv_to_b64(input_img)}')
             responses = sio_client.get_received()

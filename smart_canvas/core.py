@@ -18,6 +18,10 @@ from smart_canvas.filters.carousel import FilterCarousel
 from smart_canvas.ui import UI
 from smart_canvas.database import Database
 from smart_canvas.instructions import InstructionsLanguage
+try:
+    from web.main.common_events import send_ui_state
+except ImportError:
+    pass # import will fail when running openGL version but not needed in that case -> just ignore
 
 
 class CanvasCore:
@@ -26,7 +30,7 @@ class CanvasCore:
     """
     _state = None
 
-    def __init__(self, q_consumer, screensize: tuple):
+    def __init__(self, q_consumer, screensize: tuple, webapp=False, sid=None):
         self.q_consumer = q_consumer
         self.stopped = False
         self.tick = time.time()
@@ -42,6 +46,8 @@ class CanvasCore:
         self.image_processing_active = False
         self.instruction_language = InstructionsLanguage()
         self.filtered_frame = None
+        self.is_webapp = webapp
+        self.sid = sid
         # This is initial state
         self.set_state(Startup())
 
@@ -163,6 +169,9 @@ class Idle(State):
         else:
             self.core.database.create_database()
 
+        if self.core.is_webapp:
+            send_ui_state(self.core.get_ui_state(), self.core.sid)
+
         # masked_frame = self.core.fg_masker.apply(frame)
         # filtered_frame = self.core.filters.current_filter(masked_frame)
         # self.core.filtered_frame = self.core.fg_masker.changeBackground(filtered_frame)
@@ -190,6 +199,8 @@ class Idle(State):
             thread = Thread(target=self.core.database.delete)
             thread.start()
             self.core.ui.set_prog("bar", self.take_pic_cnt)
+            if self.core.is_webapp:
+                send_ui_state(self.core.get_ui_state(), self.core.sid)
 
     def update_filter_trigger(self, finger_count):
         if finger_count == 5:
@@ -216,6 +227,9 @@ class GPDR_consent(State):
         self.core.ui.set_prog("bar", 1.1)
         self.waiting_time = time.time() + 20
 
+        if self.core.is_webapp:
+            send_ui_state(self.core.get_ui_state(), self.core.sid)
+
     # Update is called on new frame
     def update(self, tick, frame):
         # Now we update UI elements to Opengl so no need to wait for slow functions to finish
@@ -229,6 +243,8 @@ class GPDR_consent(State):
             self.update_filter_trigger(gesture)
 
             self.core.ui.set_prog("bar", self.take_pic_cnt)
+            if self.core.is_webapp:
+                send_ui_state(self.core.get_ui_state(), self.core.sid)
 
         if self.waiting_time - tick < 0:
             self.core.set_state(Idle())
@@ -267,7 +283,10 @@ class Active(State):
         self.core.ui.hide("idle_text_1", "idle_text_2", "bar", "image_showing_promote", "gdpr_consent")
         self.core.ui.show("help_1", "help_2", "filter_name", "bar")
         self.core.ui.set_prog("bar", 0.0)
-        self.waiting_time = time.time() + 20
+        self.waiting_time = time.time() + 60
+
+        if self.core.is_webapp:
+            send_ui_state(self.core.get_ui_state(), self.core.sid)
 
     # Update is called on new frame
     def update(self, tick, frame):
@@ -283,6 +302,8 @@ class Active(State):
             self.update_language_set(finger_count, tick)
 
             self.core.ui.set_prog("bar", self.take_pic_cnt)
+            if self.core.is_webapp:
+                send_ui_state(self.core.get_ui_state(), self.core.sid)
 
         if self.waiting_time - tick < 0:
             self.core.out_frame = self.core.filtered_frame
@@ -331,6 +352,9 @@ class Filter(State):
         self.core.ui.set_text("countdown", "3")
         self.core.ui.show("countdown")
 
+        if self.core.is_webapp:
+            send_ui_state(self.core.get_ui_state(), self.core.sid)
+
     def update(self, tick, frame):
         if self.countdown_time - tick > 0:
             self.core.ui.set_text("countdown", '{}'.format(int(self.countdown_time - tick)))
@@ -340,6 +364,8 @@ class Filter(State):
             self.core.image_processing_active = True
             self.apply_filter(frame)
             self.core.set_state(ShowPic())
+        if self.core.is_webapp:
+            send_ui_state(self.core.get_ui_state(), self.core.sid)
 
     def apply_filter(self, frame):
 
@@ -373,6 +399,9 @@ class ShowPic(State):
         self.show_image_time = time.time() + 15
         # Frame does not change so update only once
         self.core.out_frame = self.core.filtered_frame
+
+        if self.core.is_webapp:
+            send_ui_state(self.core.get_ui_state(), self.core.sid)
 
         # TODO If gpdr was accepted, save image to db
         if self.core.gdpr_accepted:
