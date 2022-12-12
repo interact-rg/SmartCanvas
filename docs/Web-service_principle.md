@@ -1,14 +1,6 @@
 # Web-service principle
-![image](https://user-images.githubusercontent.com/49340148/136955296-421fd326-545e-46c3-b609-3b47fcb837c6.png)
+![image](https://raw.githubusercontent.com/antilaanssi/SmartCanvasV/main/.github/images/web-service-prinsible-new.png)
 
-The webservice allows a customer to see current status of the project effortlessly without the need to run the software locally.
-The web-service is not a required functionality of the project, but rather a convenience for the customer.
+The webservice allows the core application to be hosted in cloud improving stability and providing functionalities such as image download. Instructions for hosting the application can be found in web_app_installation.md.
 
-Having such service available, we shorten the feedbackloop between customer and the current implementation.
-Customer can see the current implementation and report feedback right away.
-
-It is also important that the customer understands that image processing is computationally heavy. Therefore web-service does not provide the same performance as the local development machines or the deployed machine. The web-service does not give one the same experience but tries to rather give a glimpse of how the actual deployment will feel like.
-
-The endpoint to the web-service is https://uni-smartcanvas.herokuapp.com/
-
-### ! Mind what you show to the camera at the web-service, it is by design insecure. !
+Idea of the webservice is to wrap the core implementation so that usage of it is possible on any computer without the need of installing required python dependancies. Important to note is that the current implementation does not encrpyt the image feed in any way and thus you should be midful of what is visible on the camera.

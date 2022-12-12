@@ -65,5 +65,4 @@ def download_image(img_id):
         else:
             return render_template("dl_failed.html", reason="Requested image too old")
 
-
     return render_template("dl_failed.html", reason="Requested image id does not exist")

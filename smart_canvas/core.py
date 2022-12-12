@@ -18,7 +18,10 @@ from smart_canvas.filters.carousel import FilterCarousel
 from smart_canvas.ui import UI
 from smart_canvas.database import Database
 from smart_canvas.instructions import InstructionsLanguage
-from web.main.common_events import send_ui_state
+try:
+    from web.main.common_events import send_ui_state
+except ImportError:
+    pass # import will fail when running openGL version but not needed in that case -> just ignore
 
 
 class CanvasCore:
@@ -280,7 +283,7 @@ class Active(State):
         self.core.ui.hide("idle_text_1", "idle_text_2", "bar", "image_showing_promote", "gdpr_consent")
         self.core.ui.show("help_1", "help_2", "filter_name", "bar")
         self.core.ui.set_prog("bar", 0.0)
-        self.waiting_time = time.time() + 20
+        self.waiting_time = time.time() + 60
 
         if self.core.is_webapp:
             send_ui_state(self.core.get_ui_state(), self.core.sid)

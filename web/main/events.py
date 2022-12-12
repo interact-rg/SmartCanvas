@@ -10,7 +10,7 @@ from flask_socketio import SocketIO, send, emit
 from flask import request
 import numpy as np
 import cv2
-from smart_canvas.core import CanvasCore
+import smart_canvas.core
 
 # Internal modules
 from .. import socketio
@@ -29,7 +29,7 @@ def connect_web():
     print('[INFO] Web client connected: {}'.format(request.sid))
     sid = request.sid
     core_queues.update({sid: Queue()})
-    core_threads.update({sid: CanvasCore(q_consumer=core_queues[sid], screensize=(0, 0), webapp=True, sid=sid).start()})
+    core_threads.update({sid: smart_canvas.core.CanvasCore(q_consumer=core_queues[sid], screensize=(0, 0), webapp=True, sid=sid).start()})
 
 
 @socketio.on('disconnect')
@@ -75,13 +75,6 @@ def handle_client_message(message):
     mod_message = header + "," + cv_to_b64(core.out_frame)
     socketio.emit('current_state', core.get_current_state(), to=sid, broadcast=False) #send current state
     socketio.emit('consume', mod_message, to=sid, broadcast=False)
-
-#Not used atm
-#@socketio.on('update_ui_request')
-#def update_ui():
-#    sid = request.sid
-#    core = core_threads[sid]
-#    socketio.emit('update_ui_response', core.get_ui_state(), to=sid, broadcast=False)
 
 @socketio.on('check_image_processing')
 def check_image_processing():
