@@ -18,7 +18,8 @@ class InstructionsLanguage:
                     "watercolor": "watercolor",
                     "oil painting": "oil painting",
                     "mosaic": "mosaic",
-                    "grayscale cartoon": "grayscale cartoon"
+                    "grayscale cartoon": "grayscale cartoon",
+					"anime style": "anime style"
                 }
             },
             "finnish": {
@@ -35,7 +36,8 @@ class InstructionsLanguage:
                     "watercolor": "akvarelli",
                     "oil painting": "öljyvärimaalaus",
                     "mosaic": "mosaiikki",
-                    "grayscale cartoon": "grayscale cartoon"
+                    "grayscale cartoon": "grayscale cartoon",
+					"anime style": "anime style"
                 }
             }
         }

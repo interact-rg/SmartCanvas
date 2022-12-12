@@ -40,6 +40,9 @@ setup(
         'Werkzeug==2.0.2',
         'Flask-APScheduler==1.12.2',
         'Flask-HTTPAuth==4.5.0'
+		# AI filtering (cuda probably not working)
+		'torch>=1.7.1',
+		'torchvision'
     ],
     setup_requires=['wheel']
 )
