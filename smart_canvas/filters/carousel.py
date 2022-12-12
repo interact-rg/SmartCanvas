@@ -2,7 +2,6 @@
 
 # Default packages
 import itertools
-from dataclasses import dataclass
 
 import smart_canvas.filters.mosaic
 # Internal modules
