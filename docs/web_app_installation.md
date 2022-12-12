@@ -12,7 +12,22 @@ Associate a floating ip for your machine.
 
 Open SSH access for your ip in the security groups and open access to port 5000 for all IP-addresses (0.0.0.0)
 
+# Clone SmartCanvas to your server:
+
+```console
+git clone git@github.com:interact-rg/SmartCanvas.git
+```
+Or from your own fork of the project.
+
 # Run the following commands on the server
+
+First enable flask port in firewall:
+
+```console
+sudo ufw allow 5000
+```
+
+Then launch the server
 
 ```console
 make init
