@@ -10,12 +10,11 @@ from smart_canvas.filters.watercolor import watercolor
 from smart_canvas.filters.oil_painting import oil_painting
 from smart_canvas.filters.mosaic import mosaic_filter
 from smart_canvas.filters.gs_cartoon import gs_cartoon_filter
-from smart_canvas.filters.animeStyle import AnimeFilter
-
+from smart_canvas.filters.animeFilter.animeStyle import AnimeFilter
 
 
 class FilterCarousel:
-	animeFilter = AnimeFilter() # needs an instance
+	animeFilter = AnimeFilter()
 
 	catalog = {
 		'painterly': painterly_filter,
@@ -23,8 +22,7 @@ class FilterCarousel:
 		'oil painting': oil_painting,
 		'mosaic': mosaic_filter,
 		'grayscale cartoon': gs_cartoon_filter,
-		'animeStyle': animeFilter.filter
-		
+		'anime style': animeFilter.filter
 	}
 	carousel = itertools.cycle(catalog)
 

@@ -19,7 +19,7 @@ class InstructionsLanguage:
                     "oil painting": "oil painting",
                     "mosaic": "mosaic",
                     "grayscale cartoon": "grayscale cartoon",
-					"animeStyle": "anime style"
+					"anime style": "anime style"
                 }
             },
             "finnish": {
@@ -37,7 +37,7 @@ class InstructionsLanguage:
                     "oil painting": "öljyvärimaalaus",
                     "mosaic": "mosaiikki",
                     "grayscale cartoon": "grayscale cartoon",
-					"animeStyle": "anime style"
+					"anime style": "anime style"
                 }
             }
         }

@@ -39,13 +39,10 @@ setup(
         'eventlet==0.30.2',
         'Werkzeug==2.0.2',
         'Flask-APScheduler==1.12.2',
-        'Flask-HTTPAuth==4.5.0',
-        'mysql==0.0.3',
-        'mysqlclient==2.1.1',
-        'mysql-connector-python==8.0.31',
+        'Flask-HTTPAuth==4.5.0'
 		# AI filtering (cuda probably not working)
 		'torch>=1.7.1',
-		'torchvision',
+		'torchvision'
     ],
     setup_requires=['wheel']
 )

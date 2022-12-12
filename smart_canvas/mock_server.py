@@ -18,7 +18,7 @@ class MockServer:
     def start(self):
         self.server = Process(
             target=self.app.run,
-            args=('127.0.0.1', self.port,),
+            args=('127.0.0.1', self.port),
             daemon=True,
         )
         self.server.start()

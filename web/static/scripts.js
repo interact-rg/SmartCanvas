@@ -79,16 +79,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
                   }
                 }
 
-                console.log("countrdownstarted", countdownStarted)
-                console.log("in msg ", "countdown" in msg)
-                console.log("msg len", Object.keys(msg).length)
-                if (countdownStarted && Object.keys(msg).length == 1) {
-                  console.log("making hidden")
-                  var html_item = document.getElementById("countdown");
-                  html_item.style.visibility = "hidden";
-                  countdownStarted = false;
-                }
-                else if (key == "countdown" && countdownStarted && Object.keys(msg).length != 1) {
+                if (key == "countdown" && countdownStarted && Object.keys(msg).length != 1) {
                   console.log("making visible")
                   var html_item = document.getElementById("countdown");
                   html_item.style.visibility = "visible";
@@ -131,13 +122,16 @@ document.addEventListener("DOMContentLoaded", async function (event) {
             var processing_element = document.getElementById("image_processing");
             processing_element.style.display = "block";
             server_feed_visible = true;
+            var html_item = document.getElementById("countdown");
+            html_item.style.visibility = "hidden";
+            countdownStarted = false;
         });
         socket.on("imgage_processing_finished", (msg) => {
             console.log("image processing finished")
             var processing_element = document.getElementById("image_processing");
             processing_element.style.display = "none";
 
-            //Request download link (TODO: make condinational based on wheter user allowed for saving)
+            //Request download link (response will only come if core is in "gdpr accepted" state)
             socket.emit("get_dl_link", "");
         });
     }
@@ -151,7 +145,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       let stream = await navigator.mediaDevices.getUserMedia({
-        //480p will also work fine but other resolutions might cause unexpected behaviour
+        //480p should also work fine but other resolutions might cause unexpected behaviour
         video: {
             width: { ideal: 1280 },
             height: { ideal: 720 } 
@@ -176,7 +170,6 @@ document.addEventListener("DOMContentLoaded", async function (event) {
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       let interval = setInterval(() => {
-        socket.emit("update_ui_request");
         socket.emit("check_image_processing");
       }, 200);
     }

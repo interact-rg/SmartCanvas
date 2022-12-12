@@ -22,8 +22,8 @@ class ForegroundMask:
             'watercolor': 'IMG_2826-paint10.jpg',
             'oil painting': 'IMG_0254-paint10.jpg',
             'mosaic': 'IMG_0254-paint10.jpg',
-			'grayscale cartoon': 'forest_2_bw.jpeg',
-			'animeStyle': 'anime_test.jpg'
+            'grayscale cartoon': 'forest_2_bw.jpeg',
+			'anime style': 'anime_bg.jpg'
         }
         filter_image = filter_images_lib[current_filter]
         image_full_path = 'smart_canvas/backgrounds/' + filter_image

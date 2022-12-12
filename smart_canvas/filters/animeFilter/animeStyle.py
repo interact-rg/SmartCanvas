@@ -4,7 +4,7 @@ import torch
 from torchvision.transforms.functional import to_tensor, to_pil_image
 from PIL import Image
 
-from smart_canvas.filters.model import Generator
+from smart_canvas.filters.animeFilter.model import Generator
 
 
 class AnimeFilter:
