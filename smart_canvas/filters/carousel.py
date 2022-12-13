@@ -10,8 +10,8 @@ from smart_canvas.filters.watercolor import watercolor
 from smart_canvas.filters.oil_painting import oil_painting
 from smart_canvas.filters.mosaic import mosaic_filter
 from smart_canvas.filters.gs_cartoon import gs_cartoon_filter
-from smart_canvas.filters.animeFilter.animeStyle import AnimeFilter
-from smart_canvas.filters.pointillism.pointillism import pointillism
+from .animefilter.animestyle import AnimeFilter
+from .pointillism.pointillism import pointillism
 
 
 class FilterCarousel:
