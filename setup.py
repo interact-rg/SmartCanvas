@@ -39,10 +39,14 @@ setup(
         'eventlet==0.30.2',
         'Werkzeug==2.0.2',
         'Flask-APScheduler==1.12.2',
-        'Flask-HTTPAuth==4.5.0'
-		# AI filtering (cuda probably not working)
+        'Flask-HTTPAuth==4.5.0',
+		# filtering 
 		'torch>=1.7.1',
-		'torchvision'
+		'torchvision',
+		'scipy==1.9.3',
+		'sklearn==0.0',
+		'scikit-learn==1.2.0',
+		'six==1.16.0'
     ],
     setup_requires=['wheel']
 )

@@ -11,6 +11,7 @@ from smart_canvas.filters.oil_painting import oil_painting
 from smart_canvas.filters.mosaic import mosaic_filter
 from smart_canvas.filters.gs_cartoon import gs_cartoon_filter
 from smart_canvas.filters.animeFilter.animeStyle import AnimeFilter
+from smart_canvas.filters.pointillism.pointillism import pointillism
 
 
 class FilterCarousel:
@@ -22,7 +23,8 @@ class FilterCarousel:
 		'oil painting': oil_painting,
 		'mosaic': mosaic_filter,
 		'grayscale cartoon': gs_cartoon_filter,
-		'anime style': animeFilter.filter
+		'anime style': animeFilter.filter,
+		'pointillism': pointillism
 	}
 	carousel = itertools.cycle(catalog)
 

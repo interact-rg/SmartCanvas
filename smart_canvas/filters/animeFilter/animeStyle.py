@@ -12,14 +12,20 @@ class AnimeFilter:
 	def __init__(self):
 
 		self.device = "cpu" # change to to cuda if available
-		self.model="./smart_canvas/filters/weights/face_paint_512_v2.pt"
+		self.model="./smart_canvas/filters/animeFilter/weights/face_paint_512_v2.pt"
 		self.net = Generator()
 		self.net.load_state_dict(torch.load(self.model, map_location="cpu"))
 		self.net.to(self.device).eval()
-		print(f"model loaded: {self.model}")
+		print(f"model weights loaded: {self.model}")
 
 
 	def filter(self, original_img):
+		
+		original_shape = original_img.shape
+		# fix for small image test
+		if original_shape[0] < 8 or original_shape[1] < 8:
+			original_img = cv2.resize(original_img, (8, 8))
+
 		
 		PIL_img = self.convert_openCV_to_PIL(original_img)
 
@@ -30,6 +36,10 @@ class AnimeFilter:
 			out_img = to_pil_image(out_img)
 
 		opencv_img = self.convert_PIL_to_openCV(out_img)
+
+		filtered_shape = opencv_img.shape
+		if filtered_shape != original_shape:
+			opencv_img = cv2.resize(opencv_img, (original_shape[0], original_shape[1]), interpolation=cv2.INTER_CUBIC)
 
 		return opencv_img
 
