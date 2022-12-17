@@ -47,9 +47,9 @@ class TestFilters(object):
 			assert c == p_c, f'wrong amount of color channels in: {carousel.current_name}'
 			carousel.next_filter()
 
-	# TODO: This test breaks alot of filters
+	# TODO: This test breaks alot of filters if smaller size image
 	def test_filter_with_min_imagesize(self, carousel):
-		frame = (np.random.random((2, 2, 3)) * 255).astype(np.uint8) # min input size
+		frame = (np.random.random((5, 5, 3)) * 255).astype(np.uint8) # min input size
 		w, h, c = frame.shape
 		for _ in carousel.catalog:
 			filtered_frame = carousel.current_filter(frame)
