@@ -50,3 +50,6 @@ ENV/
 
 # vscode
 settings.json
+database.db
+
+database.db

@@ -21,8 +21,8 @@ from smart_canvas.qr_code import *
 core_threads = {}
 core_queues = {}
 
-HOST_IP = "86.50.168.39"
-#HOST_IP = "127.0.0.1"
+#HOST_IP = "86.50.168.39"
+HOST_IP = "127.0.0.1"
 
 @socketio.on('connect')
 def connect_web():
