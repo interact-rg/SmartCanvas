@@ -15,24 +15,24 @@ from .pointillism.pointillism import pointillism
 
 
 class FilterCarousel:
-	animeFilter = AnimeFilter()
+    animeFilter = AnimeFilter()
 
-	catalog = {
-		'painterly': painterly_filter,
-		'watercolor': watercolor,
-		'oil painting': oil_painting,
-		'mosaic': mosaic_filter,
-		'grayscale cartoon': gs_cartoon_filter,
-		'anime style': animeFilter.filter,
-		'pointillism': pointillism
-	}
-	carousel = itertools.cycle(catalog)
+    catalog = {
+        'painterly': painterly_filter,
+        'watercolor': watercolor,
+        'oil painting': oil_painting,
+        'mosaic': mosaic_filter,
+        'grayscale cartoon': gs_cartoon_filter,
+        'anime style': animeFilter.filter,
+        'pointillism': pointillism
+    }
+    carousel = itertools.cycle(catalog)
 
-	def __init__(self, **kwargs):
-		self.current_filter = None
-		self.current_name = None
-		self.next_filter()
+    def __init__(self, **kwargs):
+        self.current_filter = None
+        self.current_name = None
+        self.next_filter()
 
-	def next_filter(self):
-		self.current_name = next(self.carousel)
-		self.current_filter = self.catalog[self.current_name]
+    def next_filter(self):
+        self.current_name = next(self.carousel)
+        self.current_filter = self.catalog[self.current_name]
