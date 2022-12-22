@@ -1,0 +1,178 @@
+body {
+    background-color: #3c3c3c;
+  }
+
+.container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-top: 30px;
+  width: 100%;
+  align-content: center;
+}
+.container_fs {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-top: 0px;
+  width: 100%;
+  align-content: center;
+}
+
+.navbar-light .navbar-nav .nav-link,
+.navbar-light .navbar-nav .nav-link:hover {
+  font-family: Karla;
+  font-size: 14px;
+  color: #000000;
+}
+
+.navbar-brand img {
+  width: 120px;
+}
+
+.dash-sub-title h1 {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 24px 0 8px 0;
+}
+
+.dash-sub-title h2 {
+  font-size: 14px;
+  margin: 8px 0 8px 0;
+}
+
+.card {
+  height: 100%;
+}
+
+.card-deck {
+  display: block;
+}
+
+.card-scroller {
+  overflow: scroll;
+  height: 420px;
+}
+
+.stop-button {
+  opacity: 1;
+  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMjRweCIgaGVpZ2h0PSIyNHB4IiB2aWV3Qm94PSIwIDAgMjQgMjQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDU3LjEgKDgzMDg4KSAtIGh0dHBzOi8vc2tldGNoLmNvbSAtLT4KICAgIDx0aXRsZT5Hcm91cEAxeDwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxkZWZzPgogICAgICAgIDxwb2x5Z29uIGlkPSJwYXRoLTEiIHBvaW50cz0iNS45OTk5OTk5OCA1Ljk5OTk5OTk3IDE4IDUuOTk5OTk5OTcgMTggMTggNS45OTk5OTk5OCAxOCI+PC9wb2x5Z29uPgogICAgPC9kZWZzPgogICAgPGcgaWQ9IlN0cmVhbWVyIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0iU3RyZWFtZXItRmluYWwtQ29weS00IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNDE5LjAwMDAwMCwgLTE3OS4wMDAwMDApIj4KICAgICAgICAgICAgPGcgaWQ9Ikdyb3VwIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0MTkuMDAwMDAwLCAxNzkuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlIiBmaWxsPSIjRkZGRkZGIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiPjwvcmVjdD4KICAgICAgICAgICAgICAgIDxnIGlkPSJzdG9wIj4KICAgICAgICAgICAgICAgICAgICA8cG9seWdvbiBpZD0iQmFzZSIgcG9pbnRzPSItNS4wMDAwMDExMmUtMDggLTQuOTk5OTkyNmUtMDggMjQgLTQuOTk5OTkyNmUtMDggMjQgMjQuMDAwMDAwMSAtNS4wMDAwMDExMmUtMDggMjQuMDAwMDAwMSI+PC9wb2x5Z29uPgogICAgICAgICAgICAgICAgICAgIDxtYXNrIGlkPSJtYXNrLTIiIGZpbGw9IndoaXRlIj4KICAgICAgICAgICAgICAgICAgICAgICAgPHVzZSB4bGluazpocmVmPSIjcGF0aC0xIj48L3VzZT4KICAgICAgICAgICAgICAgICAgICA8L21hc2s+CiAgICAgICAgICAgICAgICAgICAgPGcgaWQ9Ikljb24iPjwvZz4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i4oazLfCfjqgtQ29sb3IiIGZpbGw9IiNGMjMwM0EiIGZpbGwtcnVsZT0iZXZlbm9kZCIgbWFzaz0idXJsKCNtYXNrLTIpIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiPjwvcmVjdD4KICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgPC9nPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+)
+    no-repeat;
+  cursor: pointer;
+  border: none;
+  width: 24px;
+  height: 24px;
+  float: right;
+}
+
+.stop-button:hover {
+  opacity: 0.75;
+}
+
+h5 {
+  border-bottom: solid 1px #d2d2d2;
+}
+
+#canvasCard {
+  display: none;
+}
+
+#clientCard {
+  display: none;
+} 
+
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+#hold_bar, #serverFeedDiv, #countdown {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+#hold_bar {
+  z-index: 1;
+}
+#serverFeedDiv {
+  z-index: 0;
+}
+#hold_progress {
+  color: aqua;
+  transform: translate(140%,2800%);
+}
+#countdown_value {
+  display: inline-block;
+  transform: translate(350%, 100%);
+  font-size: 150px;
+}
+
+#fs_ui {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  height: 700px;
+}
+#fs_ui a {
+  font-size: 35px;
+  width: 1280px;
+  font-family: Tahoma;
+}
+
+#ui a {
+  font-size: 40px;
+  font-family: Tahoma;
+}
+
+#idle_text_1 a {
+  font-size: 60px;
+  font-weight: bold;
+}
+
+.topnav {
+  background-color: #333;
+  overflow: hidden;
+  display: flex;
+}
+.topnav a {
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  font-size: 25px;
+}
+.topnav a.link:hover {
+  background-color: #ddd;
+  color: black;
+}
+.topnav a.active {
+  background-color: #04AA6D;
+  color: white;
+}
+.topnav a.logo {
+  margin-right: auto;
+  font-family: Impact;
+  font-size: 30px;
+}
+
+.tos-bg {
+  height: 100%;
+}
+
+.html {
+  height: 100%;
+}
+
+#dl_qr_div {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+}

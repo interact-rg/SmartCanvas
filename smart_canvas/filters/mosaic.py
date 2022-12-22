@@ -8,7 +8,7 @@ def mosaic_filter(frame, randomness=500):
     rect = (0, 0, width, height)
     subdiv = cv2.Subdiv2D(rect)
     for n in range(randomness):
-        v = [np.random.randint(0, width-1), np.random.randint(0, height-1)]
+        v = [np.random.randint(0, width - 1), np.random.randint(0, height - 1)]
         subdiv.insert(v)
 
     (facets, centers) = subdiv.getVoronoiFacetList([])
@@ -25,5 +25,5 @@ def mosaic_filter(frame, randomness=500):
         col_mean = cv2.mean(res, mask)
 
         cv2.fillConvexPoly(frame, ifacet, col_mean)
-        #cv2.polylines(img, ifacets, True, (0,0,0), 1)
+        # cv2.polylines(img, ifacets, True, (0,0,0), 1)
     return frame

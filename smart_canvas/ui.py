@@ -13,13 +13,14 @@ from moderngl_window.meta import (
 from moderngl import TRIANGLE_STRIP
 from moderngl_window.text.bitmapped.base import FontMeta
 
-
 resources.register_dir(Path(__file__).parent.resolve())
+
 
 class TextWriterTest(TextWriter2D):
     """
     Class for creating text in OpenGL context. Extended from TextWriter2D
     """
+
     def __init__(self, position, size=24.0):
         super().__init__()
 
@@ -90,10 +91,12 @@ class TextWriterTest(TextWriter2D):
 
         self._vao.render(self._program, instances=len(self._text))
 
-class Image2D():
+
+class Image2D:
     """
     Draw images with opengl! Currently not working.
     """
+
     def __init__(self, pos: tuple, size: tuple, path: str):
         # get context for this class
         self.ctx = ContextRefs.CONTEXT
@@ -103,14 +106,14 @@ class Image2D():
         pos = self.ctx.buffer(
             array('f',
                   [
-                      -1,  1, 0, 1,  # upper left
+                      -1, 1, 0, 1,  # upper left
                       -1, -1, 0, 0,  # lower left
-                      1,  1, 1, 1,  # upper right
+                      1, 1, 1, 1,  # upper right
                       1, -1, 1, 0,  # lower right
                   ])
         )
-        #pos = self.ctx.buffer(data=bytes([0] * 4 * 2))
-       # print(bytes([0] * 4 * 3))
+        # pos = self.ctx.buffer(data=bytes([0] * 4 * 2))
+        # print(bytes([0] * 4 * 3))
         projection = matrix44.create_orthogonal_projection_matrix(
             0,  # left
             1280,  # right
@@ -121,24 +124,24 @@ class Image2D():
             dtype=np.float32,
         )
 
-        #self.scale = self._program['scale']
+        # self.scale = self._program['scale']
         self.pos = self._program['in_vert']
 
-        #self.vbo = self.ctx.buffer()
-        #self.scale.value = (0.5, 0.5)
+        # self.vbo = self.ctx.buffer()
+        # self.scale.value = (0.5, 0.5)
 
         self._program['m_proj'].write(projection)
 
         self.vao = self.ctx.vertex_array(
             self._program,
             [
-                (pos, '2f 2f',  'in_vert', 'in_uv'),
+                (pos, '2f 2f', 'in_vert', 'in_uv'),
             ]
         )
 
         self.visible = True
         self._image = resources.textures.load(TextureDescription(
-            path, midmap=False,))
+            path, midmap=False, ))
 
     def draw(self):
         # Calculate ortho projection based on viewport
@@ -155,15 +158,17 @@ class Image2D():
             -1.0,  # far
             dtype=np.float32,
         )
-        #self.pos = (1.0, 1.0)
+        # self.pos = (1.0, 1.0)
         self._image.use(location=0)
         self.vao.render(TRIANGLE_STRIP)
 
-class Progressbar():
+
+class Progressbar:
     """
     Create a progress bar badly with quads. Simply scale the vertex translation matrix
     to create an illusion of progress bar
     """
+
     def __init__(self):
 
         self.ctx = ContextRefs.CONTEXT
@@ -172,8 +177,8 @@ class Progressbar():
         )
 
         vertices = np.array([
-                      0.4,  -0.7, 0, -0.7,  
-                      0.4, -0.8, 0, -0.8,  
+            0.4, -0.7, 0, -0.7,
+            0.4, -0.8, 0, -0.8,
         ]
         )
         self.vbo = self.ctx.buffer(vertices.astype('f4').tobytes())
@@ -192,25 +197,27 @@ class Progressbar():
         return self.scale
 
     @scale.setter
-    def scale(self,value):
+    def scale(self, value):
         if value < 0.0:
             self._scale = 0.0
         else:
             self._scale = value
 
     def draw(self):
-        self._program["scale"] = self._scale 
+        self._program["scale"] = self._scale
         self.vao.render(mode=TRIANGLE_STRIP)
+
 
 class DummyElement:
     def __init__(self):
         self.visible = False
-        self.pos = (0,0)
+        self.pos = (0, 0)
         self.size = 0
         self.text = ""
 
     def draw(self):
         pass
+
 
 class UI:
     """
@@ -225,9 +232,9 @@ class UI:
         return cls._instance
 
     def __init__(self):
-        if(self._initialized): return
+        if self._initialized:
+            return
         self._initialized = True
-
         self.elements = dict()
         self.texts = dict()
         self.images = dict()
@@ -235,7 +242,7 @@ class UI:
     # add new element
     def create_text(self, name: str, pos: tuple, size: float):
         if ContextRefs.CONTEXT:
-            self.elements[name] = TextWriterTest(pos,size)
+            self.elements[name] = TextWriterTest(pos, size)
         else:
             self.elements[name] = DummyElement()
 
@@ -257,7 +264,12 @@ class UI:
         if name not in self.elements:
             raise KeyError("Element not found. Check name or element not created!")
         self.elements[name].scale = value
-        
+
+    def get_prog(self, name: str):
+        if name not in self.elements:
+            raise KeyError("Element not found. Check name or element not created!")
+        return self.elements[name].scale
+
     def show(self, *names: str):
         for name in names:
             if name not in self.elements:
@@ -270,11 +282,10 @@ class UI:
                 raise KeyError("Element not found. Check name or element not created!")
             self.elements[name].visible = False
 
-
     def draw(self):
-        #copy new texts to buffer
-        for k,v in self.texts.items():
+        # copy new texts to buffer
+        for k, v in self.texts.items():
             if self.elements[k].text is not v:
-                self.elements[k].text = v 
-        #render all
-        {v.draw() for k,v in self.elements.items() if v.visible }
+                self.elements[k].text = v
+                # render all
+        {v.draw() for k, v in self.elements.items() if v.visible}

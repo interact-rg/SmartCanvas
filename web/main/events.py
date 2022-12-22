@@ -10,23 +10,26 @@ from flask_socketio import SocketIO, send, emit
 from flask import request
 import numpy as np
 import cv2
-from smart_canvas.core import CanvasCore
+import smart_canvas.core
 
 # Internal modules
 from .. import socketio
+from smart_canvas.qr_code import *
 
 
 # Global dicts
 core_threads = {}
 core_queues = {}
 
+#HOST_IP = "86.50.168.39"
+HOST_IP = "127.0.0.1"
 
 @socketio.on('connect')
 def connect_web():
     print('[INFO] Web client connected: {}'.format(request.sid))
     sid = request.sid
     core_queues.update({sid: Queue()})
-    core_threads.update({sid: CanvasCore(q_consumer=core_queues[sid], screensize=(0, 0)).start()})
+    core_threads.update({sid: smart_canvas.core.CanvasCore(q_consumer=core_queues[sid], screensize=(0, 0), webapp=True, sid=sid).start()})
 
 
 @socketio.on('disconnect')
@@ -70,4 +73,28 @@ def handle_client_message(message):
     if core.out_frame is None:
         return
     mod_message = header + "," + cv_to_b64(core.out_frame)
+    socketio.emit('current_state', core.get_current_state(), to=sid, broadcast=False) #send current state
     socketio.emit('consume', mod_message, to=sid, broadcast=False)
+
+@socketio.on('check_image_processing')
+def check_image_processing():
+    sid = request.sid
+    core = core_threads[sid]
+    if core.image_processing_active:
+        socketio.emit('imgage_processing_started', '', to=sid, broadcast=False)
+    if not core.image_processing_active and "ShowPic" in core.get_current_state():
+        socketio.emit('imgage_processing_finished', '', to=sid, broadcast=False)
+
+@socketio.on('get_dl_link')
+def get_dl_qr(message):
+    core = core_threads[request.sid]
+    if core.gdpr_accepted:
+        header = message.split(",")[0]
+        if core.image_id:
+            cv_qr = cv2.resize(create_qr_code(f"{HOST_IP}:5000/dl_image/{core.image_id}"), (200, 200), interpolation = cv2.INTER_AREA)
+            mod_message = header + "," + cv_to_b64(cv_qr)
+            socketio.emit('dl_qr', mod_message, to=request.sid, broadcast=False)
+        else:
+            print("Missing image id -> cannot generate link")
+
+

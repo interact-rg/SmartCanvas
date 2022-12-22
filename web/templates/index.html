@@ -8,196 +8,104 @@
     />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>SmartCanvas Video Streamer</title>
+    <title>SmartCanvasV</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
-    <!-- Socket IO
-  ================================================== -->
+    <!-- Socket IO -->
     <script
       type="text/javascript"
       src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"
     ></script>
 
-    <style>
-      body {
-        background-color: #f1f2f3;
-      }
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
 
-      .container {
-        max-width: 1024px;
-      }
-
-      .navbar-light .navbar-nav .nav-link,
-      .navbar-light .navbar-nav .nav-link:hover {
-        font-family: Karla;
-        font-size: 14px;
-        color: #000000;
-      }
-
-      .navbar-brand img {
-        width: 120px;
-      }
-
-      .dash-sub-title h1 {
-        font-size: 16px;
-        font-weight: bold;
-        margin: 24px 0 8px 0;
-      }
-
-      .dash-sub-title h2 {
-        font-size: 14px;
-        margin: 8px 0 8px 0;
-      }
-
-      .card {
-        height: 100%;
-      }
-
-      .card-scroller {
-        overflow: scroll;
-        height: 420px;
-      }
-
-      .stop-button {
-        opacity: 1;
-        background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMjRweCIgaGVpZ2h0PSIyNHB4IiB2aWV3Qm94PSIwIDAgMjQgMjQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDU3LjEgKDgzMDg4KSAtIGh0dHBzOi8vc2tldGNoLmNvbSAtLT4KICAgIDx0aXRsZT5Hcm91cEAxeDwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxkZWZzPgogICAgICAgIDxwb2x5Z29uIGlkPSJwYXRoLTEiIHBvaW50cz0iNS45OTk5OTk5OCA1Ljk5OTk5OTk3IDE4IDUuOTk5OTk5OTcgMTggMTggNS45OTk5OTk5OCAxOCI+PC9wb2x5Z29uPgogICAgPC9kZWZzPgogICAgPGcgaWQ9IlN0cmVhbWVyIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0iU3RyZWFtZXItRmluYWwtQ29weS00IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNDE5LjAwMDAwMCwgLTE3OS4wMDAwMDApIj4KICAgICAgICAgICAgPGcgaWQ9Ikdyb3VwIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0MTkuMDAwMDAwLCAxNzkuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlIiBmaWxsPSIjRkZGRkZGIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiPjwvcmVjdD4KICAgICAgICAgICAgICAgIDxnIGlkPSJzdG9wIj4KICAgICAgICAgICAgICAgICAgICA8cG9seWdvbiBpZD0iQmFzZSIgcG9pbnRzPSItNS4wMDAwMDExMmUtMDggLTQuOTk5OTkyNmUtMDggMjQgLTQuOTk5OTkyNmUtMDggMjQgMjQuMDAwMDAwMSAtNS4wMDAwMDExMmUtMDggMjQuMDAwMDAwMSI+PC9wb2x5Z29uPgogICAgICAgICAgICAgICAgICAgIDxtYXNrIGlkPSJtYXNrLTIiIGZpbGw9IndoaXRlIj4KICAgICAgICAgICAgICAgICAgICAgICAgPHVzZSB4bGluazpocmVmPSIjcGF0aC0xIj48L3VzZT4KICAgICAgICAgICAgICAgICAgICA8L21hc2s+CiAgICAgICAgICAgICAgICAgICAgPGcgaWQ9Ikljb24iPjwvZz4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i4oazLfCfjqgtQ29sb3IiIGZpbGw9IiNGMjMwM0EiIGZpbGwtcnVsZT0iZXZlbm9kZCIgbWFzaz0idXJsKCNtYXNrLTIpIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiPjwvcmVjdD4KICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgPC9nPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+)
-          no-repeat;
-        cursor: pointer;
-        border: none;
-        width: 24px;
-        height: 24px;
-        float: right;
-      }
-
-      .stop-button:hover {
-        opacity: 0.75;
-      }
-
-      h5 {
-        border-bottom: solid 1px #d2d2d2;
-      }
-
-      #canvasCard {
-        display: none;
-      }
-
-      #clientCard {
-        display: none;
-      }
-
-      ::-webkit-scrollbar {
-        -webkit-appearance: none;
-        width: 7px;
-      }
-
-      ::-webkit-scrollbar-thumb {
-        border-radius: 4px;
-        background-color: rgba(0, 0, 0, 0.5);
-        -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
-      }
-    </style>
+    <a id="page_identifier" style="display: none;">normal</a>
   </head>
 
   <body class="tos-bg">
-    <div class="container" min-width="1024px" width="100%">
-      <div class="dash-sub-title">
-        <h1>SmartCanvas Video Streamer</h1>
-        <h2>This demo preview is insecure and might leak the video feed</h2>
-        <h2>Mind what is visible!</h2>
-      </div>
-
+    <div class="topnav">
+      <a class="logo">SmartCanvasV</a>
+      <a class="link active" href="">Home</a>
+      <a class="link" href="fullscreen">Fullscreen</a>
+      <a class="link" href="http://interact.oulu.fi/site/smart-canvas">About</a>
+    </div>
+    <div style="padding-top: 10px">
+      <a href="fullscreen" style="color: white; font-size: large;">Visit Fullscreen for better experience</a>
+    </div>
+    
+    
+    
+    <div id="mainContainer" class="container_fs" min-width="1024px" width="100%">
       <div class="card-deck">
 
+        <!--Not in use-->
         <div class="card" id="clientCard">
           <div class="card-body">
-            <h5 class="card-title">clientFeed</h5>
-            <div style="width: 70%">
-              <video id="clientFeed" width="640" height="480" autoplay></video>
+            <div style="width: 100%">
+              <video id="clientFeedmain" width="1280" height="720" autoplay></video>
             </div>
           </div>
         </div>
-
+        
+        <!--Not in use-->
         <div class="card" id="canvasCard">
           <div class="card-body">
             <h5 class="card-title">canvas</h5>
-            <div style="width: 70%">
-              <canvas id="canvas" width="640" height="480"></canvas>
+            <div style="width: 100%">
+              <canvas id="canvas" width="1280" height="720"></canvas>
             </div>
           </div>
         </div>
-
+        
+        <!--Server feed-->
         <div class="card" id="serverCard">
-          <div class="card-body">
-            <h5 class="card-title">serverFeed</h5>
-            <div style="width: 70%">
-              <canvas id="serverFeed" width="640" height="480"></canvas>
+          <div class="container">
+            <div id="serverFeedDiv" style="width: 100%">
+              <canvas id="serverFeed" width="1280" height="720" style="display: none"></canvas>
+              <video id="clientFeed" width="1280" height="720" autoplay style="display: block"></video>
+              <div id="hold_bar">
+                <progress id="hold_progress" value="32" max="100"></progress>
+              </div>
+              <div id="countdown" style="visibility: hidden;">
+                <a id="countdown_value">0</a>
+              </div>
+              <div id="fs_ui" >
+                <div id="idle_text_1" style="width: 1260px; display: none;">
+                  <a>SmartCanvasV</a>
+                </div>
+                <div id="idle_text_2" style="width: 1260px; display: none;">
+                  <a>Wave your hand and start your artistic experience</a>
+                </div>
+                <div id="help_1" style="width: 1260px; display: none;">
+                  <img src="static/resources/five_fingers.png" width="30" height="30"></img><a>to take a picture</a>
+                </div>
+                <div id="help_2" style="width: 1260px; display: none;">
+                  <img src="static/resources/two_fingers.png" width="30" height="30"></img><a>to change the filter</a>
+                </div>
+                <div id="filter_name" style="width: 1260px; display: none;">
+                  <a>placeholder text</a>
+                </div>
+                <div id="image_showing_promote" style="width: 1260px; display: none;">
+                  <a>Wave your hand to create another artwork</a>
+                </div>
+                <div id="gdpr_consent" style="width: 1260px; display: none;">
+                  <a>Do you concent to having your images saved?</a>
+                </div>
+                <div id="image_processing" style="display: none; width: fit-content;">
+                  <img src="static/resources/processing2.gif"></img>
+                </div>
+                <div id="dl_qr_div" style="display: none;">
+                  <img id="dl_qr_img" src="" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
       </div>
     </div>
+    
   </body>
 </html>
 
-<script>
-  document.addEventListener("DOMContentLoaded", async function (event) {
-    const clientFeed = document.getElementById("clientFeed");
-    const serverFeed = document.getElementById("serverFeed");
-    const canvas = document.getElementById("canvas");
 
-    const socket = io.connect({ reconnection: false });
-
-    socket.on("connect", () => {
-      console.log("Connected");
-    });
-
-    socket.on("disconnect", () => {
-      console.log("Disconnected");
-    });
-
-    socket.on("connect_error", (error) => {
-      console.log("Connect error! " + error);
-    });
-
-    socket.on("connect_timeout", (error) => {
-      console.log("Connect timeout! " + error);
-    });
-
-    socket.on("error", (error) => {
-      console.log("Error! " + error);
-    });
-
-    socket.on("consume", (msg) => {
-      var img = new Image;
-
-      const serveFeedCtx = serverFeed.getContext("2d");
-      img.onload = function(){
-        serveFeedCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      };
-
-      img.src = msg;
-    });
-
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      let stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: false,
-      });
-      clientFeed.srcObject = stream;
-
-      canvas
-        .getContext("2d")
-        .drawImage(clientFeed, 0, 0, canvas.width, canvas.height);
-      
-      const FPS = 6;
-      let interval = setInterval(() => {
-        canvas
-          .getContext("2d")
-          .drawImage(clientFeed, 0, 0, canvas.width, canvas.height);
-        const image_data_url = canvas.toDataURL("image/jpeg");
-        socket.emit("produce", image_data_url)
-      }, 1000/FPS);
-    }
-    
-  });
-</script>
+<script src="{{ url_for('static', filename='scripts.js') }}"></script>
