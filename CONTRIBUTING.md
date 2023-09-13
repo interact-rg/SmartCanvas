@@ -11,4 +11,6 @@ If you wish to contribute to this project:
 7. Maintainers will then check your pull request, maybe suggesting fixes.
 8. When all is OK, your fix/feature will be merged with this repo.
 
+If you are a student group assigned to take this project further by INTERACT, M3S or OASIS research groups, then contact maintainers to get access to this repo, if you wish to work here directly.
+
 Any questions can be asked from the maintainers (©anttijuu, @jlappala).
