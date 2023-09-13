@@ -44,6 +44,10 @@ Lint the code:
 Clean environment:  
 `make clean`
 
+## Contributing
+
+See the [CONTRIBUTING.md](CONTRIBUTING.md) guide.
+
 ## Contributors
 - @vtiinanen
 - @jarkkokotaniemi
