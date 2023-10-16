@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.24.3)
 
-set(CMAKE_C_COMPILER glang)
+set(CMAKE_C_COMPILER clang)
 
 project(c_smart_canvas LANGUAGES C)
 
