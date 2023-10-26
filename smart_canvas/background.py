@@ -19,9 +19,9 @@ class ForegroundMask:
     def switchBackground(self, current_filter):
         filter_images_lib = {
             'painterly': 'painterly_bg.jpg',
-            'watercolor': 'watercolor_bg.jpg',
+            'watercolor': 'watercolor_bg.jpeg',
             'oil painting': 'oil_painting_bg.jpg',
-            'mosaic': 'mosaic_bg.jpg',
+            'mosaic': 'mosaic_bg.jpeg',
             'grayscale cartoon': 'gs_cartoon_bg_2.jpeg',
             'anime style': 'anime_bg.jpg',
             'pointillism': 'pointillism_bg.jpg'
