@@ -1,4 +1,4 @@
-FROM python:3.11-bullseye AS builder
+FROM python:3.11.5-bullseye AS builder
 
 WORKDIR /smart-canvas
 
