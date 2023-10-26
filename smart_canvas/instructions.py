@@ -36,7 +36,7 @@ class InstructionsLanguage:
                 "image_showing_promote": "Heilauta kättä luodaksesi toisen taideteoksen",
                 "filter_list": {
                     "painterly": "maalauksellinen",
-                    "watercolor": "akvarelli",
+                    "watercolor": "vesiväri",
                     "oil painting": "öljyvärimaalaus",
                     "mosaic": "mosaiikki",
                     "grayscale cartoon": "grayscale cartoon",
