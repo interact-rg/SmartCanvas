@@ -141,6 +141,13 @@ class Startup(State):
         self.ui.create_progressbar("bar")
         self.core.set_text_messages()
 
+        # Creating database
+        if os.path.exists(r"database.db"):
+            print("Database already exists, don't create a new one")
+            pass
+        else:
+            self.core.database.create_database()
+
     def update(self, tick, frame):
         self.core.set_state(Idle())
 
@@ -163,11 +170,6 @@ class Idle(State):
         self.core.ui.hide("help_1", "help_2", "filter_name", "bar", "image_showing_promote", "gdpr_consent")
         self.core.ui.show("idle_text_1", "idle_text_2", "bar")
         self.core.ui.set_prog("bar", 1.1)
-        if os.path.exists(r"database.db"):
-            print("Database already exists, don't create a new one")
-            pass
-        else:
-            self.core.database.create_database()
 
         if self.core.is_webapp:
             send_ui_state(self.core.get_ui_state(), self.core.sid)
@@ -196,8 +198,6 @@ class Idle(State):
             finger_count, gesture = self.core.hand_detector.count_fingers(frame)
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
-            thread = Thread(target=self.core.database.delete)
-            thread.start()
             self.core.ui.set_prog("bar", self.take_pic_cnt)
             if self.core.is_webapp:
                 send_ui_state(self.core.get_ui_state(), self.core.sid)
@@ -377,6 +377,10 @@ class Filter(State):
         if self.core.gdpr_accepted:
             self.core.image_id = self.core.database.insert_blob(self.core.filtered_frame)
         
+        # delete images from database that are more than 1 day old
+        thread = Thread(target=self.core.database.delete)
+        thread.start()
+        
 
 class ShowPic(State):
     """
@@ -402,12 +406,6 @@ class ShowPic(State):
 
         if self.core.is_webapp:
             send_ui_state(self.core.get_ui_state(), self.core.sid)
-
-        # TODO If gpdr was accepted, save image to db
-        if self.core.gdpr_accepted:
-            print("PICTURE SHOULD BE SAVED")
-        elif not self.core.gdpr_accepted:
-            print("PICTURE SHOULD NOT BE SAVED")
 
     def update(self, tick, frame):
         if self.show_image_time - tick < 0:
