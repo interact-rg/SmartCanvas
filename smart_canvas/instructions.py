@@ -39,9 +39,9 @@ class InstructionsLanguage:
                     "watercolor": "vesiväri",
                     "oil painting": "öljyvärimaalaus",
                     "mosaic": "mosaiikki",
-                    "grayscale cartoon": "grayscale cartoon",
-                    "anime style": "anime style",
-                    "pointillism": "pointillism"
+                    "grayscale cartoon": "harmaasävy sarjakuva",
+                    "anime style": "anime tyyli",
+                    "pointillism": "pistemaalaus"
                 }
             }
         }
