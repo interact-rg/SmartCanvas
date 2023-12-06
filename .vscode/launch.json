@@ -8,6 +8,23 @@
         "module": "smart_canvas",
         "cwd": "${workspaceFolder}",
         "console": "integratedTerminal",
+      },
+      {
+        "name": "Flask App",
+        "type": "python",
+        "request": "launch",
+        "module": "flask",
+        "args": [
+          "run",
+          "--no-debugger",
+          "--no-reload"
+        ],
+        "env": {
+          "FLASK_APP": "web",  // Update with your actual Flask app file
+          "FLASK_ENV": "development",
+          "CLIENT_TOKEN": "90371948-9461-11ee-924d-4c348848282b"
+        },
+        "jinja": true
       }
-    ]
+    ],
 }

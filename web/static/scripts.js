@@ -125,6 +125,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
             var html_item = document.getElementById("countdown");
             html_item.style.visibility = "hidden";
             countdownStarted = false;
+            dl_link_created = false;
         });
         socket.on("imgage_processing_finished", (msg) => {
             console.log("image processing finished")
@@ -132,7 +133,10 @@ document.addEventListener("DOMContentLoaded", async function (event) {
             processing_element.style.display = "none";
 
             //Request download link (response will only come if core is in "gdpr accepted" state)
-            socket.emit("get_dl_link", "");
+            if (dl_link_created == false) {
+              socket.emit("get_dl_link", "");
+              dl_link_created = true;
+            }
         });
     }
     
@@ -174,7 +178,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
       }, 200);
     }
 
-    //Once camera is initialized, adjust offsets of UI items based on resolution (currently will only work at 720/480p but should probably somehow made automatic)
+    //Once camera is initicheck_image_processingalized, adjust offsets of UI items based on resolution (currently will only work at 720/480p but should probably somehow made automatic)
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !itemsResized) {
         console.log("text moving functions")
         const canvass = document.getElementById("canvas");
