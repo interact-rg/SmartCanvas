@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug smart_canvas",
+        "type": "python",
+        "request": "launch",
+        "module": "smart_canvas",
+        "cwd": "${workspaceFolder}",
+        "console": "integratedTerminal",
+      }
+    ]
+}
