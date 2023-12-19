@@ -14,13 +14,13 @@ Windows also requires us to install [Docker Desktop](https://docs.docker.com/des
 If your system doesn't recognize Docker, you might need to:
 
 - Download WSL (Windows Subsystem for Linux) by opening Windows terminal (Command Prompt) or PowerShell in administrator mode.
-![Admin guidance](.github/images/open-admin.png)
+![Admin guidance](../.github/images/open-admin.png)
 Then type
 ```console
 wsl --install
 ```
 This installs WSL to your machine, then we need to enable WSL support for Docker in the Docker desktop settings
-![Docker guidance](.github/images/DockerforWindows.png)
+![Docker guidance](../.github/images/DockerforWindows.png)
 # Docker compose
 After installing Docker and making sure the engine is running, bring up the application by running the following command in the root folder of the application folder:
 ```console
