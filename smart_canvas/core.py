@@ -88,6 +88,7 @@ class CanvasCore:
     def set_text_messages(self):
         self.ui.set_text("help_1", self.instruction_language.current_instruction_set["help_1"])
         self.ui.set_text("help_2", self.instruction_language.current_instruction_set["help_2"])
+        self.ui.set_text("help_3", self.instruction_language.current_instruction_set["help_3"])
 
         self.ui.set_text("idle_text_1", self.instruction_language.current_instruction_set["idle_text_1"])
         self.ui.set_text("idle_text_2", self.instruction_language.current_instruction_set["idle_text_2"])
@@ -129,6 +130,7 @@ class Startup(State):
         self.ui = self.core.ui
         self.ui.create_text("help_1", (20, 40), 30.0)
         self.ui.create_text("help_2", (20, 80), 30.0)
+        self.ui.create_text("help_3", (20, 80), 30.0)
 
         self.ui.create_text("idle_text_1", (550, 300), 30.0)
         self.ui.create_text("idle_text_2", (230, 400), 30.0)
@@ -140,6 +142,13 @@ class Startup(State):
         self.ui.create_text("image_showing_promote", (550, 80), 00.0)
         self.ui.create_progressbar("bar")
         self.core.set_text_messages()
+
+        # Creating database
+        if os.path.exists(r"database.db"):
+            print("Database already exists, don't create a new one")
+            pass
+        else:
+            self.core.database.create_database()
 
     def update(self, tick, frame):
         self.core.set_state(Idle())
@@ -160,14 +169,9 @@ class Idle(State):
 
     # Runs once on init
     def enter(self, tick):
-        self.core.ui.hide("help_1", "help_2", "filter_name", "bar", "image_showing_promote", "gdpr_consent")
+        self.core.ui.hide("help_1", "help_2", "help_3", "filter_name", "bar", "image_showing_promote", "gdpr_consent")
         self.core.ui.show("idle_text_1", "idle_text_2", "bar")
         self.core.ui.set_prog("bar", 1.1)
-        if os.path.exists(r"database.db"):
-            print("Database already exists, don't create a new one")
-            pass
-        else:
-            self.core.database.create_database()
 
         if self.core.is_webapp:
             send_ui_state(self.core.get_ui_state(), self.core.sid)
@@ -196,8 +200,6 @@ class Idle(State):
             finger_count, gesture = self.core.hand_detector.count_fingers(frame)
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
-            thread = Thread(target=self.core.database.delete)
-            thread.start()
             self.core.ui.set_prog("bar", self.take_pic_cnt)
             if self.core.is_webapp:
                 send_ui_state(self.core.get_ui_state(), self.core.sid)
@@ -221,7 +223,7 @@ class GPDR_consent(State):
 
     # Runs once on init
     def enter(self, tick):
-        self.core.ui.hide("help_1", "help_2", "filter_name", "bar", "image_showing_promote", "idle_text_1",
+        self.core.ui.hide("help_1", "help_2", "help_3", "filter_name", "bar", "image_showing_promote", "idle_text_1",
                           "idle_text_2")
         self.core.ui.show("bar", "gdpr_consent")
         self.core.ui.set_prog("bar", 1.1)
@@ -281,7 +283,7 @@ class Active(State):
     # Runs once on init
     def enter(self, tick):
         self.core.ui.hide("idle_text_1", "idle_text_2", "bar", "image_showing_promote", "gdpr_consent")
-        self.core.ui.show("help_1", "help_2", "filter_name", "bar")
+        self.core.ui.show("help_1", "help_2", "help_3", "filter_name", "bar")
         self.core.ui.set_prog("bar", 0.0)
         self.waiting_time = time.time() + 60
 
@@ -348,7 +350,7 @@ class Filter(State):
     def enter(self, tick):
         self.countdown_time = tick + 4
         self.core.ui.hide("idle_text_1", "idle_text_2", "bar", "gdpr_consent")
-        self.core.ui.hide("help_1", "help_2", "filter_name", "image_showing_promote")
+        self.core.ui.hide("help_1", "help_2", "help_3", "filter_name", "image_showing_promote")
         self.core.ui.set_text("countdown", "3")
         self.core.ui.show("countdown")
 
@@ -377,6 +379,10 @@ class Filter(State):
         if self.core.gdpr_accepted:
             self.core.image_id = self.core.database.insert_blob(self.core.filtered_frame)
         
+        # delete images from database that are more than 1 day old
+        thread = Thread(target=self.core.database.delete)
+        thread.start()
+        
 
 class ShowPic(State):
     """
@@ -402,12 +408,6 @@ class ShowPic(State):
 
         if self.core.is_webapp:
             send_ui_state(self.core.get_ui_state(), self.core.sid)
-
-        # TODO If gpdr was accepted, save image to db
-        if self.core.gdpr_accepted:
-            print("PICTURE SHOULD BE SAVED")
-        elif not self.core.gdpr_accepted:
-            print("PICTURE SHOULD NOT BE SAVED")
 
     def update(self, tick, frame):
         if self.show_image_time - tick < 0:
