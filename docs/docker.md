@@ -10,6 +10,17 @@ snap install docker
 On Mac, we have to install [Docker desktop](https://docs.docker.com/desktop/install/mac-install/). After installation, Docker can be used from the terminal.
 # Windows
 Windows also requires us to install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/). After installation, Docker can be used from the command line.
+
+If your system doesn't recognize Docker, you might need to:
+
+- Download WSL (Windows Subsystem for Linux) by opening Windows terminal (Command Prompt) or PowerShell in administrator mode.
+![open-admin.png]
+Then type
+```console
+wsl --install
+```
+This installs WSL to your machine, then we need to enable WSL support for Docker in the Docker desktop settings
+![.github/images/DockerforWindows.png]
 # Docker compose
 After installing Docker and making sure the engine is running, bring up the application by running the following command in the root folder of the application folder:
 ```console
