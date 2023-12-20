@@ -1,4 +1,7 @@
 # SmartCanvas
+## Usage with Docker
+
+Check out full instructions [HERE](docs/docker.md)
 
 ## Usage with terminal commands
 If you do not have Make installed use the following commands on a terminal (like Git Bash) to install and run the program.
@@ -44,11 +47,22 @@ Lint the code:
 Clean environment:  
 `make clean`
 
+## Accessing web app (if running)
+
+[SmartCanvas web app running on cPouta service](http://86.50.228.113:5000/)
+
+Check out further info [HERE](docs/web_app_usage.md)
+
 ## Contributing
 
 See the [CONTRIBUTING.md](CONTRIBUTING.md) guide.
 
 ## Contributors
+- @Vilatsut
+- @loppastoffa
+- @hpeteri
+- @juusosar
+- @topoto123
 - @vtiinanen
 - @jarkkokotaniemi
 - @jvuorine
