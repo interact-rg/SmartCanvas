@@ -1,10 +1,4 @@
 # SmartCanvas
-## Accessing web app (if running)
-
-[SmartCanvas web app running on cPouta service](http://86.50.228.113:5000/)
-
-Check out further info [HERE](docs/web_app_usage.md)
-
 ## Usage with Docker
 
 Check out full instructions [HERE](docs/docker.md)
