@@ -4,7 +4,7 @@ You can access the SmartCanvas application from
 
 [SmartCanvas](http://86.50.228.113:5000/)
 
-
+[chrome::/flags](chrome://flags/#unsafely-treat-insecure-origin-as-secure)
 # Camera not showing?
 
 In the case of the camera feed not showing, you need to do the following:
