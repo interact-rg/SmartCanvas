@@ -3,7 +3,6 @@
 # Default packages
 import itertools
 
-import smart_canvas.filters.mosaic
 # Internal modules
 from smart_canvas.filters.painterly import painterly_filter
 from smart_canvas.filters.watercolor import watercolor

@@ -20,7 +20,7 @@ class Database:
 
         cursor.close()
         connection.close()
-        print("SQLite connection is closed")
+        print("Database created")
 
     def convert_image_to_binary(self, filename) -> bytes:
         # Convert digital data to binary format
@@ -69,7 +69,7 @@ class Database:
 
         cursor.close()
         connection.close()
-        print("SQLITE connection is closed")
+        print("Inserted image into database")
 
         return image_id
 
@@ -103,16 +103,16 @@ class Database:
 
         cursor.close()
         connection.close()
-        print("SQLite connection is closed")
+        print("Downloaded image from database")
         return image, date
 
     def delete(self):
-        # function to check if database has items older than a week.
+        # function to check if database has items older than a day.
         # establish connection
         connection = sqlite3.connect("database.db")
         cursor = connection.cursor()
         sql_delete_query = (
-            f""" DELETE FROM images WHERE date_added <= date('now', '-10 day');"""
+            f""" DELETE FROM images WHERE date_added <= date('now', '-1 day');"""
         )
 
         cursor.execute(sql_delete_query)
@@ -120,6 +120,10 @@ class Database:
         # check if something was actually deleted:
         for x in result:
             print(x)
+
+        cursor.close()
+        connection.close()
+        print("Deleted items older than a day")
 
 
 base = Database()
