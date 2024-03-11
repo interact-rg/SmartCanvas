@@ -12,7 +12,7 @@ class AnimeFilter:
 	def __init__(self):
 
 		self.device = "cpu" # change to to cuda if available
-		self.model="./smart_canvas/filters/animeFilter/weights/face_paint_512_v2.pt"
+		self.model="./smart_canvas/filters/animefilter/weights/face_paint_512_v2.pt"
 		self.net = Generator()
 		self.net.load_state_dict(torch.load(self.model, map_location="cpu"))
 		self.net.to(self.device).eval()

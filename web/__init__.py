@@ -18,6 +18,7 @@ def create_app(test_config=None):
     Based on http://flask.pocoo.org/docs/1.0/tutorial/factory/#the-application-factory
     """
     app = Flask(__name__)
+    app.debug = True
     config = {
         "SCHEDULER_API_ENABLED": False,
         "UPLOAD_FOLDER": mkdtemp('_web_service_uploads'),

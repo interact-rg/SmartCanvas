@@ -6,4 +6,4 @@
 from .. import socketio
 
 def send_ui_state(state, sid):
-    socketio.emit('update_ui_response', state, to=sid, broadcast=False)
+    socketio.emit('update_ui_response', state, to=sid)

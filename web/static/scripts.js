@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
                   ui_element_div = document.getElementById(key);
                   ui_element_div.style.display = "block";
                   resizeItem(key)
-                  if (key == "help_1" || key == "help_2") {
+                  if (key == "help_1" || key == "help_2" || key == "help_3") {
                     ui_element_div.children[1].textContent = msg[key];
                   }
                   else {
@@ -125,6 +125,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
             var html_item = document.getElementById("countdown");
             html_item.style.visibility = "hidden";
             countdownStarted = false;
+            dl_link_created = false;
         });
         socket.on("imgage_processing_finished", (msg) => {
             console.log("image processing finished")
@@ -132,7 +133,10 @@ document.addEventListener("DOMContentLoaded", async function (event) {
             processing_element.style.display = "none";
 
             //Request download link (response will only come if core is in "gdpr accepted" state)
-            socket.emit("get_dl_link", "");
+            if (dl_link_created == false) {
+              socket.emit("get_dl_link", "");
+              dl_link_created = true;
+            }
         });
     }
     
@@ -174,7 +178,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
       }, 200);
     }
 
-    //Once camera is initialized, adjust offsets of UI items based on resolution (currently will only work at 720/480p but should probably somehow made automatic)
+    //Once camera is initicheck_image_processingalized, adjust offsets of UI items based on resolution (currently will only work at 720/480p but should probably somehow made automatic)
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !itemsResized) {
         console.log("text moving functions")
         const canvass = document.getElementById("canvas");
@@ -227,7 +231,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
       console.log("resizeItem called", item)
       
       const center_texts = ["idle_text_1", "idle_text_2", "gdpr_consent"]
-      const custom_texts = ["help_1", "help_2", "filter_name", "take_new"]
+      const custom_texts = ["help_1", "help_2", "help_3", "filter_name", "take_new"]
 
       if (center_texts.includes(item)) {
         adjustCenterText(item)
@@ -261,6 +265,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
       const offsets = {
         'help_1': 'px, 0px)',
         'help_2': 'px, 0px)',
+        'help_3': 'px, 0px)',
         'filter_name': 'translate(0px, -85px)',
         'image_showing_promote': 'translate(0px, -50px)'
       }
@@ -268,7 +273,7 @@ document.addEventListener("DOMContentLoaded", async function (event) {
       const temp_element = document.getElementById(key);
 
       //Handle texts that are supposed to be pinned to right side
-      if (key == "help_1" || key == "help_2") {
+      if (key == "help_1" || key == "help_2" || key == "help_3") {
         const text_child = "#".concat(key, " > a:first-of-type");
         var w_info = parseInt(document.querySelector(text_child).getBoundingClientRect().width);
         var x_offset = (1280 - w_info) - 15 - 40;

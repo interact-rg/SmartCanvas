@@ -73,17 +73,17 @@ def handle_client_message(message):
     if core.out_frame is None:
         return
     mod_message = header + "," + cv_to_b64(core.out_frame)
-    socketio.emit('current_state', core.get_current_state(), to=sid, broadcast=False) #send current state
-    socketio.emit('consume', mod_message, to=sid, broadcast=False)
+    socketio.emit('current_state', core.get_current_state(), to=sid) #send current state
+    socketio.emit('consume', mod_message, to=sid)
 
 @socketio.on('check_image_processing')
 def check_image_processing():
     sid = request.sid
     core = core_threads[sid]
     if core.image_processing_active:
-        socketio.emit('imgage_processing_started', '', to=sid, broadcast=False)
+        socketio.emit('imgage_processing_started', '', to=sid)
     if not core.image_processing_active and "ShowPic" in core.get_current_state():
-        socketio.emit('imgage_processing_finished', '', to=sid, broadcast=False)
+        socketio.emit('imgage_processing_finished', '', to=sid)
 
 @socketio.on('get_dl_link')
 def get_dl_qr(message):
@@ -93,7 +93,7 @@ def get_dl_qr(message):
         if core.image_id:
             cv_qr = cv2.resize(create_qr_code(f"{HOST_IP}:5000/dl_image/{core.image_id}"), (200, 200), interpolation = cv2.INTER_AREA)
             mod_message = header + "," + cv_to_b64(cv_qr)
-            socketio.emit('dl_qr', mod_message, to=request.sid, broadcast=False)
+            socketio.emit('dl_qr', mod_message, to=request.sid)
         else:
             print("Missing image id -> cannot generate link")
 
