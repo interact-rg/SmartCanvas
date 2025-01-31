@@ -30,16 +30,16 @@ def verify_token(token):
 @main.route('/')
 def index():
     """ Home page """
-    if "Firefox" in request.headers.get('User-Agent'):
-        return render_template('us_browser.html')
+    # if "Firefox" in request.headers.get('User-Agent'):
+    #     return render_template('us_browser.html')
     return render_template('index.html')
 
 
 @main.route('/fullscreen')
 def fs_sym():
     """ Fullscreen """
-    if "Firefox" in request.headers.get('User-Agent'):
-        return render_template('us_browser.html')
+    # if "Firefox" in request.headers.get('User-Agent'):
+    #     return render_template('us_browser.html')
     return render_template('fullscreen.html')
 
 
