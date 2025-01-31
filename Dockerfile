@@ -1,5 +1,5 @@
 FROM python:3.11.5-bullseye AS builder
-
+#
 WORKDIR /smart-canvas
 
 COPY setup.py README.md .
