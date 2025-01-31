@@ -41,13 +41,13 @@ def create_app(test_config=None):
             """
         )
 
-    def get_old_files(age=5, files_path=app.config["UPLOAD_FOLDER"]):
+    def get_old_files(age: int=5, files_path: str=app.config["UPLOAD_FOLDER"]):
         """
         age: age of the file, time in minutes.
         file_path: file path
         old_files: list of file paths
         """
-        old_files = []
+        old_files: list[str] = []
         now = time.time()
         for filename in os.listdir(files_path):
             file_path = os.path.join(files_path, filename)
@@ -57,7 +57,7 @@ def create_app(test_config=None):
                 old_files += [file_path]
         return old_files
 
-    def rm_old_files(age=5, files_path=app.config["UPLOAD_FOLDER"]):
+    def rm_old_files(age: int=5, files_path: str=app.config["UPLOAD_FOLDER"]):
         old_files = get_old_files(age=age, files_path=files_path)
         for file in old_files:
             os.remove(file)

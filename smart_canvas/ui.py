@@ -3,15 +3,16 @@ import numpy as np
 
 from pathlib import Path
 
-from moderngl_window.text.bitmapped import TextWriter2D
+from moderngl_window.text.bitmapped.text_2d import TextWriter2D
 from moderngl_window import (resources, ContextRefs)
-from moderngl_window.meta import (
-    ProgramDescription,
-    TextureDescription,
-    DataDescription,
-)
+from moderngl_window.meta.program import ProgramDescription
+from moderngl_window.meta.texture import TextureDescription
+from moderngl_window.meta.data import DataDescription
 from moderngl import TRIANGLE_STRIP
 from moderngl_window.text.bitmapped.base import FontMeta
+
+# Types
+UI_State = dict[str, str|float]
 
 resources.register_dir(Path(__file__).parent.resolve())
 
@@ -21,7 +22,7 @@ class TextWriterTest(TextWriter2D):
     Class for creating text in OpenGL context. Extended from TextWriter2D
     """
 
-    def __init__(self, position, size=24.0):
+    def __init__(self, position, size: float=24.0):
         super().__init__()
 
         meta = FontMeta(resources.data.load(DataDescription(path="backgrounds/meta.json")))
@@ -235,18 +236,18 @@ class UI:
         if self._initialized:
             return
         self._initialized = True
-        self.elements = dict()
-        self.texts = dict()
-        self.images = dict()
+        self.elements: dict[str, TextWriterTest|DummyElement|Progressbar] = dict()
+        self.texts: dict[str, str] = dict()
+        self.images: dict[str, Image2D] = dict()
 
     # add new element
-    def create_text(self, name: str, pos: tuple, size: float):
+    def create_text(self, name: str, pos: tuple[float, float], size: float):
         if ContextRefs.CONTEXT:
             self.elements[name] = TextWriterTest(pos, size)
         else:
             self.elements[name] = DummyElement()
 
-    def create_image(self, path: str, pos: tuple, size: tuple):
+    def create_image(self, path: str, pos: tuple[float, float], size: tuple[float, float]):
         self.images[path] = Image2D(pos, size, path)
 
     def create_progressbar(self, name: str):
@@ -265,7 +266,7 @@ class UI:
             raise KeyError("Element not found. Check name or element not created!")
         self.elements[name].scale = value
 
-    def get_prog(self, name: str):
+    def get_prog(self, name: str) -> float:
         if name not in self.elements:
             raise KeyError("Element not found. Check name or element not created!")
         return self.elements[name].scale

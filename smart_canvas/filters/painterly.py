@@ -2,7 +2,9 @@
 import cv2
 import numpy as np
 
-def makeStroke(brush, x, y, img):
+from cv2.typing import MatLike
+
+def makeStroke(brush, x: int, y: int, img: MatLike):
     '''
     add diagonal stroke to list and return for the paintLayer function
     '''

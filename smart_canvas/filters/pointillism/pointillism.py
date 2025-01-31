@@ -9,8 +9,10 @@ import random
 from .color_palette import ColorPalette
 from .vector_field import VectorField
 
+# Types
+from cv2.typing import MatLike
 
-def compute_color_probabilities(pixels, palette, k=9):
+def compute_color_probabilities(pixels: MatLike, palette, k: int=9):
     distances = scipy.spatial.distance.cdist(pixels, palette.colors)
     maxima = np.amax(distances, axis=1)
 
@@ -31,12 +33,12 @@ def color_select(probabilities, palette):
     return palette[i] if i < len(palette) else palette[-1]
 
 
-def randomized_grid(h, w, scale):
+def randomized_grid(h: int, w: int, scale: int):
     assert (scale > 0)
 
     r = scale//2
 
-    grid = []
+    grid: list[tuple[int, int]] = []
     for i in range(0, h, scale):
         for j in range(0, w, scale):
             y = random.randint(-r, r) + i
@@ -50,7 +52,7 @@ def randomized_grid(h, w, scale):
 
 
 
-def pointillism(image):
+def pointillism(image: MatLike):
 
     # setup parameters
     stroke_scale = int(math.ceil(max(image.shape) / 1000))

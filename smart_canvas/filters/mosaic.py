@@ -1,8 +1,9 @@
 import cv2
 import numpy as np
 
+from cv2.typing import MatLike, Point2f
 
-def mosaic_filter(frame, randomness=500):
+def mosaic_filter(frame: MatLike, randomness: int=500):
     width = frame.shape[1]
     height = frame.shape[0]
     rect = (0, 0, width, height)
@@ -13,13 +14,13 @@ def mosaic_filter(frame, randomness=500):
 
     (facets, centers) = subdiv.getVoronoiFacetList([])
     for i in range(0, len(facets)):
-        ifacet_arr = []
+        ifacet_arr: list[Point2f] = []
         for f in facets[i]:
             ifacet_arr.append(f)
         ifacet = np.array(ifacet_arr, np.int64)
         mask = np.full((height, width), 0, dtype=np.uint8)
         cv2.fillConvexPoly(mask, ifacet, (255, 255, 255))
-        ifacets = np.array([ifacet])
+        #ifacets = np.array([ifacet])
 
         res = cv2.bitwise_or(frame, frame, mask=mask)
         col_mean = cv2.mean(res, mask)

@@ -1,9 +1,10 @@
 import itertools
 
+Locale = dict[str, dict[str, str|dict[str, str]]]
 
 class InstructionsLanguage:
     def __init__(self):
-        self.instruction_language_sets = {
+        self.instruction_language_sets: Locale = {
             "english": {
                 "code": "en",
                 "gdpr_consent": "Do you allow the saving of your pictures?",
@@ -47,8 +48,12 @@ class InstructionsLanguage:
         }
 
         self.instruction_set_iterator = itertools.cycle(self.instruction_language_sets)
-        self.current_instruction_set = None
         self.next_instruction_set()
 
     def next_instruction_set(self):
         self.current_instruction_set = self.instruction_language_sets[next(self.instruction_set_iterator)]
+
+    def get_string(self, key: str) -> str:
+        return self.current_instruction_set[key] # type: ignore
+    def get_filter_name(self, key: str) -> str:
+        return self.current_instruction_set["filter_list"][key] # type: ignore

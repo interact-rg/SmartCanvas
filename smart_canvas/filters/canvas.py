@@ -1,8 +1,9 @@
 import cv2
 import numpy as np
 
+from cv2.typing import MatLike
 
-def canvas_filter(frame):
+def canvas_filter(frame: MatLike):
     tile = cv2.imread("smart_canvas/filters/struc.pgm")
     width = frame.shape[1]
     height = frame.shape[0]
@@ -11,7 +12,7 @@ def canvas_filter(frame):
 
     tiled = np.tile(tile, (y_count, x_count, 1))
     canvas_bg = tiled[0:frame.shape[0], 0:frame.shape[1]]
-    kernel = np.array([[0.5, 0], [0, 0.5]])
+    kernel: MatLike = np.array([[0.5, 0], [0, 0.5]])
 
     canvas_bg = cv2.filter2D(canvas_bg, -1, kernel=kernel)
     alpha = 0.85

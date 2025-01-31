@@ -6,6 +6,8 @@ from PIL import Image
 
 from .model import Generator
 
+from cv2.typing import MatLike
+TImage = Image.Image
 
 class AnimeFilter:
 
@@ -19,7 +21,7 @@ class AnimeFilter:
 		print(f"model weights loaded: {self.model}")
 
 
-	def filter(self, original_img):
+	def filter(self, original_img: MatLike):
 		
 		original_shape = original_img.shape
 		# fix for small image test
@@ -45,19 +47,19 @@ class AnimeFilter:
 
 
 	@staticmethod
-	def convert_openCV_to_PIL(opencv_img):
+	def convert_openCV_to_PIL(opencv_img: MatLike) -> TImage:
 		RGB_img = cv2.cvtColor(opencv_img, cv2.COLOR_BGR2RGB)
-		PIL_img = Image.fromarray(RGB_img)
+		PIL_img: TImage = Image.fromarray(RGB_img)
 		return PIL_img
 
 	@staticmethod
-	def convert_PIL_to_openCV(PIL_img):
+	def convert_PIL_to_openCV(PIL_img: MatLike):
 		numpy_img = np.array(PIL_img)
 		opencv_img = cv2.cvtColor(numpy_img, cv2.COLOR_RGB2BGR) 
 		return opencv_img
 
 	@staticmethod
-	def gamma_correction(original_img, gamma=0.4):
+	def gamma_correction(original_img: MatLike, gamma: float=0.4):
 		lookUpTable = np.empty((1,256), np.uint8)
 		for i in range(256):
 			lookUpTable[0,i] = np.clip(pow(i / 255.0, gamma) * 255.0, 0, 255) 

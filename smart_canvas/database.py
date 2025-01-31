@@ -1,7 +1,7 @@
 """ database.py """
 import sqlite3
 import datetime
-import typing
+
 from PIL import Image as im
 import os
 
@@ -22,7 +22,7 @@ class Database:
         connection.close()
         print("Database created")
 
-    def convert_image_to_binary(self, filename) -> bytes:
+    def convert_image_to_binary(self, filename: str) -> bytes:
         # Convert digital data to binary format
         with open(filename, "rb") as file:
             binaryData = file.read()

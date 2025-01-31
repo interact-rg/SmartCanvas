@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
-import mediapipe as mp
-mp_selfie_segmentation = mp.solutions.selfie_segmentation
+from cv2.typing import MatLike
+from mediapipe.python.solutions.selfie_segmentation import SelfieSegmentation
 
 class ForegroundMask:
     """
@@ -9,14 +9,14 @@ class ForegroundMask:
     """
 
     def __init__(self):
-        self.selfie_segmentation = mp_selfie_segmentation.SelfieSegmentation(model_selection=1)
+        self.selfie_segmentation = SelfieSegmentation(model_selection=1)
         self.bg_image = cv2.imread('smart_canvas/backgrounds/painterly_bg.jpg')
         dim = (1280,720)
         self.bg_image = cv2.resize(self.bg_image, dim, interpolation=cv2.INTER_AREA)
         self.output_image = None
         self.mask = None
 
-    def switchBackground(self, current_filter):
+    def switchBackground(self, current_filter: str):
         filter_images_lib = {
             'painterly': 'painterly_bg.jpg',
             'watercolor': 'watercolor_bg.jpeg',
@@ -34,14 +34,14 @@ class ForegroundMask:
         self.bg_image = cv2.resize(self.bg_image, dim, interpolation = cv2.INTER_AREA)
         return self.bg_image
 
-    def remove_isolated_pixels(self, mask):
+    def remove_isolated_pixels(self, mask: MatLike):
         kernel = np.ones((5, 5), np.uint8)
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
         mask = cv2.morphologyEx(mask, cv2.MORPH_ERODE, kernel)
         return mask
 
-    def apply(self, frame):
+    def apply(self, frame: MatLike):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame.flags.writeable = False
 

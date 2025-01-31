@@ -1,8 +1,10 @@
 from threading import Thread
-import time
 
 import cv2
 
+# Types
+from queue import Queue
+from cv2.typing import MatLike
 
 class VideoRead:
     """
@@ -10,7 +12,7 @@ class VideoRead:
     with a dedicated thread.
     """
 
-    def __init__(self, q_producer, src=0):
+    def __init__(self, q_producer: Queue[MatLike], src: int=0):
         self.video_queue = q_producer
         self.stream = cv2.VideoCapture(src)
         self.stream.set(3, 1280)

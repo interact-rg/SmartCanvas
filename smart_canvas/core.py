@@ -1,6 +1,11 @@
 """ core.py """
 from __future__ import annotations
 
+# Types
+from queue import Queue
+from cv2.typing import MatLike
+from .gesture_detection import H_Gesture
+
 # Default packages
 
 # External packages
@@ -9,20 +14,14 @@ import time
 from abc import ABC, abstractmethod
 import os
 
-from requests import delete
-
 # Internal packages
 from smart_canvas.background import ForegroundMask
 from smart_canvas.gesture_detection import HandDetect
 from smart_canvas.filters.carousel import FilterCarousel
-from smart_canvas.ui import UI
+from smart_canvas.ui import UI, UI_State
 from smart_canvas.database import Database
 from smart_canvas.instructions import InstructionsLanguage
-try:
-    from web.main.common_events import send_ui_state
-except ImportError:
-    pass # import will fail when running openGL version but not needed in that case -> just ignore
-
+from web.main.common_events import send_ui_state
 
 class CanvasCore:
     """
@@ -30,11 +29,11 @@ class CanvasCore:
     """
     _state = None
 
-    def __init__(self, q_consumer, screensize: tuple, webapp=False, sid=None):
+    def __init__(self, q_consumer: Queue[MatLike], screensize: tuple[int, int], webapp:bool=False, sid: str|None=None):
         self.q_consumer = q_consumer
         self.stopped = False
         self.tick = time.time()
-        self.out_frame = None
+        self.out_frame: None|MatLike = None
         self.filters = FilterCarousel()
         self.fg_masker = ForegroundMask()
         self.hand_detector = HandDetect()
@@ -63,7 +62,7 @@ class CanvasCore:
             self.tick = time.time()
 
             # update state we are currently in
-            self._state.update(self.tick, frame)
+            self._state.update(self.tick, frame) # type: ignore
 
     def start(self):
         Thread(target=self.process, args=()).start()
@@ -72,9 +71,9 @@ class CanvasCore:
     def stop(self):
         self.stopped = True
 
-    def get_ui_state(self):
+    def get_ui_state(self) -> UI_State:
         # return all things that should be visible on ui
-        ui_state = {}
+        ui_state: dict[str, str|float] = {}
         for k, v in self.ui.texts.items():
             eval = self.ui.elements[k]
             if eval.visible:
@@ -86,18 +85,17 @@ class CanvasCore:
         return(str(self._state))
 
     def set_text_messages(self):
-        self.ui.set_text("help_1", self.instruction_language.current_instruction_set["help_1"])
-        self.ui.set_text("help_2", self.instruction_language.current_instruction_set["help_2"])
-        self.ui.set_text("help_3", self.instruction_language.current_instruction_set["help_3"])
+        self.ui.set_text("help_1", self.instruction_language.get_string("help_1"))
+        self.ui.set_text("help_2", self.instruction_language.get_string("help_2"))
+        self.ui.set_text("help_3", self.instruction_language.get_string("help_3"))
 
-        self.ui.set_text("idle_text_1", self.instruction_language.current_instruction_set["idle_text_1"])
-        self.ui.set_text("idle_text_2", self.instruction_language.current_instruction_set["idle_text_2"])
-        self.ui.set_text("gdpr_consent", self.instruction_language.current_instruction_set["gdpr_consent"])
-        self.ui.set_text("image_showing_promote", self.instruction_language.current_instruction_set
-        ["image_showing_promote"])
-        self.ui.set_text("filter_name", (self.instruction_language.current_instruction_set["filter_message"] +
-                                         self.instruction_language.current_instruction_set["filter_list"][
-                                             str(self.filters.current_name)]))
+        self.ui.set_text("idle_text_1", self.instruction_language.get_string("idle_text_1"))
+        self.ui.set_text("idle_text_2", self.instruction_language.get_string("idle_text_2"))
+        self.ui.set_text("gdpr_consent", self.instruction_language.get_string("gdpr_consent"))
+        self.ui.set_text("image_showing_promote", self.instruction_language.get_string("image_showing_promote"))
+
+        self.ui.set_text("filter_name", (self.instruction_language.get_string("filter_message") +
+                                         self.instruction_language.get_filter_name(str(self.filters.current_name))))
 
 
 class State(ABC):
@@ -110,11 +108,11 @@ class State(ABC):
         self._core = core
 
     @abstractmethod
-    def enter(self, tick):
+    def enter(self, tick: float):
         pass
 
     @abstractmethod
-    def update(self, tick, frame):
+    def update(self, tick: float, frame: MatLike):
         pass
 
 
@@ -126,7 +124,7 @@ class Startup(State):
     def __init__(self):
         pass
 
-    def enter(self, tick):
+    def enter(self, tick: float):
         self.ui = self.core.ui
         self.ui.create_text("help_1", (20, 40), 30.0)
         self.ui.create_text("help_2", (20, 80), 30.0)
@@ -150,7 +148,7 @@ class Startup(State):
         else:
             self.core.database.create_database()
 
-    def update(self, tick, frame):
+    def update(self, tick: float, frame: MatLike):
         self.core.set_state(Idle())
 
 
@@ -168,7 +166,7 @@ class Idle(State):
         self.finger_frame_interval = 0.0
 
     # Runs once on init
-    def enter(self, tick):
+    def enter(self, tick: float):
         self.core.ui.hide("help_1", "help_2", "help_3", "filter_name", "bar", "image_showing_promote", "gdpr_consent")
         self.core.ui.show("idle_text_1", "idle_text_2", "bar")
         self.core.ui.set_prog("bar", 1.1)
@@ -185,7 +183,7 @@ class Idle(State):
         # self.core.ui.set_prog("bar", 0.0)
 
     # Update is called on new frame
-    def update(self, tick, frame):
+    def update(self, tick: float, frame: MatLike):
         # Now we update UI elements to Opengl so no need to wait for slow functions to finish
 
         # masked_frame = self.core.fg_masker.apply(frame)
@@ -204,7 +202,7 @@ class Idle(State):
             if self.core.is_webapp:
                 send_ui_state(self.core.get_ui_state(), self.core.sid)
 
-    def update_filter_trigger(self, finger_count):
+    def update_filter_trigger(self, finger_count: int):
         if finger_count == 5:
             self.take_pic_cnt += 0.05
         elif self.take_pic_cnt > 0.0:
@@ -222,7 +220,7 @@ class GPDR_consent(State):
         self.waiting_time = 0.0
 
     # Runs once on init
-    def enter(self, tick):
+    def enter(self, tick: float):
         self.core.ui.hide("help_1", "help_2", "help_3", "filter_name", "bar", "image_showing_promote", "idle_text_1",
                           "idle_text_2")
         self.core.ui.show("bar", "gdpr_consent")
@@ -233,7 +231,7 @@ class GPDR_consent(State):
             send_ui_state(self.core.get_ui_state(), self.core.sid)
 
     # Update is called on new frame
-    def update(self, tick, frame):
+    def update(self, tick: float, frame: MatLike):
         # Now we update UI elements to Opengl so no need to wait for slow functions to finish
 
         self.core.out_frame = frame
@@ -251,7 +249,7 @@ class GPDR_consent(State):
         if self.waiting_time - tick < 0:
             self.core.set_state(Idle())
 
-    def update_filter_trigger(self, gesture):
+    def update_filter_trigger(self, gesture: H_Gesture):
         if gesture != {'RIGHT': 'UNKNOWN', 'LEFT': 'UNKNOWN'}:
             self.take_pic_cnt += 0.05
         elif self.take_pic_cnt > 0.0:
@@ -281,7 +279,7 @@ class Active(State):
         self.waiting_time = 0.0
 
     # Runs once on init
-    def enter(self, tick):
+    def enter(self, tick: float):
         self.core.ui.hide("idle_text_1", "idle_text_2", "bar", "image_showing_promote", "gdpr_consent")
         self.core.ui.show("help_1", "help_2", "help_3", "filter_name", "bar")
         self.core.ui.set_prog("bar", 0.0)
@@ -291,7 +289,7 @@ class Active(State):
             send_ui_state(self.core.get_ui_state(), self.core.sid)
 
     # Update is called on new frame
-    def update(self, tick, frame):
+    def update(self, tick: float, frame: MatLike):
         # Now we update UI elements to Opengl so no need to wait for slow functions to finish
         self.core.out_frame = frame
         # Detect fingers 10 times in a second
@@ -311,17 +309,15 @@ class Active(State):
             self.core.out_frame = self.core.filtered_frame
             self.core.set_state(Idle())
 
-    def update_filter_carousel(self, finger_count, tick):
+    def update_filter_carousel(self, finger_count: int, tick: float):
         if finger_count == 2:
             if self.change_filter_time - tick <= 0 and self.take_pic_cnt <= 0:
                 self.change_filter_time = tick + 1.5
                 self.core.filters.next_filter()
-                self.core.ui.set_text("filter_name", (self.core.instruction_language.current_instruction_set
-                                                      ["filter_message"] + self.core.instruction_language.
-                                                      current_instruction_set["filter_list"][
-                                                          str(self.core.filters.current_name)]))
+                self.core.ui.set_text("filter_name", (self.core.instruction_language.get_string("filter_message") + 
+                                                      self.core.instruction_language.get_filter_name(str(self.core.filters.current_name))))
 
-    def update_filter_trigger(self, finger_count):
+    def update_filter_trigger(self, finger_count: int):
         if finger_count == 5:
             self.take_pic_cnt += 0.05
         elif self.take_pic_cnt > 0.0:
@@ -329,11 +325,11 @@ class Active(State):
         if self.take_pic_cnt >= 1.0:
             self.core.set_state(Filter())
 
-    def update_language_set(self, finger_count, tick):
+    def update_language_set(self, finger_count: int, tick: float):
         if finger_count == 10:
             if self.change_language_time - tick <= 0 and self.take_pic_cnt <= 0:
                 self.change_language_time = tick + 1.5
-                print("Changed Language: " + self.core.instruction_language.current_instruction_set["code"])
+                print("Changed Language: " + self.core.instruction_language.get_string("code"))
                 self.core.instruction_language.next_instruction_set()
                 self.core.set_text_messages()
 
@@ -347,7 +343,7 @@ class Filter(State):
     def __init__(self):
         self.countdown_time = 0.0
 
-    def enter(self, tick):
+    def enter(self, tick: float):
         self.countdown_time = tick + 4
         self.core.ui.hide("idle_text_1", "idle_text_2", "bar", "gdpr_consent")
         self.core.ui.hide("help_1", "help_2", "help_3", "filter_name", "image_showing_promote")
@@ -357,7 +353,7 @@ class Filter(State):
         if self.core.is_webapp:
             send_ui_state(self.core.get_ui_state(), self.core.sid)
 
-    def update(self, tick, frame):
+    def update(self, tick: float, frame: MatLike):
         if self.countdown_time - tick > 0:
             self.core.ui.set_text("countdown", '{}'.format(int(self.countdown_time - tick)))
             self.core.out_frame = frame
@@ -369,10 +365,10 @@ class Filter(State):
         if self.core.is_webapp:
             send_ui_state(self.core.get_ui_state(), self.core.sid)
 
-    def apply_filter(self, frame):
+    def apply_filter(self, frame: MatLike):
 
-        masked_frame = self.core.fg_masker.apply(frame)
-        filtered_frame = self.core.filters.current_filter(masked_frame)
+        masked_frame: MatLike = self.core.fg_masker.apply(frame)
+        filtered_frame: MatLike = self.core.filters.current_filter(masked_frame)
         self.core.filtered_frame = self.core.fg_masker.changeBackground(filtered_frame, self.core.filters.current_name)
 
         # upload image to database if consent was given
@@ -395,7 +391,7 @@ class ShowPic(State):
         self.change_filter_time = 0.0
         self.finger_frame_interval = 0.0
 
-    def enter(self, tick):
+    def enter(self, tick: float):
         self.core.ui.hide("countdown", "gdpr_consent")
         self.core.ui.set_text("filter_name", 'Current filter is {}'.format(self.core.filters.current_name))
         self.core.ui.show("filter_name")
@@ -409,7 +405,7 @@ class ShowPic(State):
         if self.core.is_webapp:
             send_ui_state(self.core.get_ui_state(), self.core.sid)
 
-    def update(self, tick, frame):
+    def update(self, tick: float, frame: MatLike):
         if self.show_image_time - tick < 0:
             self.core.set_state(Active())
 
@@ -423,7 +419,7 @@ class ShowPic(State):
 
             self.core.ui.set_prog("bar", self.take_pic_cnt)
 
-    def update_filter_trigger(self, finger_count):
+    def update_filter_trigger(self, finger_count: int):
         if finger_count == 5:
             self.take_pic_cnt += 0.05
         elif self.take_pic_cnt > 0.0:

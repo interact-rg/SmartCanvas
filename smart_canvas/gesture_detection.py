@@ -1,10 +1,26 @@
-from threading import Thread
-import time
-
-import mediapipe as mp
+from mediapipe.python.solutions.hands import Hands
 import cv2
 
-mpHands = mp.solutions.hands
+# Types
+from cv2.typing import MatLike
+from typing import Protocol, Literal, Any
+
+class Landmarks:
+    x: float
+    y: float
+    z: float
+
+class HandLandmark(Protocol):
+    landmark: list[Landmarks]
+
+class HandResults(Protocol):
+    multi_hand_landmarks: Any
+    multi_hand_world_landmarks: Any
+    multi_handedness: Any
+
+H_Label = Literal["Left", "Right"]
+H_Gesture = dict[Literal["RIGHT", "LEFT"], str]
+H_Landmarks = list[list[float|H_Label]]
 
 
 class HandDetect:
@@ -13,7 +29,7 @@ class HandDetect:
     """
 
     def __init__(self):
-        self.hands = mpHands.Hands(
+        self.hands = Hands(
             max_num_hands=2, 
             min_detection_confidence=0.8, 
             min_tracking_confidence=0.8
@@ -22,7 +38,7 @@ class HandDetect:
         self.count = 0
 
 
-    def findHandLandMarks(self, hand_landmark, label):
+    def findHandLandMarks(self, hand_landmark: HandLandmark, label: H_Label) -> H_Landmarks:
 
         # label gives if hand is left or right
         # account for inversion in webcams
@@ -31,16 +47,16 @@ class HandDetect:
         elif label == "Right":
             label = "Left"
 
-        landMarkList = []
+        landMarkList: H_Landmarks = []
 
         # Fill list with x and y positions of each landmark
-        for landmarks in hand_landmark.landmark:
-            landMarkList.append([landmarks.x, landmarks.y, label])
+        for landmark in hand_landmark.landmark:
+            landMarkList.append([landmark.x, landmark.y, label])
 
         return landMarkList
 
 
-    def check_thumbs_up(self, HandLabel, landmarks):
+    def check_thumbs_up(self, HandLabel: H_Label, landmarks: H_Landmarks) -> None:
         #Check if thumb tip is higher than index tip
         if HandLabel == "Left" and landmarks[4][1] < landmarks[8][1]:   # Left thumb up
             self.fingers_statuses[landmarks[4][2].upper()+'_THUMB_UP'] = True
@@ -56,12 +72,12 @@ class HandDetect:
             self.fingers_statuses[landmarks[4][2].upper()+'_THUMB_DOWN'] = True
 
 
-    def count_fingers(self, frame):
+    def count_fingers(self, frame: MatLike):
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        results = self.hands.process(image)
+        results: HandResults = self.hands.process(image) # type: ignore
         
         fingerCount = 0
-        hand_gesture = {'RIGHT': "UNKNOWN", 'LEFT': "UNKNOWN"}
+        hand_gesture: H_Gesture = {'RIGHT': "UNKNOWN", 'LEFT': "UNKNOWN"}
 
         # a dictionary to store the status (i.e., True for open and False for close) of each finger of both hands.
         self.fingers_statuses = {'RIGHT_THUMB': False, 'RIGHT_INDEX': False, 'RIGHT_MIDDLE': False, 'RIGHT_RING': False,
@@ -73,8 +89,8 @@ class HandDetect:
 
             for hand_landmarks in results.multi_hand_landmarks:
                 # Get hand index to check label (left or right)
-                handIndex = results.multi_hand_landmarks.index(hand_landmarks)
-                handLabel = results.multi_handedness[handIndex].classification[0].label
+                handIndex: int = results.multi_hand_landmarks.index(hand_landmarks)
+                handLabel: Literal["Left", "Right"] = results.multi_handedness[handIndex].classification[0].label
                 # hand landmark positions (x, y, label)
                 handLandmarks = self.findHandLandMarks(hand_landmarks, handLabel)
                 
@@ -109,11 +125,11 @@ class HandDetect:
         return fingerCount, hand_gesture
     
 
-    def recognizeGesture(self, hands_gestures):
-        hands_labels = {'RIGHT', 'LEFT'}
+    def recognizeGesture(self, hands_gestures: H_Gesture) -> H_Gesture:
+        hands_labels: list[Literal['RIGHT', 'LEFT']] = ['RIGHT', 'LEFT']
         
         # Iterate over the left and right hand.
-        for hand_index, hand_label in enumerate(hands_labels):  
+        for hand_label in hands_labels:
             # Check if the person is making the 'V' gesture with the hand.
             if self.count == 2  and self.fingers_statuses[hand_label+'_MIDDLE'] and self.fingers_statuses[hand_label+'_INDEX']:
                 # Update the gesture value of the hand that we are iterating upon to V SIGN.

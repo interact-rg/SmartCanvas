@@ -12,11 +12,15 @@ from smart_canvas.filters.gs_cartoon import gs_cartoon_filter
 from .animefilter.animestyle import AnimeFilter
 from .pointillism.pointillism import pointillism
 
+from typing import Callable, Any
+
 
 class FilterCarousel:
     animeFilter = AnimeFilter()
+    current_name: str
+    current_filter: Callable[..., Any]
 
-    catalog = {
+    catalog: dict[str, Callable[..., Any]] = {
         'painterly': painterly_filter,
         'watercolor': watercolor,
         'oil painting': oil_painting,
@@ -28,8 +32,6 @@ class FilterCarousel:
     carousel = itertools.cycle(catalog)
 
     def __init__(self, **kwargs):
-        self.current_filter = None
-        self.current_name = None
         self.next_filter()
 
     def next_filter(self):

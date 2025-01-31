@@ -1,8 +1,10 @@
 import cv2
 import numpy as np
 
+# Types
+from cv2.typing import MatLike
 
-def limit_size(img, max_x, max_y=0):
+def limit_size(img: MatLike, max_x: int, max_y: int=0):
     if max_x == 0:
         return img
 
@@ -18,7 +20,7 @@ def limit_size(img, max_x, max_y=0):
         return img
 
 
-def clipped_addition(img, x, _max=255, _min=0):
+def clipped_addition(img: MatLike, x: int, _max: int=255, _min: int=0):
     if x > 0:
         mask = img > (_max - x)
         img += x
@@ -29,7 +31,7 @@ def clipped_addition(img, x, _max=255, _min=0):
         np.putmask(img, mask, _min)
 
 
-def regulate(img, hue=0, saturation=0, luminosity=0):
+def regulate(img: MatLike, hue: int=0, saturation: int=0, luminosity: int=0):
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV_FULL)
     if hue < 0:
         hue = 255 + hue
