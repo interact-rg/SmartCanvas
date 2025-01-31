@@ -5,7 +5,7 @@ WORKDIR /smart-canvas
 COPY setup.py README.md .
 
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install .
+    pip install --no-cache-dir .
 
 RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 COPY . .
