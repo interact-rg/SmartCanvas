@@ -45,7 +45,8 @@ setup(
         'torchvision==0.15.2',
         'scipy==1.11.2',
         'scikit-learn==1.3.0',
-        'six==1.16.0'
+        'six==1.16.0',
+        'python-dotenv==1.0.1'
     ],
     setup_requires=['wheel'],
     python_requires='==3.11.5'
