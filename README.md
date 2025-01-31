@@ -4,11 +4,14 @@
 Check out full instructions [HERE](docs/docker.md)
 
 ## Usage with terminal commands
-If you do not have Make installed use the following commands on a terminal (like Git Bash) to install and run the program.
-```
-git clone https://github.com/interact-rg/SmartCanvas.git
-cd SmartCanvas
-pip install .
+
+Setting up the Python environment uses https://github.com/astral-sh/uv, a Python package and project manager.
+
+```ps
+uv python install 3.11.5
+uv venv --python 3.11.5
+.venv\Scripts\activate # This command may differ depending on your platform
+uv pip install .
 python -m smart_canvas
 ```
 
