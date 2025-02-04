@@ -8,10 +8,11 @@ Check out full instructions [HERE](docs/docker.md)
 Setting up the Python environment uses https://github.com/astral-sh/uv, a Python package and project manager.
 
 ```ps
-uv python install 3.11.5
-uv venv --python 3.11.5
+uv python install 3.12
+uv venv --python 3.12
 .venv\Scripts\activate # This command may differ depending on your platform
-uv pip install .
+uv sync
+uv build
 python -m smart_canvas
 ```
 
