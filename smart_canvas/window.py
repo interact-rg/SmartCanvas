@@ -1,10 +1,11 @@
 from array import array
 
 import numpy as np
-import moderngl_window as mglw
+from moderngl_window import run_window_config
+from moderngl_window.context.base.window import WindowConfig
 
 
-class Window(mglw.WindowConfig):
+class Window(WindowConfig):
     """
     Class that defines OpenGL window.
     More information:
@@ -79,4 +80,4 @@ class Window(mglw.WindowConfig):
 
     @classmethod
     def run(cls):
-        mglw.run_window_config(cls)
+        run_window_config(cls)

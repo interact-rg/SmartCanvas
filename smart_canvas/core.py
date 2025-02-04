@@ -38,13 +38,13 @@ class CanvasCore:
         self.fg_masker = ForegroundMask()
         self.hand_detector = HandDetect()
         self.database = Database()
-        self.image_id = None
+        self.image_id: None|int = None
         self.ui = UI()
         self.win_size = screensize
         self.gdpr_accepted = False
         self.image_processing_active = False
         self.instruction_language = InstructionsLanguage()
-        self.filtered_frame = None
+        self.filtered_frame: None|MatLike = None
         self.is_webapp = webapp
         self.sid = sid
         # This is initial state

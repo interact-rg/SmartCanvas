@@ -25,7 +25,7 @@ class SmartRender(Window):
         self.frame_texture = self.ctx.texture(
             (self.video.width, self.video.height), 3)  # , internal_format=0x8C41)
 
-    def render(self, _time, frame_time):
+    def render(self, time, frame_time):
         if self.core.out_frame is None:
             return
 
