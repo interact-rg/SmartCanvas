@@ -3,7 +3,7 @@ import os
 import requests
 
 
-def upload_image(image_path, url=None, auth_token=None):
+def upload_image(image_path: str, url: str|None=None, auth_token:str|None=None):
     """
     Uploads image to web-service
     """

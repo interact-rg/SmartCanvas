@@ -195,7 +195,7 @@ class Idle(State):
         # Detect fingers 10 times in a second
         # Using timer here because frame rate can differ
         if self.finger_frame_interval - tick < 0:
-            finger_count, gesture = self.core.hand_detector.count_fingers(frame)
+            finger_count, _ = self.core.hand_detector.count_fingers(frame)
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
             self.core.ui.set_prog("bar", self.take_pic_cnt)
@@ -238,7 +238,7 @@ class GPDR_consent(State):
         # Detect gestures 10 times in a second
         # Using timer here because frame rate can differ
         if self.finger_frame_interval - tick < 0:
-            finger_count, gesture = self.core.hand_detector.count_fingers(frame)
+            _, gesture = self.core.hand_detector.count_fingers(frame)
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(gesture)
 
@@ -295,7 +295,7 @@ class Active(State):
         # Detect fingers 10 times in a second
         # Using timer here because frame rate can differ
         if self.finger_frame_interval - tick < 0:
-            finger_count, gesture = self.core.hand_detector.count_fingers(frame)
+            finger_count, _ = self.core.hand_detector.count_fingers(frame)
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
             self.update_filter_carousel(finger_count, tick)
@@ -372,7 +372,7 @@ class Filter(State):
         self.core.filtered_frame = self.core.fg_masker.changeBackground(filtered_frame, self.core.filters.current_name)
 
         # upload image to database if consent was given
-        if self.core.gdpr_accepted:
+        if self.core.gdpr_accepted and self.core.filtered_frame:
             self.core.image_id = self.core.database.insert_blob(self.core.filtered_frame)
         
         # delete images from database that are more than 1 day old
@@ -413,7 +413,7 @@ class ShowPic(State):
         # Detect fingers 10 times in a second
         # Using timer here because frame rate can differ
         if self.finger_frame_interval - tick < 0:
-            finger_count, gesture = self.core.hand_detector.count_fingers(frame)
+            finger_count, _ = self.core.hand_detector.count_fingers(frame)
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
 

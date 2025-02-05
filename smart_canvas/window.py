@@ -1,6 +1,5 @@
 from array import array
 
-import numpy as np
 from moderngl_window import run_window_config
 from moderngl_window.context.base.window import WindowConfig
 
@@ -17,10 +16,10 @@ class Window(WindowConfig):
     aspect_ratio = 16 / 9
     resizable = True
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any):
         super().__init__(**kwargs)
 
-        self.camera = self.argv.camera
+        self.camera: int = self.argv.camera
         self.fbo = self.ctx.framebuffer(
             color_attachments=[self.ctx.texture(Window.window_size, 3)]
         )

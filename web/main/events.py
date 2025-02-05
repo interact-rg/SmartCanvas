@@ -1,25 +1,24 @@
 """ __main__.py """
 
 # Default packages
-import uuid
 import base64
 from queue import Queue
 
 # External packages
-from flask_socketio import SocketIO, send, emit
 from flask import request
 import numpy as np
 import cv2
-import smart_canvas.core
+from cv2.typing import MatLike
 
 # Internal modules
 from .. import socketio
+from smart_canvas.core import CanvasCore
 from smart_canvas.qr_code import *
 
 
 # Global dicts
-core_threads = {}
-core_queues = {}
+core_threads: dict[str, CanvasCore] = {}
+core_queues: dict[str, Queue[MatLike]] = {}
 
 #HOST_IP = "86.50.168.39"
 HOST_IP = "127.0.0.1"
@@ -27,15 +26,15 @@ HOST_IP = "127.0.0.1"
 @socketio.on('connect')
 def connect_web():
     print('[INFO] Web client connected: {}'.format(request.sid))
-    sid = request.sid
+    sid: str = request.sid
     core_queues.update({sid: Queue()})
-    core_threads.update({sid: smart_canvas.core.CanvasCore(q_consumer=core_queues[sid], screensize=(0, 0), webapp=True, sid=sid).start()})
+    core_threads.update({sid: CanvasCore(q_consumer=core_queues[sid], screensize=(0, 0), webapp=True, sid=sid).start()})
 
 
 @socketio.on('disconnect')
 def disconnect_web():
     print('[INFO] Web client disconnected: {}'.format(request.sid))
-    sid = request.sid
+    sid: str = request.sid
     core = core_threads[sid]
     core.stop()
     core_queues[sid].put(None)
@@ -43,7 +42,7 @@ def disconnect_web():
     core_queues.pop(sid)
 
 
-def cv_to_b64(cv_image):
+def cv_to_b64(cv_image: MatLike):
     if (cv_image is None):
         return ''
     _, buffer = cv2.imencode('.jpg', cv_image)
@@ -52,7 +51,7 @@ def cv_to_b64(cv_image):
     return string_b64
 
 
-def b64_to_cv(jpg_as_text):
+def b64_to_cv(jpg_as_text: str):
     jpg_original = base64.b64decode(jpg_as_text)
     jpg_as_np = np.frombuffer(jpg_original, dtype=np.uint8)
     img = cv2.imdecode(jpg_as_np, flags=1)
@@ -60,8 +59,8 @@ def b64_to_cv(jpg_as_text):
 
 
 @socketio.on('produce')
-def handle_client_message(message):
-    sid = request.sid
+def handle_client_message(message: str):
+    sid: str = request.sid
     core = core_threads[sid]
     producer_q = core_queues[sid]
     header = message.split(",")[0]
@@ -86,7 +85,7 @@ def check_image_processing():
         socketio.emit('imgage_processing_finished', '', to=sid)
 
 @socketio.on('get_dl_link')
-def get_dl_qr(message):
+def get_dl_qr(message: str):
     core = core_threads[request.sid]
     if core.gdpr_accepted:
         header = message.split(",")[0]

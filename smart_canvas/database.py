@@ -3,6 +3,8 @@ import sqlite3
 import datetime
 
 from PIL import Image as im
+from cv2.typing import MatLike
+from PIL.Image import Image
 import os
 
 
@@ -16,7 +18,7 @@ class Database:
 
         sql_select_query = """SELECT * from images"""
         cursor.execute(sql_select_query)
-        myresult = cursor.fetchall()
+        cursor.fetchall()
 
         cursor.close()
         connection.close()
@@ -28,13 +30,13 @@ class Database:
             binaryData = file.read()
         return binaryData
 
-    def insert_blob(self, image):
+    def insert_blob(self, image: MatLike):
 
         print("Inserting BLOB into images table")
         # create image object of numpy array
-        data = im.fromarray(image)
+        data: Image = im.fromarray(image)
         data.save(
-            "assets\picwithcanvas.png"
+            r"assets\picwithcanvas.png"
         )  # remove this later, no need to save locally.
         image_id = 1
         date_added = datetime.datetime.now()
@@ -53,10 +55,10 @@ class Database:
         sql_insert_blob_query = """ INSERT INTO images
                                 (image_id, image, date_added) VALUES (?, ?, ?)"""
 
-        image = self.convert_image_to_binary(r"assets\picwithcanvas.png")
+        b_image = self.convert_image_to_binary(r"assets\picwithcanvas.png")
 
         # Convert data into tuple format
-        data_tuple = (image_id, image, date_added)
+        data_tuple = (image_id, b_image, date_added)
         cursor.execute(sql_insert_blob_query, data_tuple)
 
         connection.commit()

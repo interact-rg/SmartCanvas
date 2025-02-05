@@ -1,15 +1,13 @@
-import os
 import time
 from multiprocessing import Process
-
+from typing import Any
 import requests
-from flask import Flask, jsonify
 
 from web import create_app
 
 
 class MockServer:
-    def __init__(self, config, port):
+    def __init__(self, config: dict[str, Any], port: int):
         self.app = create_app(config)
         self.port = port
         self.url = f'http://localhost:{self.port}'
@@ -38,5 +36,7 @@ class MockServer:
         return self
 
     def stop(self):
+        if not self.server:
+            raise Exception('Server was stopped before it was started')
         self.server.terminate()
         self.server.join()

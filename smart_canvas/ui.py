@@ -3,6 +3,7 @@ import numpy as np
 
 from pathlib import Path
 
+from moderngl import Program
 from moderngl_window.text.bitmapped.text_2d import TextWriter2D
 from moderngl_window import (resources, ContextRefs)
 from moderngl_window.meta.program import ProgramDescription
@@ -173,7 +174,7 @@ class Progressbar:
     def __init__(self):
 
         self.ctx = ContextRefs.CONTEXT
-        self._program = resources.programs.load(
+        self._program: Program = resources.programs.load(
             ProgramDescription(path="shaders/progressbar.glsl")
         )
 
@@ -194,11 +195,11 @@ class Progressbar:
         )
 
     @property
-    def scale(self):
+    def scale(self) -> float:
         return self.scale
 
     @scale.setter
-    def scale(self, value):
+    def scale(self, value: float):
         if value < 0.0:
             self._scale = 0.0
         else:

@@ -6,20 +6,22 @@ import atexit
 import time
 from tempfile import mkdtemp
 
-from flask import Flask, render_template
+from typing import Any
+
+from flask import Flask
 from flask_socketio import SocketIO
-from flask_apscheduler import APScheduler
+from flask_apscheduler.scheduler import APScheduler
 
 socketio = SocketIO(cors_allowed_origins="*")
 
 
-def create_app(test_config=None):
+def create_app(test_config: dict[str, Any]|None = None):
     """
     Based on http://flask.pocoo.org/docs/1.0/tutorial/factory/#the-application-factory
     """
     app = Flask(__name__)
     app.debug = True
-    config = {
+    config: dict[str, Any] = {
         "SCHEDULER_API_ENABLED": False,
         "UPLOAD_FOLDER": mkdtemp('_web_service_uploads'),
         "TOKENS": dict(),
@@ -48,7 +50,7 @@ def create_app(test_config=None):
         old_files: list of file paths
         """
         old_files: list[str] = []
-        now = time.time()
+        # now = time.time() # Why was this here?
         for filename in os.listdir(files_path):
             file_path = os.path.join(files_path, filename)
             filestamp = os.stat(file_path).st_mtime

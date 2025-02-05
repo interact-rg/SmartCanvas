@@ -1,7 +1,12 @@
 import cv2
 import numpy as np
 from cv2.typing import MatLike
+from numpy.typing import ArrayLike
+from typing import Protocol
 from mediapipe.python.solutions.selfie_segmentation import SelfieSegmentation
+
+class Segmentation(Protocol):
+    segmentation_mask: MatLike
 
 class ForegroundMask:
     """
@@ -45,7 +50,7 @@ class ForegroundMask:
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame.flags.writeable = False
 
-        results = self.selfie_segmentation.process(frame)
+        results: Segmentation = self.selfie_segmentation.process(frame) # type: ignore
 
         frame.flags.writeable = True
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
@@ -57,8 +62,10 @@ class ForegroundMask:
         self.output_image = np.where(condition, frame, emptyBg)
         return self.output_image
 
-    def changeBackground(self, frame, current_filter):
-        condition = np.stack((self.mask,) * 3, axis=-1) > 0.1
+    def changeBackground(self, frame: MatLike, current_filter: str) -> MatLike:
+        if self.mask is None:
+            raise ValueError("Foreground mask is missing.")
+        condition: ArrayLike = np.stack((self.mask,) * 3, axis=-1) > 0.1
 
         self.bg_image = self.switchBackground(current_filter)
         self.output_image = np.where(condition, frame, self.bg_image)
