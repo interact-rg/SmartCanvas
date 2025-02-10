@@ -372,7 +372,7 @@ class Filter(State):
         self.core.filtered_frame = self.core.fg_masker.changeBackground(filtered_frame, self.core.filters.current_name)
 
         # upload image to database if consent was given
-        if self.core.gdpr_accepted and self.core.filtered_frame:
+        if self.core.gdpr_accepted and self.core.filtered_frame.any():
             self.core.image_id = self.core.database.insert_blob(self.core.filtered_frame)
         
         # delete images from database that are more than 1 day old
