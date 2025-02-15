@@ -21,13 +21,14 @@ def create_app(test_config: dict[str, Any]|None = None):
     """
     app = Flask(__name__)
     app.debug = True
+    app.env = "development"
     config: dict[str, Any] = {
         "SCHEDULER_API_ENABLED": False,
         "UPLOAD_FOLDER": mkdtemp('_web_service_uploads'),
         "TOKENS": dict(),
     }
     app.config.from_mapping(config)
-
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
     if os.getenv('CLIENT_TOKEN'):
         auth_token = os.getenv('CLIENT_TOKEN')
         app.config["TOKENS"].update({auth_token: 'Client-1'})

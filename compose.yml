@@ -1,6 +1,15 @@
-services: 
-  web: 
+version: "3.8"
+
+services:
+  web:
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
     build: .
-    ports: 
-      - '5000:5000'
+    ports:
+      - "5000:5000"
     restart: on-failure
+    volumes:
+      - ./smart_canvas:/app/smart_canvas  
+      - ./web:/app/web  
+      - ./assets:/app/assets  
