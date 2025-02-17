@@ -1,5 +1,7 @@
 """ __main__.py """
 
+from __future__ import annotations
+
 # Default packages
 import base64
 from queue import Queue
@@ -8,10 +10,14 @@ from queue import Queue
 from flask import request
 import numpy as np
 import cv2
-from cv2.typing import MatLike
+
+from typing import TYPE_CHECKING
 
 # Internal modules
 from .. import socketio
+if TYPE_CHECKING:
+    from cv2.typing import MatLike
+
 from smart_canvas.core import CanvasCore
 from smart_canvas.qr_code import *
 

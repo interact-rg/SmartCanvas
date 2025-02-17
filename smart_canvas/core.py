@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 # Types
-from queue import Queue
-from cv2.typing import MatLike
-from .gesture_detection import H_Gesture
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from queue import Queue
+    from cv2.typing import MatLike
+    from .gesture_detection import H_Gesture
 
 # Default packages
 
@@ -21,7 +23,11 @@ from smart_canvas.filters.carousel import FilterCarousel
 from smart_canvas.ui import UI, UI_State
 from smart_canvas.database import Database
 from smart_canvas.instructions import InstructionsLanguage
-from web.main.common_events import send_ui_state
+
+try:
+    from web.main.common_events import send_ui_state
+except ImportError:
+    send_ui_state = lambda x, y: None
 
 class CanvasCore:
     """

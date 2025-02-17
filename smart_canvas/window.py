@@ -16,7 +16,7 @@ class Window(WindowConfig):
     aspect_ratio = 16 / 9
     resizable = True
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
         self.camera: int = self.argv.camera
