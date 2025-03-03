@@ -1,0 +1,28 @@
+FROM python:3.12-slim AS builder
+
+COPY . /smart-canvas
+WORKDIR /smart-canvas
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen
+RUN ls
+RUN uv build
+
+
+RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
+    --mount=target=/var/cache/apt,type=cache,sharing=locked \
+    rm -f /etc/apt/apt.conf.d/docker-clean \
+    && apt-get update \
+    && apt-get -y --no-install-recommends install \
+        ffmpeg libsm6 libxext6
+COPY . .
+
+ENV FLASK_APP=web
+ENV CLIENT_TOKEN=d159f6d5-6bb6-44c3-a2fa-ae5a60b5ce75
+
+ENTRYPOINT ["uv", "run", "--", "flask", "run", "--host=0.0.0.0"]
+#ENTRYPOINT ["python", "-m", "flask", "run", "--host=0.0.0.0"]
+
+# ENTRYPOINT ["gunicorn", "-b", "0.0.0.0:5000", "--worker-class", "eventlet", "-w", "2", "web:create_app()"]
+# To enable gunicorn (a WSGI server) uncomment the line above and comment the line WORKDIR

@@ -2,14 +2,11 @@ version: "3.8"
 
 services:
   web:
-    environment:
-      - FLASK_ENV=development
-      - FLASK_DEBUG=1
     build: .
+    env_file:
+      - .env  # Load environment variables from the .env file
     ports:
       - "5000:5000"
     restart: on-failure
     volumes:
-      - ./smart_canvas:/app/smart_canvas  
-      - ./web:/app/web  
-      - ./assets:/app/assets  
+      - .:/smart-canvas  # Syncs local changes instantly

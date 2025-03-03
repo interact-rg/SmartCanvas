@@ -13,7 +13,7 @@ class InstructionsLanguage:
                 "help_2": "Show 2 fingers to change filter",
                 "help_3": "Show 10 fingers to change language",
                 "idle_text_1": "SmartCanvas",
-                "idle_text_2": "Wave your hand and start your artistic experience",
+                "idle_text_2": "Show me your hands",
                 "image_showing_promote": "Wave hand to create another artwork",
                 "filter_list": {
                     "painterly": "painterly",

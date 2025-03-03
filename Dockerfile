@@ -1,28 +1,32 @@
+# Use the official Python 3.12 slim image
 FROM python:3.12-slim AS builder
 
-COPY . /smart-canvas
+# Set working directory inside the container
 WORKDIR /smart-canvas
 
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen
-RUN ls
-RUN uv build
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg libsm6 libxext6 && \
+    rm -rf /var/lib/apt/lists/*
 
+# Upgrade pip and set up dependency cache
+RUN pip install --upgrade pip
 
-RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
-    --mount=target=/var/cache/apt,type=cache,sharing=locked \
-    rm -f /etc/apt/apt.conf.d/docker-clean \
-    && apt-get update \
-    && apt-get -y --no-install-recommends install \
-        ffmpeg libsm6 libxext6
+# Copy only requirements.txt first to leverage Docker cache
+COPY requirements.txt .
+
+# Install dependencies with caching enabled
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the project AFTER dependencies are installed
 COPY . .
 
+# Set Flask environment variables
 ENV FLASK_APP=web
-ENV CLIENT_TOKEN=d159f6d5-6bb6-44c3-a2fa-ae5a60b5ce75
+ENV FLASK_ENV=development
 
-ENTRYPOINT ["uv", "run", "--", "flask", "run", "--host=0.0.0.0"]
-#ENTRYPOINT ["python", "-m", "flask", "run", "--host=0.0.0.0"]
+# Expose Flask's default port
+EXPOSE 5000
 
-# ENTRYPOINT ["gunicorn", "-b", "0.0.0.0:5000", "--worker-class", "eventlet", "-w", "2", "web:create_app()"]
-# To enable gunicorn (a WSGI server) uncomment the line above and comment the line WORKDIR
+# Run Flask (replace with gunicorn if deploying to production)
+CMD ["flask", "run", "--host=0.0.0.0"]

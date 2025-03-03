@@ -1,0 +1,21 @@
+Flask
+flask_apscheduler
+flask_httpauth
+flask_socketio
+mediapipe
+moderngl
+moderngl_window
+numpy
+opencv-python-headless
+Pillow
+pyrr
+pytest
+qrcode
+requests
+scikit_learn
+scipy
+werkzeug
+
+# PyTorch (CPU-only version for compatibility)
+torch
+torchvision
