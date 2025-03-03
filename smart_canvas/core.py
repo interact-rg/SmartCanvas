@@ -20,14 +20,8 @@ import os
 from smart_canvas.background import ForegroundMask
 from smart_canvas.gesture_detection import HandDetect
 from smart_canvas.filters.carousel import FilterCarousel
-from smart_canvas.ui import UI, UI_State
+from smart_canvas.ui import UI
 from smart_canvas.database import Database
-from smart_canvas.instructions import InstructionsLanguage
-
-try:
-    from web.main.common_events import send_ui_state
-except ImportError:
-    send_ui_state = lambda x, y: None
 
 class CanvasCore:
     """
@@ -35,7 +29,7 @@ class CanvasCore:
     """
     _state = None
 
-    def __init__(self, q_consumer: Queue[MatLike], screensize: tuple[int, int], webapp:bool=False, sid: str|None=None):
+    def __init__(self, q_consumer: Queue[MatLike], screensize: tuple[int, int], webapp:bool=False, sid: str = ''):
         self.q_consumer = q_consumer
         self.stopped = False
         self.tick = time.time()
@@ -45,11 +39,10 @@ class CanvasCore:
         self.hand_detector = HandDetect()
         self.database = Database()
         self.image_id: None|int = None
-        self.ui = UI()
+        self.ui = UI(sid, is_webapp=webapp)
         self.win_size = screensize
         self.gdpr_accepted = False
         self.image_processing_active = False
-        self.instruction_language = InstructionsLanguage()
         self.filtered_frame: None|MatLike = None
         self.is_webapp = webapp
         self.sid = sid
@@ -77,32 +70,9 @@ class CanvasCore:
     def stop(self):
         self.stopped = True
 
-    def get_ui_state(self) -> UI_State:
-        # return all things that should be visible on ui
-        ui_state: dict[str, str|float] = {}
-        for k, v in self.ui.texts.items():
-            eval = self.ui.elements[k]
-            if eval.visible:
-                ui_state[k] = v
-        ui_state["hold_timer"] = self.ui.get_prog("bar")
-        return ui_state
 
     def get_current_state(self):
         return(str(self._state))
-
-    def set_text_messages(self):
-        self.ui.set_text("help_1", self.instruction_language.get_string("help_1"))
-        self.ui.set_text("help_2", self.instruction_language.get_string("help_2"))
-        self.ui.set_text("help_3", self.instruction_language.get_string("help_3"))
-
-        self.ui.set_text("idle_text_1", self.instruction_language.get_string("idle_text_1"))
-        self.ui.set_text("idle_text_2", self.instruction_language.get_string("idle_text_2"))
-        self.ui.set_text("gdpr_consent", self.instruction_language.get_string("gdpr_consent"))
-        self.ui.set_text("image_showing_promote", self.instruction_language.get_string("image_showing_promote"))
-
-        self.ui.set_text("filter_name", (self.instruction_language.get_string("filter_message") +
-                                         self.instruction_language.get_filter_name(str(self.filters.current_name))))
-
 
 class State(ABC):
     @property
@@ -132,20 +102,6 @@ class Startup(State):
 
     def enter(self, tick: float):
         self.ui = self.core.ui
-        self.ui.create_text("help_1", (20, 40), 30.0)
-        self.ui.create_text("help_2", (20, 80), 30.0)
-        self.ui.create_text("help_3", (20, 80), 30.0)
-
-        self.ui.create_text("idle_text_1", (550, 300), 30.0)
-        self.ui.create_text("idle_text_2", (230, 400), 30.0)
-        self.ui.create_text("gdpr_consent", (250, 400), 30.0)
-
-        self.ui.create_text("countdown", (self.core.win_size[0] / 2, self.core.win_size[1] / 2), 80.0)
-        self.ui.create_text("filter_name", (750, 50), 30.0)
-
-        self.ui.create_text("image_showing_promote", (550, 80), 00.0)
-        self.ui.create_progressbar("bar")
-        self.core.set_text_messages()
 
         # Creating database
         if os.path.exists(r"database.db"):
@@ -173,20 +129,17 @@ class Idle(State):
 
     # Runs once on init
     def enter(self, tick: float):
-        self.core.ui.hide("help_1", "help_2", "help_3", "filter_name", "bar", "image_showing_promote", "gdpr_consent")
-        self.core.ui.show("idle_text_1", "idle_text_2", "bar")
-        self.core.ui.set_prog("bar", 1.1)
-
-        if self.core.is_webapp:
-            send_ui_state(self.core.get_ui_state(), self.core.sid)
+        self.core.ui.hide("help_1", "help_2", "help_3", "filter_name", "image_showing_promote", "gdpr_consent")
+        self.core.ui.show("idle_text_1", "idle_text_2")
+        self.core.ui.set_prog(1.1)
 
         # masked_frame = self.core.fg_masker.apply(frame)
         # filtered_frame = self.core.filters.current_filter(masked_frame)
         # self.core.filtered_frame = self.core.fg_masker.changeBackground(filtered_frame)
         # self.core.out_frame = self.core.filtered_frame
 
-        # self.core.ui.show("help_1", "help_2", "filter_name", "bar")
-        # self.core.ui.set_prog("bar", 0.0)
+        # self.core.ui.show("help_1", "help_2", "filter_name")
+        # self.core.ui.set_prog(0.0)
 
     # Update is called on new frame
     def update(self, tick: float, frame: MatLike):
@@ -204,9 +157,7 @@ class Idle(State):
             finger_count, _ = self.core.hand_detector.count_fingers(frame)
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
-            self.core.ui.set_prog("bar", self.take_pic_cnt)
-            if self.core.is_webapp:
-                send_ui_state(self.core.get_ui_state(), self.core.sid)
+            self.core.ui.set_prog(self.take_pic_cnt)
 
     def update_filter_trigger(self, finger_count: int):
         if finger_count == 5:
@@ -227,14 +178,11 @@ class GPDR_consent(State):
 
     # Runs once on init
     def enter(self, tick: float):
-        self.core.ui.hide("help_1", "help_2", "help_3", "filter_name", "bar", "image_showing_promote", "idle_text_1",
+        self.core.ui.hide("help_1", "help_2", "help_3", "filter_name", "image_showing_promote", "idle_text_1",
                           "idle_text_2")
-        self.core.ui.show("bar", "gdpr_consent")
-        self.core.ui.set_prog("bar", 1.1)
+        self.core.ui.show("gdpr_consent")
+        self.core.ui.set_prog(1.1)
         self.waiting_time = time.time() + 20
-
-        if self.core.is_webapp:
-            send_ui_state(self.core.get_ui_state(), self.core.sid)
 
     # Update is called on new frame
     def update(self, tick: float, frame: MatLike):
@@ -248,9 +196,7 @@ class GPDR_consent(State):
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(gesture)
 
-            self.core.ui.set_prog("bar", self.take_pic_cnt)
-            if self.core.is_webapp:
-                send_ui_state(self.core.get_ui_state(), self.core.sid)
+            self.core.ui.set_prog(self.take_pic_cnt)
 
         if self.waiting_time - tick < 0:
             self.core.set_state(Idle())
@@ -286,13 +232,11 @@ class Active(State):
 
     # Runs once on init
     def enter(self, tick: float):
-        self.core.ui.hide("idle_text_1", "idle_text_2", "bar", "image_showing_promote", "gdpr_consent")
-        self.core.ui.show("help_1", "help_2", "help_3", "filter_name", "bar")
-        self.core.ui.set_prog("bar", 0.0)
+        self.core.ui.hide("idle_text_1", "idle_text_2", "image_showing_promote", "gdpr_consent")
+        self.core.ui.show("help_1", "help_2", "help_3", "filter_name")
+        self.core.ui.set_prog(0.0)
         self.waiting_time = time.time() + 60
 
-        if self.core.is_webapp:
-            send_ui_state(self.core.get_ui_state(), self.core.sid)
 
     # Update is called on new frame
     def update(self, tick: float, frame: MatLike):
@@ -305,11 +249,8 @@ class Active(State):
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
             self.update_filter_carousel(finger_count, tick)
-            self.update_language_set(finger_count, tick)
 
-            self.core.ui.set_prog("bar", self.take_pic_cnt)
-            if self.core.is_webapp:
-                send_ui_state(self.core.get_ui_state(), self.core.sid)
+            self.core.ui.set_prog(self.take_pic_cnt)
 
         if self.waiting_time - tick < 0:
             self.core.out_frame = self.core.filtered_frame
@@ -320,8 +261,6 @@ class Active(State):
             if self.change_filter_time - tick <= 0 and self.take_pic_cnt <= 0:
                 self.change_filter_time = tick + 1.5
                 self.core.filters.next_filter()
-                self.core.ui.set_text("filter_name", (self.core.instruction_language.get_string("filter_message") + 
-                                                      self.core.instruction_language.get_filter_name(str(self.core.filters.current_name))))
 
     def update_filter_trigger(self, finger_count: int):
         if finger_count == 5:
@@ -330,15 +269,6 @@ class Active(State):
             self.take_pic_cnt -= 0.1
         if self.take_pic_cnt >= 1.0:
             self.core.set_state(Filter())
-
-    def update_language_set(self, finger_count: int, tick: float):
-        if finger_count == 10:
-            if self.change_language_time - tick <= 0 and self.take_pic_cnt <= 0:
-                self.change_language_time = tick + 1.5
-                print("Changed Language: " + self.core.instruction_language.get_string("code"))
-                self.core.instruction_language.next_instruction_set()
-                self.core.set_text_messages()
-
 
 class Filter(State):
     """
@@ -351,25 +281,19 @@ class Filter(State):
 
     def enter(self, tick: float):
         self.countdown_time = tick + 4
-        self.core.ui.hide("idle_text_1", "idle_text_2", "bar", "gdpr_consent")
+        self.core.ui.hide("idle_text_1", "idle_text_2", "gdpr_consent")
         self.core.ui.hide("help_1", "help_2", "help_3", "filter_name", "image_showing_promote")
-        self.core.ui.set_text("countdown", "3")
         self.core.ui.show("countdown")
 
-        if self.core.is_webapp:
-            send_ui_state(self.core.get_ui_state(), self.core.sid)
 
     def update(self, tick: float, frame: MatLike):
         if self.countdown_time - tick > 0:
-            self.core.ui.set_text("countdown", '{}'.format(int(self.countdown_time - tick)))
             self.core.out_frame = frame
         else:
             self.core.ui.hide("countdown")
             self.core.image_processing_active = True
             self.apply_filter(frame)
             self.core.set_state(ShowPic())
-        if self.core.is_webapp:
-            send_ui_state(self.core.get_ui_state(), self.core.sid)
 
     def apply_filter(self, frame: MatLike):
 
@@ -399,7 +323,6 @@ class ShowPic(State):
 
     def enter(self, tick: float):
         self.core.ui.hide("countdown", "gdpr_consent")
-        self.core.ui.set_text("filter_name", 'Current filter is {}'.format(self.core.filters.current_name))
         self.core.ui.show("filter_name")
         self.core.ui.show("image_showing_promote")
         self.core.image_processing_active = False
@@ -408,8 +331,6 @@ class ShowPic(State):
         # Frame does not change so update only once
         self.core.out_frame = self.core.filtered_frame
 
-        if self.core.is_webapp:
-            send_ui_state(self.core.get_ui_state(), self.core.sid)
 
     def update(self, tick: float, frame: MatLike):
         if self.show_image_time - tick < 0:
@@ -423,7 +344,7 @@ class ShowPic(State):
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
 
-            self.core.ui.set_prog("bar", self.take_pic_cnt)
+            self.core.ui.set_prog(self.take_pic_cnt)
 
     def update_filter_trigger(self, finger_count: int):
         if finger_count == 5:
