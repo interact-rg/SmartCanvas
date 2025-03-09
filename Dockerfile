@@ -1,24 +1,29 @@
 # Use the official Python 3.12 slim image
-FROM python:3.12-slim AS builder
+FROM python:3.12-slim
+
+# Set Poetry environment variables
+ENV POETRY_HOME="/opt/poetry"
+ENV PATH="/root/.local/bin:$PATH"
+ENV POETRY_VIRTUALENVS_CREATE=false  # Install dependencies globally
 
 # Set working directory inside the container
 WORKDIR /smart-canvas
 
+# Install system dependencies for Poetry & project
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg libsm6 libxext6 && \
+    ffmpeg libsm6 libxext6 curl python3-venv && \
     rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip and set up dependency cache
-RUN pip install --upgrade pip
+# Install Poetry
+RUN pip install poetry
 
-# Copy only requirements.txt first to leverage Docker cache
-COPY requirements.txt .
+# Copy only dependency files first (to leverage Docker cache)
+COPY pyproject.toml poetry.lock ./
 
-# Install dependencies with caching enabled
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --no-cache-dir -r requirements.txt
+# Install dependencies using Poetry
+RUN poetry install --no-root --no-interaction --no-ansi
 
-# Copy the rest of the project AFTER dependencies are installed
+# Copy the rest of the project AFTER dependencies
 COPY . .
 
 # Set Flask environment variables
@@ -28,5 +33,5 @@ ENV FLASK_ENV=development
 # Expose Flask's default port
 EXPOSE 5000
 
-# Run Flask (replace with gunicorn if deploying to production)
-CMD ["flask", "run", "--host=0.0.0.0"]
+# Run Flask (or replace with gunicorn for production)
+CMD ["poetry", "run", "gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "web:app"]

@@ -3,7 +3,7 @@ name = "smart_canvas"
 version = "0.1.0"
 description = "SmartCanvas-project"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.13"
 dependencies = [
     "moderngl-window==2.4.6",
     "moderngl>=5.12.0",
