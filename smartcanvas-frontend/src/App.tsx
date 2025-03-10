@@ -8,7 +8,7 @@ const App = () => {
     const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
 
     return (
-        <div>
+        <div className="app-container">
             <h1>Smartest Canvas</h1>
             <img src="https://interact.oulu.fi/site/files/make4change/interact-logo.png" className="logo" />
 

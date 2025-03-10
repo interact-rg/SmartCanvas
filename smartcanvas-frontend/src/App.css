@@ -3,3 +3,12 @@
   height: 10em;
   padding: 1.5em;
 }
+
+.app-container {
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  align-items: center; /* Center everything inside */
+  justify-content: center;
+  text-align: center; /* Ensure text elements are centered */
+  width: 100%;
+}
