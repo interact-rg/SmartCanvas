@@ -5,7 +5,7 @@ services:
       - "5000:5000"
     restart: on-failure
     volumes:
-      - .:/smart-canvas  # Syncs local code with container
+      - .:/smart-canvas  
     environment:
       - FLASK_ENV=development
       - CLIENT_TOKEN=d159f6d5-6bb6-44c3-a2fa-ae5a60b5ce75

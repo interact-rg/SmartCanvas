@@ -12,7 +12,7 @@ WORKDIR /smart-canvas
 # Install system dependencies for Poetry & project
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg libsm6 libxext6 curl python3-venv && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
 RUN pip install poetry
@@ -20,10 +20,10 @@ RUN pip install poetry
 # Copy only dependency files first (to leverage Docker cache)
 COPY pyproject.toml poetry.lock ./
 
-# Install dependencies using Poetry
+# Install dependencies before copying the full project
 RUN poetry install --no-root --no-interaction --no-ansi
 
-# Copy the rest of the project AFTER dependencies
+# Now copy the rest of the project AFTER dependencies
 COPY . .
 
 # Set Flask environment variables
@@ -33,5 +33,4 @@ ENV FLASK_ENV=development
 # Expose Flask's default port
 EXPOSE 5000
 
-# Run Flask (or replace with gunicorn for production)
-CMD ["poetry", "run", "gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "web:app"]
+CMD ["poetry", "run", "flask", "run", "--host=0.0.0.0"]
