@@ -6,7 +6,6 @@ interface CameraFeedProps {
 
 const CameraFeed = ({ onFrame }: CameraFeedProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
-    const [error, setError] = useState<string | null>(null); // Store error messages
 
     useEffect(() => {
         const startCamera = async () => {
@@ -22,26 +21,16 @@ const CameraFeed = ({ onFrame }: CameraFeedProps) => {
                         videoRef.current?.play();
                     };
                 }
-
         }
 
-    
-
         startCamera();
-
-        return () => {
-            if (videoRef.current?.srcObject) {
-                console.log("Stopping camera stream...");
-                const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
-                tracks.forEach((track) => track.stop());
-            }
-        };
+ 
     }, []);
 
     useEffect(() => {
         const interval = setInterval(() => {
             if (videoRef.current) {
-                console.log("Sending video frame to App.tsx"); // ✅ Debugging
+                console.log("Sending video frame to App.tsx"); 
                 onFrame(videoRef.current);
             }
         }, 100);
@@ -51,8 +40,6 @@ const CameraFeed = ({ onFrame }: CameraFeedProps) => {
 
     return (
         <div style={{ textAlign: "center" }}>
-            <h2>Camera Feed</h2>
-            {error && <p style={{ color: "red" }}>{error}</p>}
             <video ref={videoRef} autoPlay playsInline width="640" height="480" />
         </div>
     );

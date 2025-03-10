@@ -7,8 +7,9 @@ interface GestureRecognizerProps {
 
 const GestureRecognizerComponent = ({ video }: GestureRecognizerProps) => {
     const [gesture, setGesture] = useState<string>("No Gesture");
+    const [isModelLoaded, setIsModelLoaded] = useState<boolean>(false);
     const gestureRecognizerRef = useRef<GestureRecognizer | null>(null);
-    const isProcessingRef = useRef<boolean>(false); // Prevents multiple loops
+    const isProcessingRef = useRef<boolean>(false);
 
     // Load the gesture recognition model
     useEffect(() => {
@@ -21,12 +22,13 @@ const GestureRecognizerComponent = ({ video }: GestureRecognizerProps) => {
                 gestureRecognizerRef.current = await GestureRecognizer.createFromOptions(vision, {
                     baseOptions: {
                         modelAssetPath: "/models/gesture_recognizer.task",
-                        delegate: "GPU",
+                        delegate: "CPU",
                     },
                     runningMode: "VIDEO",
                     numHands: 2,
                 });
 
+                setIsModelLoaded(true);
                 console.log("Gesture Recognizer Loaded");
             } catch (error) {
                 console.error("Error loading gesture recognizer:", error);
@@ -34,34 +36,34 @@ const GestureRecognizerComponent = ({ video }: GestureRecognizerProps) => {
         };
 
         loadGestureRecognizer();
-    }, []); 
+    }, []);
 
     // Process video frames continuously
     const processVideo = async () => {
         if (!gestureRecognizerRef.current || !video || !isProcessingRef.current) return;
 
         try {
+            if (video.videoWidth === 0 || video.videoHeight === 0) {
+                console.warn("Skipping frame: Video dimensions are invalid.");
+                requestAnimationFrame(() => processVideo());
+                return;
+            }
+
             const results = await gestureRecognizerRef.current.recognizeForVideo(video, Date.now());
 
             if (results.gestures.length > 0) {
-                setGesture(prevGesture => 
-                    results.gestures[0][0].categoryName !== prevGesture 
-                        ? results.gestures[0][0].categoryName 
-                        : prevGesture
-                );
+                setGesture(results.gestures[0][0].categoryName);
             } else {
                 setGesture("No Gesture");
             }
         } catch (error) {
             console.error("Gesture recognition error:", error);
         }
-
         requestAnimationFrame(() => processVideo());
     };
 
-    // Start gesture recognition loop
     useEffect(() => {
-        if (!video || !gestureRecognizerRef.current || isProcessingRef.current) return;
+        if (!video || !gestureRecognizerRef.current || isProcessingRef.current || !isModelLoaded) return;
 
         isProcessingRef.current = true;
         processVideo();
@@ -69,7 +71,7 @@ const GestureRecognizerComponent = ({ video }: GestureRecognizerProps) => {
         return () => {
             isProcessingRef.current = false;
         };
-    }, [video, gestureRecognizerRef.current]); 
+    }, [video, isModelLoaded]);
 
     return (
         <div style={{ textAlign: "center" }}>
