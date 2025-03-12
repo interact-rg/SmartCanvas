@@ -4,7 +4,7 @@
   padding: 1.5em;
 }
 
-.app-container {
+.webcam-container {
   display: flex;
   flex-direction: column; /* Stack elements vertically */
   align-items: center; /* Center everything inside */

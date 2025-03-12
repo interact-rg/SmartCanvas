@@ -1,14 +1,19 @@
 import { useState } from "react";
 import CameraFeed from "./components/CameraFeed";
 import GestureRecognizerComponent from "./components/GestureRecognizerComponent";
-import './app.css'
+import TopNav from "./components/TopNav";
+import './styles/app.css'
+import './styles/style.css'
 
 
 const App = () => {
     const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
 
     return (
-        <div className="app-container">
+        <div>
+            <TopNav/>
+       <div className="webcam-container">
+            
             <h1>Smartest Canvas</h1>
             <img src="https://interact.oulu.fi/site/files/make4change/interact-logo.png" className="logo" />
 
@@ -23,6 +28,7 @@ const App = () => {
             ) : (
                 <p>Waiting for video...</p>
             )}
+        </div>
         </div>
     );
 };
