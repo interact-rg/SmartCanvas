@@ -1,6 +1,5 @@
 import { useState } from "react";
 import CameraFeed from "./components/CameraFeed";
-import GestureRecognizerComponent from "./components/GestureRecognizerComponent";
 import TopNav from "./components/TopNav";
 import './styles/app.css'
 import './styles/style.css'
@@ -22,12 +21,6 @@ const App = () => {
                 setVideoElement(video);
             }} />
 
-            {/* Gesture recognizer processes video frames */}
-            {videoElement ? (
-                <GestureRecognizerComponent video={videoElement} />
-            ) : (
-                <p>Waiting for video...</p>
-            )}
         </div>
         </div>
     );

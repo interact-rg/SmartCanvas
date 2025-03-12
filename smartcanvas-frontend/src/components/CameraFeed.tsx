@@ -22,9 +22,7 @@ const CameraFeed = ({ onFrame }: CameraFeedProps) => {
                     };
                 }
         }
-
         startCamera();
- 
     }, []);
 
     useEffect(() => {
