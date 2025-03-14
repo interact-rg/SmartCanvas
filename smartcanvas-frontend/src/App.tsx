@@ -1,10 +1,10 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import CameraFeed from "./components/CameraFeed";
 // import TopNav from "./components/TopNav";
 import './styles/style.css'
 
 
-const App = () => {
+const App: React.FC = () => {
     const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
 
     return (

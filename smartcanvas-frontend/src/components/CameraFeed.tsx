@@ -1,3 +1,7 @@
+/**
+ * This element displays the video feed from the client side camera.
+ */
+
 import { useEffect, useRef, useState } from "react";
 
 // Allow the video frame size to be customized
