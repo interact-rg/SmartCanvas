@@ -1,8 +1,6 @@
 from mediapipe.python.solutions.hands import Hands
 import cv2
 
-from time import perf_counter
-
 # Types
 from cv2.typing import MatLike
 from typing import Protocol, Literal, Any
@@ -75,10 +73,8 @@ class HandDetect:
 
 
     def count_fingers(self, frame: MatLike):
-        start_time = perf_counter()
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results: HandResults = self.hands.process(image) # type: ignore
-        print(f"[Landmarks] {perf_counter() - start_time}s")
         
         fingerCount = 0
         hand_gesture: H_Gesture = {'RIGHT': "UNKNOWN", 'LEFT': "UNKNOWN"}
@@ -126,7 +122,6 @@ class HandDetect:
             self.count = fingerCount
             hand_gesture = self.recognizeGesture(hand_gesture)
 
-        print(f"[Gestures]: {perf_counter() - start_time}s")
         return fingerCount, hand_gesture
     
 

@@ -74,6 +74,11 @@ class ForegroundMask:
         condition: ArrayLike = np.stack((self.mask,) * 3, axis=-1) > 0.1
 
         self.bg_image = self.switchBackground(current_filter)
-        self.output_image = np.where(condition, frame, self.bg_image)
+        try:
+            self.output_image = np.where(condition, frame, self.bg_image)
+        except:
+            print('[Warn] Frame is not 1280x720!')
+            temp_bg_image = cv2.resize(self.bg_image, (frame.shape[1], frame.shape[0]))
+            self.output_image = np.where(condition, frame, temp_bg_image)
         print(f"[Background]: {perf_counter() - start_time}s")
         return self.output_image

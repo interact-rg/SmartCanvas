@@ -41,7 +41,7 @@ class CanvasCore:
         self.image_id: None|int = None
         self.ui = UI(sid, is_webapp=webapp)
         self.win_size = screensize
-        self.gdpr_accepted = False
+        self.gdpr_accepted = True
         self.image_processing_active = False
         self.filtered_frame: None|MatLike = None
         self.is_webapp = webapp
@@ -50,6 +50,7 @@ class CanvasCore:
         self.set_state(Startup())
 
     def set_state(self, state: State):
+        print('State change:', state)
         self._state = state
         self._state.core = self
         # FYI runs state "init"-function 
@@ -165,9 +166,10 @@ class Idle(State):
         elif self.take_pic_cnt > 0.0:
             self.take_pic_cnt -= 0.1
         if self.take_pic_cnt >= 0.1:
-            self.core.set_state(GPDR_consent())
+            # GDPR state skipped for now
+            self.core.set_state(Active())
 
-
+## TODO: Remove this if deemed unnecessary
 class GPDR_consent(State):
     # State holds its own variables and these are not persistent after a state change
     def __init__(self):
