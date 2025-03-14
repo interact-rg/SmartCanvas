@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 
+// Allow the video frame size to be customized
 interface CameraFeedProps {
     onFrame: (video: HTMLVideoElement) => void;
+    width?: number;
+    height?: number;
 }
 
-const CameraFeed = ({ onFrame }: CameraFeedProps) => {
+const CameraFeed = ({ onFrame, width = 640, height = 480 }: CameraFeedProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
 
     useEffect(() => {
@@ -37,8 +40,8 @@ const CameraFeed = ({ onFrame }: CameraFeedProps) => {
     }, [onFrame]);
 
     return (
-        <div style={{ textAlign: "center" }}>
-            <video ref={videoRef} autoPlay playsInline width="640" height="480" />
+        <div className="video-feed" >
+            <video ref={videoRef} autoPlay playsInline width={width} height={height} />
         </div>
     );
 };

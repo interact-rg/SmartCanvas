@@ -1,3 +1,18 @@
+/* Component specific styligs */
+
+.logo {
+  height: 10em;
+  padding: 1.5em;
+}
+
+.webcam-container {
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  align-items: center; /* Center everything inside */
+  justify-content: center;
+  text-align: center; /* Ensure text elements are centered */
+  width: 100%;
+}
 
 .container {
   position: relative;
@@ -7,6 +22,7 @@
   width: 100%;
   align-content: center;
 }
+
 .container_fs {
   position: relative;
   display: flex;
@@ -67,17 +83,10 @@
   opacity: 0.75;
 }
 
-h5 {
-  border-bottom: solid 1px #d2d2d2;
+.video-feed {
+  text-align: center;
+  ;
 }
-
-#canvasCard {
-  display: none;
-}
-
-#clientCard {
-  display: none;
-} 
 
 ::-webkit-scrollbar {
   -webkit-appearance: none;
@@ -88,51 +97,6 @@ h5 {
   border-radius: 4px;
   background-color: rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
-}
-
-#hold_bar, #serverFeedDiv, #countdown {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-#hold_bar {
-  z-index: 1;
-}
-#serverFeedDiv {
-  z-index: 0;
-}
-#hold_progress {
-  color: aqua;
-  transform: translate(140%,2800%);
-}
-#countdown_value {
-  display: inline-block;
-  transform: translate(350%, 100%);
-  font-size: 150px;
-}
-
-#fs_ui {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  height: 700px;
-}
-#fs_ui a {
-  font-size: 35px;
-  width: 1280px;
-  font-family: Tahoma;
-}
-
-#ui a {
-  font-size: 40px;
-  font-family: Tahoma;
-}
-
-#idle_text_1 a {
-  font-size: 60px;
-  font-weight: bold;
 }
 
 .topnav {
@@ -160,18 +124,4 @@ h5 {
   margin-right: auto;
   font-family: Impact;
   font-size: 30px;
-}
-
-.tos-bg {
-  height: 100%;
-}
-
-.html {
-  height: 100%;
-}
-
-#dl_qr_div {
-  position: absolute;
-  bottom: 0px;
-  right: 0px;
 }
