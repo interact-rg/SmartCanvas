@@ -31,7 +31,8 @@ class ForegroundMask:
             'mosaic': 'mosaic_bg.jpeg',
             'grayscale cartoon': 'gs_cartoon_bg_2.jpeg',
             'anime style': 'anime_bg.jpg',
-            'pointillism': 'pointillism_bg.jpg'
+            'pointillism': 'pointillism_bg.jpg',
+            'testfilter': 'testimage.jpg'
         }
         filter_image = filter_images_lib[current_filter]
         image_full_path = 'smart_canvas/backgrounds/' + filter_image

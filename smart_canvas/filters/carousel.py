@@ -11,6 +11,7 @@ from smart_canvas.filters.mosaic import mosaic_filter
 from smart_canvas.filters.gs_cartoon import gs_cartoon_filter
 from .animefilter.animestyle import AnimeFilter
 from .pointillism.pointillism import pointillism
+from smart_canvas.filters.testfilter import testfilter
 
 from typing import Callable, Any
 
@@ -27,7 +28,8 @@ class FilterCarousel:
         'mosaic': mosaic_filter,
         'grayscale cartoon': gs_cartoon_filter,
         'anime style': animeFilter.filter,
-        'pointillism': pointillism
+        'pointillism': pointillism,
+        'testfilter': testfilter
     }
     carousel = itertools.cycle(catalog)
 
@@ -37,3 +39,6 @@ class FilterCarousel:
     def next_filter(self):
         self.current_name = next(self.carousel)
         self.current_filter = self.catalog[self.current_name]
+
+    def get_filter(self):
+        return (self.current_name)
