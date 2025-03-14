@@ -261,6 +261,7 @@ class Active(State):
             if self.change_filter_time - tick <= 0 and self.take_pic_cnt <= 0:
                 self.change_filter_time = tick + 1.5
                 self.core.filters.next_filter()
+                print('Current filter is' + self.core.filters.get_filter())
 
     def update_filter_trigger(self, finger_count: int):
         if finger_count == 5:
