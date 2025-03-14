@@ -4,10 +4,14 @@
  * */ 
 
 import React, { useEffect, useState } from 'react';
-import useSocket from '../hooks/useSocket';
+import { Socket } from 'socket.io-client';
 
-const SocketHandler: React.FC = () => {
-  const socket = useSocket('http://localhost:5000');
+interface SocketHandlerProps {
+    socket: Socket | null;
+  }
+
+const SocketHandler: React.FC<SocketHandlerProps> = ({ socket }) => {
+
     console.log(socket);
 
   return null;
