@@ -52,29 +52,31 @@ const CameraFeed: React.FC<CameraFeedProps> = ({ socket, width = 1280, height = 
     // }, [onFrame]);
 
     useEffect(() => {
-        if (!socket || !videoReady) {
-            console.log("Socket not connected or video not ready yet...");
+        if (!socket) {
+            console.log("Socket not connected yet...");
             return;
-          }
-          
-        const FPS = 10;
+        }
+    
+        if (!videoReady) {
+            console.log("Video not ready yet...");
+            return;
+        }
+    
         console.log("Setting up video frame capture...");
-        console.log(videoRef.current);
-        console.log(canvasRef.current);
-        console.log(socket);
+        const FPS = 10;
         const interval = setInterval(() => {
-          if (videoRef.current && canvasRef.current && socket !== null) {
-            console.log("Sending video frame to backend...");
-            const canvas = canvasRef.current;
-            const context = canvas.getContext('2d');
-            context?.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-            const imageDataUrl = canvas.toDataURL('image/jpeg');
-            socket.emit('produce', imageDataUrl);
-          }
+            if (videoRef.current && canvasRef.current) {
+                console.log("Sending video frame to backend...");
+                const canvas = canvasRef.current;
+                const context = canvas.getContext("2d");
+                context?.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+                const imageDataUrl = canvas.toDataURL("image/jpeg");
+                socket.emit("produce", imageDataUrl);
+            }
         }, 1000 / FPS);
     
         return () => clearInterval(interval);
-      }, [socket]);
+    }, [socket, videoReady]);
 
 
     return (
