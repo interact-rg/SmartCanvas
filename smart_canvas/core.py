@@ -19,6 +19,7 @@ import os
 # Internal packages
 from smart_canvas.background import ForegroundMask
 from smart_canvas.gesture_detection import HandDetect
+from smart_canvas.gesture_detection_using_model import GestureDetection
 from smart_canvas.filters.carousel import FilterCarousel
 from smart_canvas.ui import UI
 from smart_canvas.database import Database
@@ -37,6 +38,7 @@ class CanvasCore:
         self.filters = FilterCarousel()
         self.fg_masker = ForegroundMask()
         self.hand_detector = HandDetect()
+        self.gesture_detector = GestureDetection().detect_gestures
         self.database = Database()
         self.image_id: None|int = None
         self.ui = UI(sid, is_webapp=webapp)
@@ -117,23 +119,24 @@ class Startup(State):
 
 # This is one state of state machine. We move from state to state by setting different classes as core._state instance
 class Idle(State):
-    """
-    Waiting or idle function for smartcanvas, waiting for commands from fingers. 
-    Next state is Active.
-    """
-
+    
+    # Waiting or idle function for smartcanvas, waiting for commands from fingers. 
+    # Next state is Active.
     # State holds its own variables and these are not persistent after a state change
     def __init__(self):
-        self.take_pic_cnt = 0.0
+        print ("Initializing core in Idle state...") #debug
+        self.progress_counter = 0.0
         self.change_filter_time = 0.0
-        self.finger_frame_interval = 0.0
+    #   self.gesture_frame_interval = 0.0
+        self.last_update_time = 0.0  # debug: simplifying the confirmation progress logic to be based on elapsed time instead of "the time when it's allowed to do an update"
+        self.recent_gestures = []
 
     # Runs once on init
     def enter(self, tick: float):
         self.core.ui.hide("help_1", "help_2", "help_3", "filter_name", "image_showing_promote", "gdpr_consent")
         self.core.ui.show("idle_text_1", "idle_text_2")
         self.core.ui.set_prog(1.1)
-
+        print ("Entering Idle state...")  #debug
         # masked_frame = self.core.fg_masker.apply(frame)
         # filtered_frame = self.core.filters.current_filter(masked_frame)
         # self.core.filtered_frame = self.core.fg_masker.changeBackground(filtered_frame)
@@ -154,26 +157,51 @@ class Idle(State):
         self.core.out_frame = frame
         # Detect fingers 10 times in a second
         # Using timer here because frame rate can differ
-        if self.finger_frame_interval - tick < 0:
+        """if self.finger_frame_interval - tick < 0:
             finger_count, _ = self.core.hand_detector.count_fingers(frame)
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
-            self.core.ui.set_prog(self.take_pic_cnt)
+            self.core.ui.set_prog(self.progress_counter)
+        
+        if self.gesture_frame_interval - tick < 0:
+            finger_count, _ = self.core.hand_detector.count_fingers(frame)
+            self.finger_frame_interval = tick + 0.1
+            self.update_filter_trigger(finger_count)
+            self.core.ui.set_prog(self.progress_counter)
+            """
+        
+        if tick - self.last_update_time >= 0.5:
 
+            current_gesture = self.core.gesture_detector(frame)
+            print(current_gesture)
+            if (current_gesture == "Open_Palm"):
+                self.recent_gestures.append(current_gesture)
+            else:
+                self.recent_gestures = []
+            
+            if len(self.recent_gestures) >= 4:
+                print("Activating...")
+                self.core.set_state(Active())
+        
+            self.last_update_time = tick
+
+        """
     def update_filter_trigger(self, finger_count: int):
         if finger_count == 5:
-            self.take_pic_cnt += 0.05
-        elif self.take_pic_cnt > 0.0:
-            self.take_pic_cnt -= 0.1
-        if self.take_pic_cnt >= 0.1:
+            self.progress_counter += 0.05
+        elif self.progress_counter > 0.0:
+            self.progress_counter -= 0.1
+        if self.progress_counter >= 0.1:
             # GDPR state skipped for now
-            self.core.set_state(Active())
+            self.core.set_state(Active()) 
+        """
 
 ## TODO: Remove this if deemed unnecessary
-class GPDR_consent(State):
+
+""" class GPDR_consent(State):
     # State holds its own variables and these are not persistent after a state change
     def __init__(self):
-        self.take_pic_cnt = 0.0
+        self.progress_counter = 0.0
         self.change_filter_time = 0.0
         self.finger_frame_interval = 0.0
         self.waiting_time = 0.0
@@ -198,25 +226,24 @@ class GPDR_consent(State):
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(gesture)
 
-            self.core.ui.set_prog(self.take_pic_cnt)
+            self.core.ui.set_prog(self.progress_counter)
 
         if self.waiting_time - tick < 0:
             self.core.set_state(Idle())
 
     def update_filter_trigger(self, gesture: H_Gesture):
         if gesture != {'RIGHT': 'UNKNOWN', 'LEFT': 'UNKNOWN'}:
-            self.take_pic_cnt += 0.05
-        elif self.take_pic_cnt > 0.0:
-            self.take_pic_cnt -= 0.1
-        if self.take_pic_cnt >= 0.8:
+            self.progress_counter += 0.05
+        elif self.progress_counter > 0.0:
+            self.progress_counter -= 0.1
+        if self.progress_counter >= 0.8:
             if "THUMBS UP" in gesture.values():
                 self.core.gdpr_accepted = True
                 print("GDPR accepted")
             elif "THUMBS DOWN" in gesture.values():
                 self.core.gdpr_accepted = False
                 print("GDPR declined")
-            self.core.set_state(Active())
-
+            self.core.set_state(Active()) """
 
 class Active(State):
     """
@@ -226,11 +253,12 @@ class Active(State):
 
     # State holds its own variables and these are not persistent after a state change
     def __init__(self):
-        self.take_pic_cnt = 0.0
+        self.progress_counter = 0.0
         self.change_filter_time = 0.0
         self.change_language_time = 0.0
         self.finger_frame_interval = 0.0
         self.waiting_time = 0.0
+
 
     # Runs once on init
     def enter(self, tick: float):
@@ -252,7 +280,7 @@ class Active(State):
             self.update_filter_trigger(finger_count)
             self.update_filter_carousel(finger_count, tick)
 
-            self.core.ui.set_prog(self.take_pic_cnt)
+            self.core.ui.set_prog(self.progress_counter)
 
         if self.waiting_time - tick < 0:
             self.core.out_frame = self.core.filtered_frame
@@ -260,17 +288,17 @@ class Active(State):
 
     def update_filter_carousel(self, finger_count: int, tick: float):
         if finger_count == 2:
-            if self.change_filter_time - tick <= 0 and self.take_pic_cnt <= 0:
+            if self.change_filter_time - tick <= 0 and self.progress_counter <= 0:
                 self.change_filter_time = tick + 1.5
                 self.core.filters.next_filter()
                 print('Current filter is' + self.core.filters.get_filter())
 
     def update_filter_trigger(self, finger_count: int):
         if finger_count == 5:
-            self.take_pic_cnt += 0.05
-        elif self.take_pic_cnt > 0.0:
-            self.take_pic_cnt -= 0.1
-        if self.take_pic_cnt >= 1.0:
+            self.progress_counter += 0.05
+        elif self.progress_counter > 0.0:
+            self.progress_counter -= 0.1
+        if self.progress_counter >= 1.0:
             self.core.set_state(Filter())
 
 class Filter(State):
@@ -320,7 +348,7 @@ class ShowPic(State):
 
     def __init__(self):
         self.show_image_time = 0.0
-        self.take_pic_cnt = 0.0
+        self.progress_counter = 0.0
         self.change_filter_time = 0.0
         self.finger_frame_interval = 0.0
 
@@ -347,12 +375,12 @@ class ShowPic(State):
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
 
-            self.core.ui.set_prog(self.take_pic_cnt)
+            self.core.ui.set_prog(self.progress_counter)
 
     def update_filter_trigger(self, finger_count: int):
         if finger_count == 5:
-            self.take_pic_cnt += 0.05
-        elif self.take_pic_cnt > 0.0:
-            self.take_pic_cnt -= 0.1
-        if self.take_pic_cnt >= 0.1:
+            self.progress_counter += 0.05
+        elif self.progress_counter > 0.0:
+            self.progress_counter -= 0.1
+        if self.progress_counter >= 0.1:
             self.core.set_state(Active())

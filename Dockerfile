@@ -1,7 +1,5 @@
-# Use the official Python 3.12 slim image
 FROM python:3.12-slim
 
-# Set Poetry environment variables
 ENV POETRY_HOME="/opt/poetry"
 ENV PATH="/root/.local/bin:$PATH"
 ENV POETRY_VIRTUALENVS_CREATE=false
