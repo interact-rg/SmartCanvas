@@ -2,16 +2,15 @@
     "version": "0.2.0",
     "configurations": [
       {
-        "name": "Debug smart_canvas",
-        "type": "python",
+        "name": "run node frontend",
+        "type": "node-terminal",
         "request": "launch",
-        "module": "smart_canvas",
-        "cwd": "${workspaceFolder}",
-        "console": "integratedTerminal",
+        "command": "npm run dev",
+        "cwd": "${workspaceFolder}/smartcanvas-frontend",
       },
       {
         "name": "Flask App",
-        "type": "python",
+        "type": "debugpy",
         "request": "launch",
         "module": "flask",
         "args": [
@@ -25,6 +24,6 @@
           "CLIENT_TOKEN": "90371948-9461-11ee-924d-4c348848282b"
         },
         "jinja": true
-      }
+      },
     ],
 }
