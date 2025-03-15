@@ -1,6 +1,7 @@
 # Types
 UI_State = dict[str, str|float]
-from web.main.common_events import send_ui_state
+from cv2.typing import MatLike
+from web.main.common_events import send_ui_state, send_image, send_hand_position
 
 
 
@@ -72,6 +73,12 @@ class UI:
             self.keys[name] = False
         if self.is_webapp:
             send_ui_state({key: False for key in names}, self.sid)
+
+    def show_image(self, image: MatLike):
+        send_image(image, self.sid)
+
+    def set_wrist_position(self, position: tuple[float, float]):
+        send_hand_position(position, self.sid)
 
     def get_state(self) -> UI_State:
         state: dict[str, bool|float] = {}

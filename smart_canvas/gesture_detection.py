@@ -72,7 +72,7 @@ class HandDetect:
             self.fingers_statuses[landmarks[4][2].upper()+'_THUMB_DOWN'] = True
 
 
-    def count_fingers(self, frame: MatLike):
+    def count_fingers(self, frame: MatLike) -> tuple[int, list[tuple[float, float]]]:
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results: HandResults = self.hands.process(image) # type: ignore
         
@@ -84,9 +84,11 @@ class HandDetect:
                             'RIGHT_PINKY': False, 'LEFT_THUMB': False, 'LEFT_INDEX': False, 'LEFT_MIDDLE': False,
                             'LEFT_RING': False, 'LEFT_PINKY': False, 'RIGHT_THUMB_UP': False, 'LEFT_THUMB_UP': False,
                             'RIGHT_THUMB_DOWN': False, 'LEFT_THUMB_DOWN': False}
+        
+        # TODO: Only add wrist positions for hands that have five fingers up
+        wrist_positions: list[tuple[float, float]] = []
 
         if results.multi_hand_landmarks:
-
             for hand_landmarks in results.multi_hand_landmarks:
                 # Get hand index to check label (left or right)
                 handIndex: int = results.multi_hand_landmarks.index(hand_landmarks)
@@ -118,11 +120,11 @@ class HandDetect:
                 if handLandmarks[20][1] < handLandmarks[18][1]:     #Pinky
                     fingerCount = fingerCount+1
                     self.fingers_statuses[handLandmarks[20][2].upper()+'_PINKY'] = True
-
+                wrist_positions.append(handLandmarks[0][0:2])
             self.count = fingerCount
-            hand_gesture = self.recognizeGesture(hand_gesture)
+            # hand_gesture = self.recognizeGesture(hand_gesture)
 
-        return fingerCount, hand_gesture
+        return fingerCount, wrist_positions
     
 
     def recognizeGesture(self, hands_gestures: H_Gesture) -> H_Gesture:

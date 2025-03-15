@@ -53,9 +53,11 @@ class CanvasCore:
 
     def set_state(self, state: State):
         print('State change:', state)
+        self.ui.hide(self.get_current_state())
         self._state = state
         self._state.core = self
-        # FYI runs state "init"-function 
+        # FYI runs state "init"-function
+        self.ui.show(state.name)
         self._state.enter(self.tick)
 
     def process(self):
@@ -75,12 +77,22 @@ class CanvasCore:
 
 
     def get_current_state(self):
-        return(str(self._state))
+        if self._state:
+            return(self._state.name)
+        else:
+            return "Uninitialized"
 
 class State(ABC):
     @property
     def core(self) -> CanvasCore:
         return self._core
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, name: str) -> None:
+        self._name = name
 
     @core.setter
     def core(self, core: CanvasCore) -> None:
@@ -101,6 +113,7 @@ class Startup(State):
     """
 
     def __init__(self):
+        self.name = "Startup"
         pass
 
     def enter(self, tick: float):
@@ -125,6 +138,7 @@ class Idle(State):
     # State holds its own variables and these are not persistent after a state change
     def __init__(self):
         print ("Initializing core in Idle state...") #debug
+        self.name = "Idle"
         self.progress_counter = 0.0
         self.change_filter_time = 0.0
     #   self.gesture_frame_interval = 0.0
@@ -133,8 +147,6 @@ class Idle(State):
 
     # Runs once on init
     def enter(self, tick: float):
-        self.core.ui.hide("help_1", "help_2", "help_3", "filter_name", "image_showing_promote", "gdpr_consent")
-        self.core.ui.show("idle_text_1", "idle_text_2")
         self.core.ui.set_prog(1.1)
         print ("Entering Idle state...")  #debug
         # masked_frame = self.core.fg_masker.apply(frame)
@@ -253,6 +265,7 @@ class Active(State):
 
     # State holds its own variables and these are not persistent after a state change
     def __init__(self):
+        self.name = "Active"
         self.progress_counter = 0.0
         self.change_filter_time = 0.0
         self.change_language_time = 0.0
@@ -262,8 +275,6 @@ class Active(State):
 
     # Runs once on init
     def enter(self, tick: float):
-        self.core.ui.hide("idle_text_1", "idle_text_2", "image_showing_promote", "gdpr_consent")
-        self.core.ui.show("help_1", "help_2", "help_3", "filter_name")
         self.core.ui.set_prog(0.0)
         self.waiting_time = time.time() + 60
 
@@ -275,11 +286,13 @@ class Active(State):
         # Detect fingers 10 times in a second
         # Using timer here because frame rate can differ
         if self.finger_frame_interval - tick < 0:
-            finger_count, _ = self.core.hand_detector.count_fingers(frame)
+            finger_count, wrist_positions = self.core.hand_detector.count_fingers(frame)
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
             self.update_filter_carousel(finger_count, tick)
 
+            if len(wrist_positions) > 0:
+                self.core.ui.set_wrist_position(wrist_positions[0])
             self.core.ui.set_prog(self.progress_counter)
 
         if self.waiting_time - tick < 0:
@@ -308,12 +321,12 @@ class Filter(State):
     """
 
     def __init__(self):
+        self.name = "Filter"
         self.countdown_time = 0.0
 
     def enter(self, tick: float):
+        #TODO figure out how to handle the countdown
         self.countdown_time = tick + 4
-        self.core.ui.hide("idle_text_1", "idle_text_2", "gdpr_consent")
-        self.core.ui.hide("help_1", "help_2", "help_3", "filter_name", "image_showing_promote")
         self.core.ui.show("countdown")
 
 
@@ -347,20 +360,20 @@ class ShowPic(State):
     """
 
     def __init__(self):
+        self.name = "ShowPic"
         self.show_image_time = 0.0
         self.progress_counter = 0.0
         self.change_filter_time = 0.0
         self.finger_frame_interval = 0.0
 
     def enter(self, tick: float):
-        self.core.ui.hide("countdown", "gdpr_consent")
-        self.core.ui.show("filter_name")
-        self.core.ui.show("image_showing_promote")
         self.core.image_processing_active = False
 
         self.show_image_time = time.time() + 15
         # Frame does not change so update only once
-        self.core.out_frame = self.core.filtered_frame
+        if self.core.filtered_frame:
+            self.core.ui.show_image(self.core.filtered_frame)
+
 
 
     def update(self, tick: float, frame: MatLike):
@@ -383,4 +396,5 @@ class ShowPic(State):
         elif self.progress_counter > 0.0:
             self.progress_counter -= 0.1
         if self.progress_counter >= 0.1:
+            self.core.ui.hide("image")
             self.core.set_state(Active())

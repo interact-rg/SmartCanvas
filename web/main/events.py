@@ -48,15 +48,6 @@ def disconnect_web():
     core_queues.pop(sid)
 
 
-def cv_to_b64(cv_image: MatLike):
-    if (cv_image is None):
-        return ''
-    _, buffer = cv2.imencode('.jpg', cv_image)
-    jpg_as_text = base64.b64encode(buffer)
-    string_b64 = jpg_as_text.decode("utf-8")
-    return string_b64
-
-
 def b64_to_cv(jpg_as_text: str):
     jpg_original = base64.b64decode(jpg_as_text)
     jpg_as_np = np.frombuffer(jpg_original, dtype=np.uint8)
@@ -77,9 +68,9 @@ def handle_client_message(message: str):
         return
     if core.out_frame is None:
         return
-    mod_message = header + "," + cv_to_b64(core.out_frame)
-    socketio.emit('current_state', core.get_current_state(), to=sid) #send current state
-    socketio.emit('consume', mod_message, to=sid)
+    #mod_message = header + "," + cv_to_b64(core.out_frame)
+    socketio.emit('ack', to=sid) #acknowledge sucessful frame processing
+    #socketio.emit('consume', mod_message, to=sid)
 
 @socketio.on('check_image_processing')
 def check_image_processing():
