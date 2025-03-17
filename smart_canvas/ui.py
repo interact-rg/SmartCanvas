@@ -61,6 +61,10 @@ class UI:
         self.progressbar.value = value
         if self.is_webapp:
             send_ui_state({"hold_timer": value}, self.sid)
+    
+    def set_filter(self, value: str):
+        if self.is_webapp:
+            send_ui_state({"filter": value}, self.sid)
 
     def show(self, *names: str):
         for name in names:

@@ -273,7 +273,8 @@ class Active(State):
             if self.change_filter_time - tick <= 0 and self.progress_counter <= 0:
                 self.change_filter_time = tick + 1.5
                 self.core.filters.next_filter()
-                print('Current filter is' + self.core.filters.get_filter())
+                self.core.ui.set_filter(self.core.filters.get_filter_name())
+                print('Current filter is' + self.core.filters.get_filter_name())
 
     def update_filter_trigger(self, finger_count: int):
         if finger_count == 5:

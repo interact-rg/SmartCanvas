@@ -40,5 +40,5 @@ class FilterCarousel:
         self.current_name = next(self.carousel)
         self.current_filter = self.catalog[self.current_name]
 
-    def get_filter(self):
+    def get_filter_name(self):
         return (self.current_name)
