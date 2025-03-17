@@ -174,28 +174,25 @@ class Idle(State):
             self.finger_frame_interval = tick + 0.1
             self.update_filter_trigger(finger_count)
             self.core.ui.set_prog(self.progress_counter)
-        
-        if self.gesture_frame_interval - tick < 0:
-            finger_count, _ = self.core.hand_detector.count_fingers(frame)
-            self.finger_frame_interval = tick + 0.1
-            self.update_filter_trigger(finger_count)
-            self.core.ui.set_prog(self.progress_counter)
             """
         
-        if tick - self.last_update_time >= 0.5:
+        if tick - self.last_update_time >= 0.1:
 
             current_gesture = self.core.gesture_detector(frame)
             print(current_gesture)
-            if (current_gesture == "Open_Palm"):
-                self.recent_gestures.append(current_gesture)
-            else:
-                self.recent_gestures = []
             
-            if len(self.recent_gestures) >= 4:
+        if current_gesture == "OPEN_PALM":
+            self.progress_counter += 0.05
+        else:
+            self.progress_counter = 0.0
+
+        self.core.ui.set_prog(self.progress_counter)
+            
+        if self.progress_counter >= 1.0:
                 print("Activating...")
                 self.core.set_state(Active())
-        
-            self.last_update_time = tick
+            
+        self.last_update_time = tick
 
         """
     def update_filter_trigger(self, finger_count: int):
