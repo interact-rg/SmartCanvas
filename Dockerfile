@@ -5,13 +5,11 @@ ENV PATH="/root/.local/bin:$PATH"
 ENV POETRY_VIRTUALENVS_CREATE=false
 
 # Set working directory inside the container
-WORKDIR /smart-canvas
+WORKDIR /SmartCanvas
 
 # Install system dependencies for Poetry & project
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg libsm6 libxext6 curl python3-venv && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg libsm6 libxext6 nodejs npm
+	
 # Install Poetry
 RUN pip install poetry
 
@@ -21,14 +19,19 @@ COPY pyproject.toml poetry.lock ./
 # Install dependencies before copying the full project
 RUN poetry install --no-root --no-interaction --no-ansi
 
-# Now copy the rest of the project AFTER dependencies
+WORKDIR /SmartCanvas/smartcanvas-frontend
+COPY smartcanvas-frontend/package.json smartcanvas-frontend/package-lock.json ./
+
+RUN npm install
+
+WORKDIR /SmartCanvas
 COPY . .
 
-# Set Flask environment variables
 ENV FLASK_APP=web
 ENV FLASK_ENV=development
+ENV FLASK_DEBUG=1
+ENV PYTHONUNBUFFERED=1
 
-# Expose Flask's default port
-EXPOSE 5000
+EXPOSE 5000 5173
 
-CMD ["poetry", "run", "flask", "run", "--host=0.0.0.0"]
+CMD ["sh", "-c", "cd smartcanvas-frontend && npm run dev -- --host & poetry run flask run --host=0.0.0.0 --debug"]

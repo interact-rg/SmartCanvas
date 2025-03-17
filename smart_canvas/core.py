@@ -144,6 +144,7 @@ class Idle(State):
     #   self.gesture_frame_interval = 0.0
         self.last_update_time = 0.0  # debug: simplifying the confirmation progress logic to be based on elapsed time instead of "the time when it's allowed to do an update"
         self.recent_gestures = []
+        self.current_gesture = "No gestures yet"
 
     # Runs once on init
     def enter(self, tick: float):
@@ -159,51 +160,22 @@ class Idle(State):
 
     # Update is called on new frame
     def update(self, tick: float, frame: MatLike):
-        # Now we update UI elements to Opengl so no need to wait for slow functions to finish
 
-        # masked_frame = self.core.fg_masker.apply(frame)
-        # filtered_frame = self.core.filters.current_filter(masked_frame)
-        # self.core.filtered_frame = self.core.fg_masker.changeBackground(filtered_frame)
-        # self.core.out_frame = self.core.filtered_frame
-
-        self.core.out_frame = frame
-        # Detect fingers 10 times in a second
-        # Using timer here because frame rate can differ
-        """if self.finger_frame_interval - tick < 0:
-            finger_count, _ = self.core.hand_detector.count_fingers(frame)
-            self.finger_frame_interval = tick + 0.1
-            self.update_filter_trigger(finger_count)
-            self.core.ui.set_prog(self.progress_counter)
-            """
         
-        if tick - self.last_update_time >= 0.1:
-
-            current_gesture = self.core.gesture_detector(frame)
-            print(current_gesture)
-            
-        if current_gesture == "OPEN_PALM":
-            self.progress_counter += 0.05
-        else:
-            self.progress_counter = 0.0
-
-        self.core.ui.set_prog(self.progress_counter)
-            
-        if self.progress_counter >= 1.0:
-                print("Activating...")
-                self.core.set_state(Active())
-            
-        self.last_update_time = tick
-
-        """
-    def update_filter_trigger(self, finger_count: int):
-        if finger_count == 5:
-            self.progress_counter += 0.05
-        elif self.progress_counter > 0.0:
-            self.progress_counter -= 0.1
-        if self.progress_counter >= 0.1:
-            # GDPR state skipped for now
-            self.core.set_state(Active()) 
-        """
+        if tick - self.last_update_time >= 0.5:
+   
+             self.current_gesture = self.core.gesture_detector(frame)
+             print(self.current_gesture)
+             if (self.current_gesture == "Open_Palm"):
+                 self.recent_gestures.append(self.current_gesture)
+             else:
+                 self.recent_gestures = []
+             
+             if len(self.recent_gestures) >= 4:
+                 print("Activating...")
+                 self.core.set_state(Active())
+         
+             self.last_update_time = tick
 
 ## TODO: Remove this if deemed unnecessary
 

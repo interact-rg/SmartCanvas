@@ -1,11 +1,16 @@
+version: "3.8"
+
 services:
   web:
     build: .
     ports:
-      - "5000:5000"
+      - "5000:5000"  # Flask backend
+      - "5173:5173"  # Vite frontend
     restart: on-failure
     volumes:
-      - .:/smart-canvas  
+      - .:/SmartCanvas  # Mount the entire project for live reloading
+      - /SmartCanvas/smartcanvas-frontend/node_modules  # Prevent overwriting frontend dependencies
     environment:
       - FLASK_ENV=development
       - CLIENT_TOKEN=d159f6d5-6bb6-44c3-a2fa-ae5a60b5ce75
+    working_dir: /SmartCanvas
