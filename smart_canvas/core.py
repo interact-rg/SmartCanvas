@@ -341,7 +341,7 @@ class ShowPic(State):
 
         self.show_image_time = time.time() + 15
         # Frame does not change so update only once
-        if self.core.filtered_frame:
+        if self.core.filtered_frame is not None:
             self.core.ui.show_image(self.core.filtered_frame)
 
 
