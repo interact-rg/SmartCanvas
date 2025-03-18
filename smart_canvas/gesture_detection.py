@@ -73,7 +73,11 @@ class HandDetect:
 
 
     def count_fingers(self, frame: MatLike) -> tuple[int, list[tuple[float, float]]]:
-        image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        try:
+            image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        except Exception as e:
+            print(f'[Gestures] Error during frame preparation: {e}')
+            return 0, []
         results: HandResults = self.hands.process(image) # type: ignore
         
         fingerCount = 0

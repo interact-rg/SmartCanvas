@@ -64,13 +64,7 @@ def handle_client_message(message: str):
     b64_frame = message.split(",")[1]
     cv_image = b64_to_cv(b64_frame)
     producer_q.put(cv_image)
-    if 'out_frame' not in vars(core):
-        return
-    if core.out_frame is None:
-        return
-    #mod_message = header + "," + cv_to_b64(core.out_frame)
     socketio.emit('ack', to=sid) #acknowledge sucessful frame processing
-    #socketio.emit('consume', mod_message, to=sid)
 
 @socketio.on('check_image_processing')
 def check_image_processing():

@@ -34,7 +34,6 @@ class CanvasCore:
         self.q_consumer = q_consumer
         self.stopped = False
         self.tick = time.time()
-        self.out_frame: None|MatLike = None
         self.filters = FilterCarousel()
         self.fg_masker = ForegroundMask()
         self.hand_detector = HandDetect()
@@ -150,13 +149,6 @@ class Idle(State):
     def enter(self, tick: float):
         self.core.ui.set_prog(1.1)
         print ("Entering Idle state...")  #debug
-        # masked_frame = self.core.fg_masker.apply(frame)
-        # filtered_frame = self.core.filters.current_filter(masked_frame)
-        # self.core.filtered_frame = self.core.fg_masker.changeBackground(filtered_frame)
-        # self.core.out_frame = self.core.filtered_frame
-
-        # self.core.ui.show("help_1", "help_2", "filter_name")
-        # self.core.ui.set_prog(0.0)
 
     # Update is called on new frame
     def update(self, tick: float, frame: MatLike):
@@ -250,8 +242,6 @@ class Active(State):
 
     # Update is called on new frame
     def update(self, tick: float, frame: MatLike):
-        # Now we update UI elements to Opengl so no need to wait for slow functions to finish
-        self.core.out_frame = frame
         # Detect fingers 10 times in a second
         # Using timer here because frame rate can differ
         if self.finger_frame_interval - tick < 0:
@@ -265,7 +255,6 @@ class Active(State):
             self.core.ui.set_prog(self.progress_counter)
 
         if self.waiting_time - tick < 0:
-            self.core.out_frame = self.core.filtered_frame
             self.core.set_state(Idle())
 
     def update_filter_carousel(self, finger_count: int, tick: float):
@@ -282,6 +271,23 @@ class Active(State):
         elif self.progress_counter > 0.0:
             self.progress_counter -= 0.1
         if self.progress_counter >= 1.0:
+            self.core.set_state(Countdown())
+
+class Countdown(State):
+    def __init__(self):
+        self.name = "Countdown"
+        self.countdown_time = 0.0
+
+    def enter(self, tick:float):
+        self.core.ui.show("countdown")
+        self.countdown_time = tick + 4
+    
+    def update(self, tick: float, frame: MatLike):
+        if self.countdown_time - tick > 0:
+            self.core.ui.set_timer(self.countdown_time - tick)
+            pass
+        else:
+            self.core.ui.hide("countdown")
             self.core.set_state(Filter())
 
 class Filter(State):
@@ -292,22 +298,14 @@ class Filter(State):
 
     def __init__(self):
         self.name = "Filter"
-        self.countdown_time = 0.0
 
     def enter(self, tick: float):
-        #TODO figure out how to handle the countdown
-        self.countdown_time = tick + 4
-        self.core.ui.show("countdown")
-
+        self.core.image_processing_active = True
 
     def update(self, tick: float, frame: MatLike):
-        if self.countdown_time - tick > 0:
-            self.core.out_frame = frame
-        else:
-            self.core.ui.hide("countdown")
-            self.core.image_processing_active = True
-            self.apply_filter(frame)
-            self.core.set_state(ShowPic())
+        self.apply_filter(frame)
+        self.core.set_state(ShowPic())
+
 
     def apply_filter(self, frame: MatLike):
 
@@ -350,7 +348,6 @@ class ShowPic(State):
         if self.show_image_time - tick < 0:
             self.core.set_state(Active())
 
-        # self.core.out_frame = frame
         # Detect fingers 10 times in a second
         # Using timer here because frame rate can differ
         if self.finger_frame_interval - tick < 0:
