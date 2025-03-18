@@ -40,18 +40,7 @@ class UI:
     """
     Class for managing UI elements
     """
-    _instance = None
-
-    def __new__(cls, sid: str, is_webapp: bool = False):
-        if cls._instance is None:
-            cls._instance = super(UI, cls).__new__(cls)
-            cls._instance._initialized = False
-        return cls._instance
-
     def __init__(self, sid: str, is_webapp: bool = False):
-        if self._initialized:
-            return
-        self._initialized = True
         self.keys: dict[str, bool] = {}
         self.progressbar = Progressbar()
         self.sid = sid
