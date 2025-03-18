@@ -32,6 +32,7 @@ const useSocket = (url: string) => {
       console.log("Error! " + error);
     });
 
+
     return () => {
       console.log("Cleaning up socket...");
       socket.disconnect();
