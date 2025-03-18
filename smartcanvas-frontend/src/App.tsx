@@ -21,7 +21,7 @@ const App: React.FC = () => {
         <div id="mainContainer" className="container_fs">
             <SocketHandler socket={socket} onStateChange={handleStateChange} />
             <div className="header">
-                <h1>Smartest Canvas</h1>
+                <h1>Smart Canvas</h1>
                 <img src="https://interact.oulu.fi/site/files/make4change/interact-logo.png" className="logo" />
             </div>
             {appState.ShowPic ? (

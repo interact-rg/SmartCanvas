@@ -1,16 +1,23 @@
-version: "3.8"
-
 services:
-  web:
-    build: .
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
     ports:
-      - "5000:5000"  # Flask backend
-      - "5173:5173"  # Vite frontend
-    restart: on-failure
+      - "5000:5000"        # Flask backend exposed on port 5000
     volumes:
-      - .:/SmartCanvas  # Mount the entire project for live reloading
-      - /SmartCanvas/smartcanvas-frontend/node_modules  # Prevent overwriting frontend dependencies
+      - ./smart_canvas:/SmartCanvas/smartcanvas-frontend:ro  #mount backend code
     environment:
       - FLASK_ENV=development
       - CLIENT_TOKEN=d159f6d5-6bb6-44c3-a2fa-ae5a60b5ce75
-    working_dir: /SmartCanvas
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "5173:5173"        # Vite frontend exposed on port 5173
+    volumes:
+      - ./smartcanvas-frontend:/SmartCanvas/smartcanvas-frontend  # mount frontend code 
+    environment:
+      - CHOKIDAR_USEPOLLING=true
