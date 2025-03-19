@@ -1,0 +1,37 @@
+FROM python:3.12-slim
+
+# Configure Poetry environment
+ENV POETRY_HOME="/opt/poetry"
+ENV PATH="/root/.local/bin:$PATH"
+ENV POETRY_VIRTUALENVS_CREATE=false
+
+# Set working directory to the project root
+WORKDIR /SmartCanvas
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg libsm6 libxext6 && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry
+RUN pip install poetry
+
+# Copy backend dependency files and install Python dependencies
+COPY pyproject.toml poetry.lock ./
+RUN poetry install --no-root --no-interaction --no-ansi
+
+# Copy the backend source code
+COPY smart_canvas /SmartCanvas/smart_canvas
+COPY models /SmartCanvas/models
+COPY web /SmartCanvas/web
+
+# Set Flask environment variables
+ENV FLASK_APP=web
+ENV FLASK_ENV=development
+ENV FLASK_DEBUG=1
+ENV PYTHONUNBUFFERED=1
+
+# Expose the Flask port
+EXPOSE 5000
+
+# Start Flask server
+CMD ["poetry", "run", "flask", "run", "--host=0.0.0.0", "--debug"]

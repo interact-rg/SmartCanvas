@@ -9,7 +9,6 @@ __pycache__/
 *.pyd
 venv/
 
-
 # Git history
 .git/
 .gitignore
