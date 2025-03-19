@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+node_modules 
+npm-debug.log
+yarn-error.log
+
 # Distribution / packaging
 .Python
 env/
