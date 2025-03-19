@@ -15,17 +15,23 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ socket, onStateChange }) 
 
   useEffect(() => {
     if (!socket) return;
-    socket.on('update_ui_response', (msg) => {
+
+    const handleUpdateUIResponse = (msg: any) => {
       console.log('Received update_ui_response: ', msg);
+
       // ignore the hold_timer for now
       if (msg.hold_timer !== undefined) {
         return;
       } else {
         onStateChange(msg);
       }
-      
-    });
+    };
 
+    socket.on('update_ui_response', handleUpdateUIResponse);
+
+    return () => {
+      socket.off('update_ui_response', handleUpdateUIResponse);
+    };
   }, [socket, onStateChange]);
 
   return null;
