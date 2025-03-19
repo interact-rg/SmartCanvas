@@ -13,11 +13,6 @@ venv/
 .git/
 .gitignore
 
-# Node.js dependencies
-node_modules/
-npm-debug.log
-yarn-error.log
-
 # Logs and temp files
 *.log
 *.tmp
