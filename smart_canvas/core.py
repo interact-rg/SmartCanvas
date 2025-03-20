@@ -157,7 +157,6 @@ class Idle(State):
         if tick - self.last_update_time >= 0.5:
    
              self.current_gesture = self.core.gesture_detector(frame)
-             print(self.current_gesture)
              if (self.current_gesture == "Open_Palm"):
                  self.recent_gestures.append(self.current_gesture)
              else:
