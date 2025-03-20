@@ -34,7 +34,12 @@ class GestureDetection:
 
         if result.gestures:
             top_gesture = result.gestures[0][0].category_name
-            print(f"Detected gesture: {top_gesture}")
+
+            if result.hand_landmarks and len(result.hand_landmarks) > 0:
+                wrist = result.hand_landmarks[0][0]  
+            else:
+                wrist = None
+            print(f"Detected gesture: {top_gesture} with wrist: {wrist}")
             return top_gesture
         else:
             print("No hands detected.")

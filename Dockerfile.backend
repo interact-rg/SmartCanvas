@@ -5,8 +5,6 @@ ENV POETRY_HOME="/opt/poetry"
 ENV PATH="/root/.local/bin:$PATH"
 ENV POETRY_VIRTUALENVS_CREATE=false
 
-# Set working directory to the project root
-WORKDIR /SmartCanvas
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -20,9 +18,9 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root --no-interaction --no-ansi
 
 # Copy the backend source code
-COPY smart_canvas /SmartCanvas/smart_canvas
-COPY models /SmartCanvas/models
-COPY web /SmartCanvas/web
+COPY smart_canvas /smart_canvas
+COPY models /models
+COPY web /web
 
 # Set Flask environment variables
 ENV FLASK_APP=web
