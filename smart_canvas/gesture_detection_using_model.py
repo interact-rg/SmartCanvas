@@ -22,7 +22,7 @@ class GestureDetection:
         self.recognizer = vision.GestureRecognizer.create_from_options(self.options)
 
     def detect_gestures(self, frame: MatLike):
-
+        
         # Convert BGR to RGB
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -34,13 +34,9 @@ class GestureDetection:
 
         if result.gestures:
             top_gesture = result.gestures[0][0].category_name
-
-            if result.hand_landmarks and len(result.hand_landmarks) > 0:
-                wrist = result.hand_landmarks[0][0]  
-            else:
-                wrist = None
-            print(f"Detected gesture: {top_gesture} with wrist: {wrist}")
-            return top_gesture
+            wrist_location = (result.hand_landmarks[0][0].x, result.hand_landmarks[0][0].y)  
+            print(f"Detected gesture: {top_gesture} with wrist at position: {wrist_location[0]}x {wrist_location[1]}y")
+            return top_gesture, wrist_location
         else:
             print("No hands detected.")
-            return "No hands detected"
+            return "No hands detected", [0,0]

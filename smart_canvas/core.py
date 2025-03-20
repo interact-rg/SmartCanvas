@@ -156,7 +156,7 @@ class Idle(State):
         
         if tick - self.last_update_time >= 0.5:
    
-             self.current_gesture = self.core.gesture_detector(frame)
+             self.current_gesture = self.core.gesture_detector(frame)[0]
              if (self.current_gesture == "Open_Palm"):
                  self.recent_gestures.append(self.current_gesture)
              else:
@@ -228,29 +228,42 @@ class Active(State):
         self.name = "Active"
         self.progress_counter = 0.0
         self.change_filter_time = 0.0
-        self.change_language_time = 0.0
-        self.finger_frame_interval = 0.0
+    #   self.change_language_time = 0.0
+    #   self.finger_frame_interval = 0.0
         self.waiting_time = 0.0
+        self.last_update_time = 0.0  # debug: simplifying the confirmation progress logic to be based on elapsed time instead of "the time when it's allowed to do an update"
+        self.closing_gestures = []
+        self.current_gesture = "No gestures yet"
+        self.wrist_position = [0,0]
 
 
     # Runs once on init
     def enter(self, tick: float):
         self.core.ui.set_prog(0.0)
+        print("Entering active state")
         self.waiting_time = time.time() + 60
 
 
     # Update is called on new frame
     def update(self, tick: float, frame: MatLike):
-        # Detect fingers 10 times in a second
-        # Using timer here because frame rate can differ
-        if self.finger_frame_interval - tick < 0:
-            finger_count, wrist_positions = self.core.hand_detector.count_fingers(frame)
-            self.finger_frame_interval = tick + 0.1
+        if tick - self.last_update_time >= 0.5:
+
+            finger_count = self.core.hand_detector.count_fingers(frame)[0]
             self.update_filter_trigger(finger_count)
             self.update_filter_carousel(finger_count, tick)
 
-            if len(wrist_positions) > 0:
-                self.core.ui.set_wrist_position(wrist_positions[0])
+            self.current_gesture, wrist_position = self.core.gesture_detector(frame)
+            if self.current_gesture == "Closed_Fist":
+                self.closing_gestures.append(self.current_gesture)
+            else:
+                self.closing_gestures = []
+            if len(self.closing_gestures) >= 4:
+                print("Returning to idle...")
+                self.core.set_state(Idle()) 
+            self.last_update_time = tick
+
+            if len(wrist_position) > 0:
+                self.core.ui.set_wrist_position(wrist_position)
             self.core.ui.set_prog(self.progress_counter)
 
         if self.waiting_time - tick < 0:
