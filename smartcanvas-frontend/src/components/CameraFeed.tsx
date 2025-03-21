@@ -53,9 +53,6 @@ const CameraFeed: React.FC<CameraFeedProps> = ({ onFrameCapture, width = 1280, h
                 const context = canvas.getContext("2d");
                 context?.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
                 
-                // NOTE: base64 string conversion moved to parent component
-                // to avoid violations in setInterval processing times.
-                
                 // Convert to Blob and send it to parent component
                 canvas.toBlob((blob) => {
                     if (blob) onFrameCapture(blob);

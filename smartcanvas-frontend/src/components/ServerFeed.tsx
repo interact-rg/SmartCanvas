@@ -27,7 +27,12 @@ const ServerFeed: React.FC<ServerFeedProps> = ({ artisticFrame }) => {
     image.src = `data:image/jpeg;base64,${artisticFrame}`;
   }, [artisticFrame]);
 
-  return <canvas ref={canvasRef} width={1280} height={720} />;
+  return (
+    <div className="server-feed">
+      {/* TODO: create an awesome frame around the image at some point */}
+      <canvas ref={canvasRef} width={1280} height={720} />
+    </div>
+  );
 };
 
 export default ServerFeed;

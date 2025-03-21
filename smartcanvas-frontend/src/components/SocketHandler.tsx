@@ -9,7 +9,7 @@ import useSocket from '../hooks/useSocket';
 
 interface SocketHandlerProps {
   onStateChange: (state: any) => void;
-  videoFrame?: string | null;
+  videoFrame: Blob | null;
   onArtisticFrame: (frame: string) => void;
 }
 
@@ -58,11 +58,18 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
 
   useEffect(() => {
     // Try to send frame to the server
-    const sendFrame = (frame: string) => {
+    const sendFrame = (frame: Blob) => {
       if (!socket || !canSendFrame) return; // Wait for ack before sending a new frame
 
-      //console.log('Sending frame to the server...');
-      socket.emit('produce', frame);
+      console.log('Sending frame to the server...');
+
+      // Convert blob to base64 string
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        socket.emit('produce', reader.result as string);
+      };
+      reader.readAsDataURL(frame);
+
       setCanSendFrame(false); // Prevent sending until ack is received
     };
 

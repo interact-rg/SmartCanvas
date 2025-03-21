@@ -8,13 +8,9 @@ import ServerFeed from "./components/ServerFeed";
 
 
 const App: React.FC = () => {
-    //const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
-    //const socket = useSocket('http://localhost:5000');
     const [appState, setAppState] = useState<any>({});
-    // Frame that is sent to the server
-    const [outboundFrame, setOutboundFrame] = useState<string>("");
-    // Artistic picture sent by the server
-    const [inboundFrame, setInboundFrame] = useState<string>("");
+    const [outboundFrame, setOutboundFrame] = useState<Blob | null>(null); // Frame that is sent to the server
+    const [inboundFrame, setInboundFrame] = useState<string>(""); // Artistic picture sent by the server
 
     const handleStateChange = (state: any) => {
         console.log("State change received in App: ", state);
@@ -22,13 +18,9 @@ const App: React.FC = () => {
     };
 
     const handleOutboundFrame = (frame: Blob) => {
-        // Convert blob to base64 string
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setOutboundFrame(reader.result as string);
-        };
-        reader.readAsDataURL(frame);
+        setOutboundFrame(frame);
     };
+
 
     const handleInboundFrame = (frame: string) => {
         setInboundFrame(frame);
