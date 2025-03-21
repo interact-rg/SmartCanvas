@@ -78,7 +78,7 @@ const CameraFeed: React.FC<CameraFeedProps> = ({ onFrameCapture, width = 1280, h
 
     return (
         <div className="video-feed" >
-            <video ref={videoRef} autoPlay playsInline width={width} height={height} />
+            <video ref={videoRef} autoPlay playsInline width={width} height={height} style={{ transform: 'scaleX(-1)' }} />
             <canvas ref={canvasRef} width={width} height={height} style={{ display: "none" }} />
         </div>
     );
