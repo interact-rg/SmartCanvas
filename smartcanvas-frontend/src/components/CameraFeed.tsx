@@ -3,21 +3,18 @@
  */
 
 import React, { useEffect, useRef, useState } from "react";
-import { Socket } from "socket.io-client";
 
 // Allow the video frame size to be customized
 interface CameraFeedProps {
-    //    onFrame: (video: HTMLVideoElement) => void;
-    socket: Socket | null;
+    onFrameCapture: (frame: Blob) => void;
     width?: number;
     height?: number;
 }
 
-const CameraFeed: React.FC<CameraFeedProps> = ({ socket, width = 1280, height = 720 }: CameraFeedProps) => {
+const CameraFeed: React.FC<CameraFeedProps> = ({ onFrameCapture, width = 1280, height = 720 }: CameraFeedProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [videoReady, setVideoReady] = useState(false);
-    const [canSendFrame, setCanSendFrame] = useState(true);
 
     useEffect(() => {
         const startCamera = async () => {
@@ -34,61 +31,50 @@ const CameraFeed: React.FC<CameraFeedProps> = ({ socket, width = 1280, height = 
                 videoRef.current.onloadedmetadata = () => {
                     console.log("Playing video...");
                     videoRef.current?.play();
-                    setVideoReady(true);
+                    setVideoReady(true);                    
                 };
+                
             }
         }
         startCamera();
+
     }, []);
 
     useEffect(() => {
-        if (!socket) {
-            console.log("Socket not connected yet...");
+        if (!videoReady || onFrameCapture === undefined) {
+            //console.log("Video not ready yet...");
             return;
         }
-
-        if (!videoReady) {
-            console.log("Video not ready yet...");
-            return;
-        }
-
-        console.log("Setting up video frame capture...");
-
-        const sendFrame = () => {
-            if (!canSendFrame) return; // Wait for ack before sending a new frame
-
+        
+        const captureFrame = () => {
             if (videoRef.current && canvasRef.current) {
-                console.log("Sending video frame to backend...");
+                //console.log("Capturing frame...");
                 const canvas = canvasRef.current;
                 const context = canvas.getContext("2d");
                 context?.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-                const imageDataUrl = canvas.toDataURL("image/jpeg");
-
-                socket.emit("produce", imageDataUrl);
-                //setCanSendFrame(false); // Prevent sending until ack is received
+                
+                // NOTE: base64 string conversion moved to parent component
+                // to avoid violations in setInterval processing times.
+                
+                // Convert to Blob and send it to parent component
+                canvas.toBlob((blob) => {
+                    if (blob) onFrameCapture(blob);
+                }, "image/jpeg", 1.0);
             }
-        };
 
-        // Listen for acknowledgment before sending the next frame
-        const handleAck = () => {
-            console.log("Ack received! Ready to send next frame.");
-            setCanSendFrame(true);
         };
-
-        socket.on("ack", handleAck);
 
         const interval = setInterval(() => {
-            if (canSendFrame) {
-                sendFrame();
+            if (videoReady) {
+                captureFrame();
             } 
-        }, 100); // Tries every 100ms but only sends if allowed
+        }, 100); // Tries every 100ms but only if the video is ready
+
 
         return () => {
             clearInterval(interval);
-            socket.off("ack", handleAck);
         };
-    }, [socket, videoReady, canSendFrame])
-
+    }, [videoReady, onFrameCapture]);
 
     return (
         <div className="video-feed" >

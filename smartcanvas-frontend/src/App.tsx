@@ -2,38 +2,55 @@ import React, { useState } from "react";
 import './styles/style.css'
 import CameraFeed from "./components/CameraFeed";
 import SocketHandler from "./components/SocketHandler";
-import useSocket from "./hooks/useSocket";
+//import useSocket from "./hooks/useSocket";
 import Instructions from "./components/Instructions";
 import ServerFeed from "./components/ServerFeed";
 
 
 const App: React.FC = () => {
     //const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
-    const socket = useSocket('http://localhost:5000');
+    //const socket = useSocket('http://localhost:5000');
     const [appState, setAppState] = useState<any>({});
+    // Frame that is sent to the server
+    const [outboundFrame, setOutboundFrame] = useState<string>("");
+    // Artistic picture sent by the server
+    const [inboundFrame, setInboundFrame] = useState<string>("");
 
     const handleStateChange = (state: any) => {
         console.log("State change received in App: ", state);
         setAppState(state);
     };
 
+    const handleOutboundFrame = (frame: Blob) => {
+        // Convert blob to base64 string
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setOutboundFrame(reader.result as string);
+        };
+        reader.readAsDataURL(frame);
+    };
+
+    const handleInboundFrame = (frame: string) => {
+        setInboundFrame(frame);
+    };
+
     return (
         <div id="mainContainer" className="container_fs">
-            <SocketHandler socket={socket} onStateChange={handleStateChange} />
-            <div className="header">
+            <SocketHandler onStateChange={handleStateChange} videoFrame={outboundFrame} onArtisticFrame={handleInboundFrame} />
+            {/* <div className="header">
                 <h1>Smart Canvas</h1>
                 <img src="https://interact.oulu.fi/site/files/make4change/interact-logo.png" className="logo" />
+            </div> */}
+            
+            <div className={`${appState.ShowPic ? 'server-feed-container' : 'hidden'}`}>
+                <ServerFeed artisticFrame={inboundFrame}/>
             </div>
-            {appState.ShowPic ? (
-                <div className="server-feed-container">
-                    <ServerFeed socket={socket} />
-                </div>
-            ) : (
-                <div className="camera-feed-container">
-                    <CameraFeed socket={socket} width={1280} height={720} />
-                    <Instructions state={appState} />
-                </div>
-            )}
+            
+            <div className={`${appState.ShowPic ? 'hidden' : 'camera-feed-container'}`}>
+                <CameraFeed onFrameCapture={handleOutboundFrame} width={1280} height={720} />
+                <Instructions state={appState} />
+            </div>
+            
         </div>
     );
 };
