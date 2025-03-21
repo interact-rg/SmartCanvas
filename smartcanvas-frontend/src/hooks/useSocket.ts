@@ -1,3 +1,5 @@
+// Basic listeners for the socket connection
+
 import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 

@@ -6,7 +6,9 @@ services:
     ports:
       - "5000:5000"        # Flask backend exposed on port 5000
     volumes:
-      - ./smart_canvas:/SmartCanvas/smartcanvas-frontend:ro  #mount backend code
+      - ./smart_canvas:/smart_canvas
+      - ./web:/web
+
     environment:
       - FLASK_ENV=development
       - CLIENT_TOKEN=d159f6d5-6bb6-44c3-a2fa-ae5a60b5ce75
@@ -18,6 +20,6 @@ services:
     ports:
       - "5173:5173"        # Vite frontend exposed on port 5173
     volumes:
-      - ./smartcanvas-frontend:/SmartCanvas/smartcanvas-frontend  # mount frontend code 
+      - ./smartcanvas-frontend:/smartcanvas-frontend  # mount frontend code 
     environment:
       - CHOKIDAR_USEPOLLING=true

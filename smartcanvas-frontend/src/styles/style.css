@@ -1,5 +1,13 @@
 /* Component specific styligs */
 
+.visible {
+  display: block;
+}
+
+.hidden {
+  display: none;
+}
+
  .logo {
   height: 10em;
   padding: 1.5em;
