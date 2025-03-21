@@ -8,17 +8,10 @@ import ServerFeed from "./components/ServerFeed";
 import FilterFrames from "./components/FilterFrames";
 
 const App: React.FC = () => {
-  //const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
-  const socket = useSocket("http://localhost:5000");
-  const [appState, setAppState] = useState<any>({});
   const [appState, setAppState] = useState<any>({});
   const [outboundFrame, setOutboundFrame] = useState<Blob | null>(null); // Frame that is sent to the server
   const [inboundFrame, setInboundFrame] = useState<string>(""); // Artistic picture sent by the server
 
-  const handleStateChange = (state: any) => {
-    console.log("State change received in App: ", state);
-    setAppState(state);
-  };
   const handleStateChange = (state: any) => {
     console.log("State change received in App: ", state);
     setAppState(state);
@@ -34,25 +27,33 @@ const App: React.FC = () => {
 
   return (
     <div id="mainContainer" className="container_fs">
-      <SocketHandler socket={socket} onStateChange={handleStateChange} />
-      <div className="header">
-        <h1>Smart Canvas</h1>
-        <img
-          src="https://interact.oulu.fi/site/files/make4change/interact-logo.png"
-          className="logo"
-        />
+      <SocketHandler
+        onStateChange={handleStateChange}
+        videoFrame={outboundFrame}
+        onArtisticFrame={handleInboundFrame}
+      />
+      {/* <div className="header">
+                <h1>Smart Canvas</h1>
+                <img src="https://interact.oulu.fi/site/files/make4change/interact-logo.png" className="logo" />
+            </div> */}
+
+      <div
+        className={`${appState.ShowPic ? "server-feed-container" : "hidden"}`}
+      >
+        <ServerFeed artisticFrame={inboundFrame} />
       </div>
-      {appState.ShowPic ? (
-        <div className="server-feed-container">
-          <ServerFeed socket={socket} />
-        </div>
-      ) : (
-        <div className="camera-feed-container">
-          <CameraFeed socket={socket} width={1280} height={720} />
-          <Instructions state={appState} />
-          <FilterFrames />
-        </div>
-      )}
+
+      <div
+        className={`${appState.ShowPic ? "hidden" : "camera-feed-container"}`}
+      >
+        <CameraFeed
+          onFrameCapture={handleOutboundFrame}
+          width={1280}
+          height={720}
+        />
+        <Instructions state={appState} />
+        <FilterFrames />
+      </div>
     </div>
   );
 };
