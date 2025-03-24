@@ -25,4 +25,4 @@ def send_ui_state(state: UI_State, sid: str|None):
     socketio.emit('update_ui_response', state, to=sid)
 
 def send_hand_position(position: tuple[float, float], sid: str|None):
-    socketio.emit('hand_position', position, to=sid)
+    socketio.emit('hand_position', list(position), to=sid) # convert to list, otherwise it'll be sent as two separate numbers

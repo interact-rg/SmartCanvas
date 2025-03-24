@@ -46,10 +46,10 @@ class UI:
         self.sid = sid
         self.is_webapp = is_webapp
 
-    def set_prog(self, value: float):
-        self.progressbar.value = value
+    def set_prog(self, value: float, max: float = 1.0):
+        self.progressbar.value = value / max
         if self.is_webapp:
-            send_ui_state({"hold_timer": value}, self.sid)
+            send_ui_state({"hold_timer": self.progressbar.value}, self.sid)
     
     def set_timer(self, value: float):
         if self.is_webapp:

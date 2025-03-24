@@ -151,7 +151,7 @@ class Idle(State):
 
     # Runs once on init
     def enter(self, tick: float):
-        self.core.ui.set_prog(1.1)
+        self.core.ui.set_prog(0)
         print ("Entering Idle state...")  #debug
 
     # Update is called on new frame
@@ -267,14 +267,14 @@ class Active(State):
                 self.core.set_state(Idle()) 
             self.last_update_time = tick
 
-            if len(wrist_position) > 0:
-                self.core.ui.set_wrist_position(wrist_position)
+            self.core.ui.set_wrist_position(wrist_position)
             self.core.ui.set_prog(self.progress_counter)
 
         if self.waiting_time - tick < 0:
             self.core.set_state(Idle())
 
     def update_filter_carousel(self, finger_count: int, tick: float):
+        #TODO Gesture detection for swiping
         if finger_count == 2:
             if self.change_filter_time - tick <= 0 and self.progress_counter <= 0:
                 self.change_filter_time = tick + 1.5

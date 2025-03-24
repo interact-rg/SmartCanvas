@@ -21,7 +21,7 @@ class GestureDetection:
          )
         self.recognizer = vision.GestureRecognizer.create_from_options(self.options)
 
-    def detect_gestures(self, frame: MatLike):
+    def detect_gestures(self, frame: MatLike) -> tuple[str, tuple[float, float]]:
         
         # Convert BGR to RGB
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -39,4 +39,4 @@ class GestureDetection:
             return top_gesture, wrist_location
         else:
             print("No hands detected.")
-            return "No hands detected", [0,0]
+            return "No hands detected", (0, 0)
