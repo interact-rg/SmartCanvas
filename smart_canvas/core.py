@@ -80,6 +80,10 @@ class CanvasCore:
             return(self._state.name)
         else:
             return "Uninitialized"
+    
+    def get_available_filters(self) -> list[str]:
+        keys = self.filters.catalog.keys()
+        return list(keys)
 
 class State(ABC):
     @property
@@ -241,12 +245,13 @@ class Active(State):
     def enter(self, tick: float):
         self.core.ui.set_prog(0.0)
         print("Entering active state")
+        self.core.ui.set_filter(self.core.filters.get_filter_name())
         self.waiting_time = time.time() + 60
 
 
     # Update is called on new frame
     def update(self, tick: float, frame: MatLike):
-        if tick - self.last_update_time >= 0.5:
+        if tick - self.last_update_time >= 0.2:
 
             finger_count = self.core.hand_detector.count_fingers(frame)[0]
             self.update_filter_trigger(finger_count)

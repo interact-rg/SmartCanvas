@@ -35,6 +35,7 @@ def connect_web():
     sid: str = request.sid
     core_queues.update({sid: Queue()})
     core_threads.update({sid: CanvasCore(q_consumer=core_queues[sid], screensize=(0, 0), webapp=True, sid=sid).start()})
+    socketio.emit('available_filters', core_threads[sid].get_available_filters(), to=sid)
 
 
 @socketio.on('disconnect')
