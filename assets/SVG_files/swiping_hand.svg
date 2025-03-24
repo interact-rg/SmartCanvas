@@ -7,9 +7,9 @@
    viewBox="0 0 210 297"
    version="1.1"
    id="svg1"
-   sodipodi:docname="swiping_hang.svg"
+   sodipodi:docname="swiping_hand.svg"
    inkscape:version="1.4 (86a8ad7, 2024-10-11)"
-   inkscape:export-filename="swiping_hang.png"
+   inkscape:export-filename="..\swiping_hand.png"
    inkscape:export-xdpi="300"
    inkscape:export-ydpi="300"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -26,9 +26,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="0.3061451"
-     inkscape:cx="-4.8996375"
-     inkscape:cy="594.48935"
+     inkscape:zoom="0.8659091"
+     inkscape:cx="297.95275"
+     inkscape:cy="567.03411"
      inkscape:window-width="1280"
      inkscape:window-height="730"
      inkscape:window-x="-6"
@@ -95,26 +95,26 @@
      id="layer1">
     <path
        id="rect1"
-       style="fill:#ffdbac;stroke-width:0.241982;fill-opacity:1"
+       style="fill:#ffde34;stroke-width:0.241982;fill-opacity:1"
        d="m 65.895719,85.420241 c -7.221236,0 -13.034863,5.859787 -13.034863,13.138733 v 65.692116 c 0.297876,-0.02 0.594502,-0.045 0.89762,-0.045 H 78.930583 V 98.558974 c 0,-7.278946 -5.813627,-13.138733 -13.034864,-13.138733 z" />
     <path
        id="rect1-8"
-       style="fill:#ffdbac;stroke-width:0.241982;fill-opacity:1"
+       style="fill:#ffde34;stroke-width:0.241982;fill-opacity:1"
        d="m 91.965446,85.42024 c -7.221236,0 -13.034863,5.859788 -13.034863,13.138733 V 164.20613 H 104.99979 V 98.558973 c 0,-7.278945 -5.813108,-13.138733 -13.034344,-13.138733 z" />
     <path
        id="rect1-5"
-       style="fill:#ffdbac;stroke-width:0.241982;fill-opacity:1"
+       style="fill:#ffde34;stroke-width:0.241982;fill-opacity:1"
        d="m 118.03466,146.25382 c -7.22124,0 -13.03487,5.85978 -13.03487,13.13873 v 0.92449 h 26.06973 v -0.92449 c 0,-7.27895 -5.81363,-13.13873 -13.03486,-13.13873 z" />
     <path
        id="rect1-8-5"
-       style="fill:#ffdbac;stroke-width:0.241982;fill-opacity:1"
+       style="fill:#ffde34;stroke-width:0.241982;fill-opacity:1"
        d="m 144.10438,146.25382 c -7.22123,0 -13.03486,5.85978 -13.03486,13.13873 v 0.92449 h 26.06921 v -0.92449 c 0,-7.27895 -5.81311,-13.13873 -13.03435,-13.13873 z" />
     <path
        id="path1"
-       style="fill:#ffdbac;stroke-width:0.381296;fill-opacity:1"
+       style="fill:#ffde34;stroke-width:0.381296;fill-opacity:1"
        d="m 52.860852,200.02643 a 52.138889,63.019421 0 0 0 52.138948,63.01941 52.138889,63.019421 0 0 0 52.13893,-63.01941 z" />
     <path
-       style="fill:#ffdbac;stroke-width:0.264583;fill-opacity:1"
+       style="fill:#ffde34;fill-opacity:1;stroke-width:0.264583"
        id="rect2"
        width="104.27788"
        height="26.165579"
