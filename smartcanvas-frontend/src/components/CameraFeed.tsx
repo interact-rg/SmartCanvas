@@ -20,7 +20,7 @@ const CameraFeed: React.FC<CameraFeedProps> = ({ onFrameCapture, width = 1280, h
         const startCamera = async () => {
             console.log("Requesting camera access...");
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+                video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30, max: 60 } },
                 audio: false,
             });
 
