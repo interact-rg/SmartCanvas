@@ -6,11 +6,14 @@ import SocketHandler from "./components/SocketHandler";
 import Instructions from "./components/Instructions";
 import ServerFeed from "./components/ServerFeed";
 import FilterFrames from "./components/FilterFrames";
+import ProgressCircle from "./components/ProgressCircle";
 
 const App: React.FC = () => {
   const [appState, setAppState] = useState<any>({});
   const [outboundFrame, setOutboundFrame] = useState<Blob | null>(null); // Frame that is sent to the server
   const [inboundFrame, setInboundFrame] = useState<string>(""); // Artistic picture sent by the server
+  const [handPosition, setHandPosition] = useState<[number, number]>([0, 0]);
+  const [progress, setProgress] = useState<number>(0);
 
   const handleStateChange = (state: any) => {
     console.log("State change received in App: ", state);
@@ -31,6 +34,8 @@ const App: React.FC = () => {
         onStateChange={handleStateChange}
         videoFrame={outboundFrame}
         onArtisticFrame={handleInboundFrame}
+        onHandPosition={setHandPosition}
+        onProgress={setProgress}
       />
       {/* <div className="header">
                 <h1>Smart Canvas</h1>
@@ -46,6 +51,7 @@ const App: React.FC = () => {
       <div
         className={`${appState.ShowPic ? "hidden" : "camera-feed-container"}`}
       >
+        <ProgressCircle position={handPosition} progress={progress} />
         <CameraFeed
           onFrameCapture={handleOutboundFrame}
           width={1280}

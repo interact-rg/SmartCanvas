@@ -11,9 +11,11 @@ interface SocketHandlerProps {
   onStateChange: (state: any) => void;
   videoFrame: Blob | null;
   onArtisticFrame: (frame: string) => void;
+  onHandPosition: (position: [number, number]) => void;
+  onProgress: (progress: number) => void;
 }
 
-const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame }) => {
+const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress }) => {
   const socket = useSocket('http://localhost:5000');
   const [canSendFrame, setCanSendFrame] = useState(true);
 
@@ -27,7 +29,11 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
       // ignore the hold_timer for now
       if (msg.hold_timer !== undefined) {
         console.log('Hold timer: ', msg.hold_timer);
+        onProgress(msg.hold_timer);
         return;
+      }
+      else if (msg.filter !== undefined) {
+        console.log('Filter: ', msg.filter);
       } else {
         onStateChange(msg);
       }
@@ -48,11 +54,13 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
     socket.on('ack', handleAck);
     socket.on('update_ui_response', handleUpdateUIResponse);
     socket.on('show_image', handleArtisticFrame);
+    socket.on('hand_position', onHandPosition);
 
     return () => {
       socket.off('update_ui_response', handleUpdateUIResponse);
       socket.off('ack', handleAck);
       socket.off('show_image', handleArtisticFrame);
+      socket.off('hand_position', onHandPosition);
     };
   }, [socket]);
 
