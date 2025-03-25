@@ -2,34 +2,36 @@ import React, { useState, useRef, useEffect } from "react";
 
 interface FilterFramesProps {
   availableFilters: string[];
-  chosenFilter: string | '';
+  chosenFilter: string | "";
 }
 
-const FilterFrames: React.FC<FilterFramesProps> = ({availableFilters, chosenFilter}) => {
-  const filters = [
-    "/images/Anime_filter.jpg",
-    "/images/Mosaic_art_filter.jpg",
-    "/images/Cartoon_filter.jpg",
-    "/images/Oil_painting_filter.jpg",
-    "/images/Anime_filter.jpg",
-    "/images/Mosaic_art_filter.jpg",
-    "/images/Cartoon_filter.jpg",
-    "/images/Oil_painting_filter.jpg",
-    "/images/Anime_filter.jpg",
-    "/images/Mosaic_art_filter.jpg",
-    "/images/Cartoon_filter.jpg",
-    "/images/Oil_painting_filter.jpg",
-  ];
-  //console.log("Filters: ", availableFilters);
-  //console.log("Chosen filter: "+ chosenFilter +", index: ", availableFilters.indexOf(chosenFilter));
+const FilterFrames: React.FC<FilterFramesProps> = ({
+  availableFilters,
+  chosenFilter,
+}) => {
+  // Construct filter paths dynamically using availableFilters
+  const filters =
+    availableFilters.length !== 0
+      ? availableFilters.map((filterName) => `/images/${filterName}.jpg`)
+      : ["/images/anime style.jpg"];
+
+  console.log("Filters: ", availableFilters);
+  console.log(
+    "Chosen filter: " + chosenFilter + ", index: ",
+    availableFilters.indexOf(chosenFilter)
+  );
 
   const [chosenFilterIndex, setChosenFilterIndex] = useState<number>(0); // Max value: filters.length
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // NOTE! This is only a placeholder implementation
-  // This is only to avoid errors and console.log spam when the implementation is not yet actually handling the available and selected filters
-  const thisIsTheFilterIndex = availableFilters.indexOf(chosenFilter);
-  // End placeholder
+  // Update chosenFilterIndex when chosenFilter changes
+  useEffect(() => {
+    const newChosenFilterIndex = availableFilters.indexOf(chosenFilter);
+    // Only update if the chosenFilter is found in the availableFilters
+    if (newChosenFilterIndex >= 0) {
+      setChosenFilterIndex(newChosenFilterIndex);
+    }
+  }, [chosenFilter, availableFilters]); // Re-run this effect when chosenFilter or availableFilters change
 
   // This function will center the selected filter and make sure it's fully visible
   const scrollToSelectedFilter = (index: number) => {
@@ -53,15 +55,10 @@ const FilterFrames: React.FC<FilterFramesProps> = ({availableFilters, chosenFilt
     }
   };
 
-  // Automatically center the middle filter image when the component is mounted
+  // Automatically center the selected filter when the component is mounted or the index changes
   useEffect(() => {
     scrollToSelectedFilter(chosenFilterIndex);
   }, [chosenFilterIndex]);
-
-  // TODO: Update when swiping gestures is ready
-  const handleFilterChange = (index: number) => {
-    setChosenFilterIndex(index); // Update the chosen filter index
-  };
 
   return (
     <div
@@ -85,8 +82,8 @@ const FilterFrames: React.FC<FilterFramesProps> = ({availableFilters, chosenFilt
           src={filter}
           alt={`frame-${index}`}
           style={{
-            width: "150px", // Width of images
-            height: "auto",
+            width: "100px", // Width of images
+            height: "100px",
             margin: "0 10px", // Margin between images
             borderRadius: "10px", // Make corners rounder
             border: `solid ${
@@ -96,7 +93,6 @@ const FilterFrames: React.FC<FilterFramesProps> = ({availableFilters, chosenFilt
             boxSizing: "border-box",
             transition: "border 0.3s ease", // Smooth transition for border change
           }}
-          onClick={() => handleFilterChange(index)} // Update state when a filter is chosen
         />
       ))}
     </div>
