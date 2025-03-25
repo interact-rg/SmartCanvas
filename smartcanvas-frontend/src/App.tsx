@@ -7,21 +7,28 @@ import Instructions from "./components/Instructions";
 import ServerFeed from "./components/ServerFeed";
 import FilterFrames from "./components/FilterFrames";
 import ProgressCircle from "./components/ProgressCircle";
+import DownloadPrompt from "./components/DownloadPrompt";
 
 const App: React.FC = () => {
   const [appState, setAppState] = useState<any>({});
   const [outboundFrame, setOutboundFrame] = useState<Blob | null>(null); // Frame that is sent to the server
   const [inboundFrame, setInboundFrame] = useState<string>(""); // Artistic picture sent by the server
+  const [qrCode, setQrCode] = useState<string|null>(""); // QR code sent by the server
   const [handPosition, setHandPosition] = useState<[number, number]>([0, 0]);
   const [progress, setProgress] = useState<number>(0);
   const [painting, setPainting] = useState<number>(0);
   const [filters, setFilters] = useState<string[]>([]);
   const [chosenFilter, setChosenFilter] = useState<string>("");
+  let qrTimeout: number|undefined = undefined;
 
-  // const handleStateChange = (state: any) => {
-  //   //console.log("State change received in App: ", state);
-  //   setAppState(state);
-  // };
+  const handleStateChange = (state: any) => {
+    console.log("State change received in App: ", state);
+    if (state.Countdown) {
+      clearTimeout(qrTimeout);
+      setQrCode(null);
+    }
+    setAppState(state);
+  };
 
   const handleOutboundFrame = (frame: Blob) => {
     setOutboundFrame(frame);
@@ -31,10 +38,18 @@ const App: React.FC = () => {
   //   setInboundFrame(frame);
   // };
 
+  const handleQrCode = (qr: string) => {
+    setQrCode(qr);
+    clearTimeout(qrTimeout);
+    qrTimeout = setTimeout(() => {
+      setQrCode(null);
+    }, 60000);
+  };
+
   return (
     <div id="mainContainer" className="container_fs">
       <SocketHandler
-        onStateChange={setAppState}
+        onStateChange={handleStateChange}
         videoFrame={outboundFrame}
         onArtisticFrame={setInboundFrame}
         onHandPosition={setHandPosition}
@@ -42,6 +57,7 @@ const App: React.FC = () => {
         onPainting={setPainting}
         onFilters={setFilters}
         onChosenFilter={setChosenFilter}
+        onQrCode={handleQrCode}
       />
       {/* <div className="header">
                 <h1>Smart Canvas</h1>
@@ -65,6 +81,11 @@ const App: React.FC = () => {
         <Instructions state={appState} />
         <FilterFrames availableFilters={filters} chosenFilter={chosenFilter}/>
       </div>
+
+      <DownloadPrompt
+        image={inboundFrame}
+        downloadQr={qrCode}
+      />
     </div>
   );
 };

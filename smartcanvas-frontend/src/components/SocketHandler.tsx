@@ -15,9 +15,10 @@ interface SocketHandlerProps {
   onPainting: (hold: number) => void;
   onFilters: (filters: string[]) => void;
   onChosenFilter: (filter: string) => void;
+  onQrCode: (qrCode: string) => void;
 }
 
-const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress, onPainting, onFilters, onChosenFilter }) => {
+const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress, onPainting, onFilters, onChosenFilter, onQrCode }) => {
   const socket = useSocket('http://localhost:5000');
   const [canSendFrame, setCanSendFrame] = useState(true);
   const previousFrameRef = useRef<string | null>(null);
@@ -74,6 +75,7 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
     socket.on('show_image', handleArtisticFrame);
     socket.on('hand_position', onHandPosition);
     socket.on('available_filters', handleAvailableFilters);
+    socket.on('qr_code', onQrCode);
 
     return () => {
       socket.off('update_ui_response', handleUpdateUIResponse);
@@ -81,6 +83,7 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
       socket.off('show_image', handleArtisticFrame);
       socket.off('hand_position', onHandPosition);
       socket.off('available_filters', handleAvailableFilters);
+      socket.off('qr_code', onQrCode);
     };
   }, [socket]);
 
