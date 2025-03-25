@@ -4,7 +4,6 @@
  * */
 
 import React, { useEffect, useState, useRef } from 'react';
-//import { Socket } from 'socket.io-client';
 import useSocket from '../hooks/useSocket';
 
 interface SocketHandlerProps {
@@ -26,7 +25,7 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
 
     // Update the UI state when the server sends a message
     const handleUpdateUIResponse = (msg: any) => {
-      //console.log('Received update_ui_response: ', msg);
+      console.log('Received update_ui_response: ', msg);
 
       // Counter to hold your hand still
       if (msg.hold_timer !== undefined) {

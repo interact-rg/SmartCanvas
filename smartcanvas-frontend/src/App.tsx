@@ -17,7 +17,7 @@ const App: React.FC = () => {
   const [painting, setPainting] = useState<number>(0);
 
   const handleStateChange = (state: any) => {
-    console.log("State change received in App: ", state);
+    //console.log("State change received in App: ", state);
     setAppState(state);
   };
 

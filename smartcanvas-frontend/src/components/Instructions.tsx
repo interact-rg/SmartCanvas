@@ -13,17 +13,17 @@ const Instructions: React.FC<InstructionsProps> = ({ state }) => {
       if (value) {
         switch (key) {
           case "Startup":
-            return <p>Instructions for Startup state</p>;
+            return <div>Instructions for Startup state</div>;
           case "Idle":
-            return <p>Instructions for Idle state</p>;
+            return <div>Instructions for Idle state</div>;
           case "Active":
-            return <p>Instructions for Active state</p>;
+            return <div>Instructions for Active state</div>;
           default:
-            return <p></p>;
+            return <></>;
         }
       }
     }
-    return <p></p>;
+    return <></>;
   };
 
   return (
@@ -32,7 +32,10 @@ const Instructions: React.FC<InstructionsProps> = ({ state }) => {
         Current State:{" "}
         {Object.keys(state).find((key) => state[key]) || "Unknown"}
       </h2>
-      {renderInstructions()}
+      <div>
+        {renderInstructions()}
+      </div>
+      
     </div>
   );
 };

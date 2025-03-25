@@ -4,7 +4,6 @@
  */
 
 import React from 'react';
-import './style.css'
 
 const TopNav: React.FC = () => {
   return (
