@@ -296,7 +296,6 @@ class Countdown(State):
         self.countdown_time = 0.0
 
     def enter(self, tick:float):
-        self.core.ui.show("countdown")
         self.countdown_time = tick + 4
     
     def update(self, tick: float, frame: MatLike):
