@@ -14,6 +14,7 @@ const App: React.FC = () => {
   const [inboundFrame, setInboundFrame] = useState<string>(""); // Artistic picture sent by the server
   const [handPosition, setHandPosition] = useState<[number, number]>([0, 0]);
   const [progress, setProgress] = useState<number>(0);
+  const [painting, setPainting] = useState<number>(0);
 
   const handleStateChange = (state: any) => {
     console.log("State change received in App: ", state);
@@ -36,6 +37,7 @@ const App: React.FC = () => {
         onArtisticFrame={handleInboundFrame}
         onHandPosition={setHandPosition}
         onProgress={setProgress}
+        onPainting={setPainting}
       />
       {/* <div className="header">
                 <h1>Smart Canvas</h1>
@@ -43,19 +45,18 @@ const App: React.FC = () => {
             </div> */}
 
       <div
-        className={`${appState.ShowPic ? "server-feed-container" : "hidden"}`}
-      >
+        className={`${appState.ShowPic ? "server-feed-container" : "hidden"}`}>
         <ServerFeed artisticFrame={inboundFrame} />
       </div>
 
       <div
-        className={`${appState.ShowPic ? "hidden" : "camera-feed-container"}`}
-      >
+        className={`${appState.ShowPic ? "hidden" : "camera-feed-container"}`}>
         <ProgressCircle position={handPosition} progress={progress} />
         <CameraFeed
           onFrameCapture={handleOutboundFrame}
           width={1280}
           height={720}
+          state={appState}
         />
         <Instructions state={appState} />
         <FilterFrames />

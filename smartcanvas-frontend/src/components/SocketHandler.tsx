@@ -13,11 +13,13 @@ interface SocketHandlerProps {
   onArtisticFrame: (frame: string) => void;
   onHandPosition: (position: [number, number]) => void;
   onProgress: (progress: number) => void;
+  onPainting: (progress: number) => void;
 }
 
-const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress }) => {
+const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress, onPainting }) => {
   const socket = useSocket('http://localhost:5000');
   const [canSendFrame, setCanSendFrame] = useState(true);
+  const previousFrameRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!socket) return;
@@ -26,10 +28,16 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
     const handleUpdateUIResponse = (msg: any) => {
       //console.log('Received update_ui_response: ', msg);
 
-      // ignore the hold_timer for now
+      // Counter to hold your hand still
       if (msg.hold_timer !== undefined) {
         console.log('Hold timer: ', msg.hold_timer);
         onProgress(msg.hold_timer);
+        return;
+      }
+      // Counter to keep still when the image is "being painted"
+      else if (msg.timer !== undefined) {
+        console.log('Timer: ', msg.timer);
+        onPainting(msg.timer);
         return;
       }
       else if (msg.filter !== undefined) {
@@ -69,16 +77,22 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
     const sendFrame = (frame: Blob) => {
       if (!socket || !canSendFrame) return; // Wait for ack before sending a new frame
 
-      console.log('Sending frame to the server...');
-
       // Convert blob to base64 string
       const reader = new FileReader();
       reader.onloadend = () => {
-        socket.emit('produce', reader.result as string);
+        const currentFrame = reader.result as string;
+
+        // Compare the current frame with the previous frame to avoid duplicates
+        if (currentFrame !== previousFrameRef.current) {
+          console.log('Sending frame to the server...');
+          socket.emit('produce', currentFrame);
+          previousFrameRef.current = currentFrame; // Update the previous frame
+          setCanSendFrame(false); // Prevent sending until ack is received
+        } else {
+          // Frame is identical to the previous one. Skipping.
+        }
       };
       reader.readAsDataURL(frame);
-
-      setCanSendFrame(false); // Prevent sending until ack is received
     };
 
     if (socket && videoFrame && canSendFrame) {

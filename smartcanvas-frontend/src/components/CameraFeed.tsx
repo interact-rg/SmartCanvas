@@ -9,9 +9,10 @@ interface CameraFeedProps {
     onFrameCapture: (frame: Blob) => void;
     width?: number;
     height?: number;
+    state: { [key: string]: any };
 }
 
-const CameraFeed: React.FC<CameraFeedProps> = ({ onFrameCapture, width = 1280, height = 720 }: CameraFeedProps) => {
+const CameraFeed: React.FC<CameraFeedProps> = ({ onFrameCapture, width = 1280, height = 720, state }: CameraFeedProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [videoReady, setVideoReady] = useState(false);
@@ -61,17 +62,21 @@ const CameraFeed: React.FC<CameraFeedProps> = ({ onFrameCapture, width = 1280, h
 
         };
 
+        // Adjust the interval based on the app state
+        const intervalTime = state.Idle ? 500 : 100;
+
         const interval = setInterval(() => {
             if (videoReady) {
+                //console.log("Interval time is: ", intervalTime);
                 captureFrame();
             } 
-        }, 100); // Tries every 100ms but only if the video is ready
+        }, intervalTime); // Tries every intervalTime ms but only if the video is ready
 
 
         return () => {
             clearInterval(interval);
         };
-    }, [videoReady, onFrameCapture]);
+    }, [videoReady, onFrameCapture, state]);
 
     return (
         <div className="video-feed" >
