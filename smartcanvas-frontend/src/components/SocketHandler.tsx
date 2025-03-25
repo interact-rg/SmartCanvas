@@ -12,16 +12,25 @@ interface SocketHandlerProps {
   onArtisticFrame: (frame: string) => void;
   onHandPosition: (position: [number, number]) => void;
   onProgress: (progress: number) => void;
-  onPainting: (progress: number) => void;
+  onPainting: (hold: number) => void;
+  onFilters: (filters: string[]) => void;
+  onChosenFilter: (filter: string) => void;
 }
 
-const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress, onPainting }) => {
+const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress, onPainting, onFilters, onChosenFilter }) => {
   const socket = useSocket('http://localhost:5000');
   const [canSendFrame, setCanSendFrame] = useState(true);
   const previousFrameRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!socket) return;
+
+    // Handle the list of available filters received from the server
+    const handleAvailableFilters = (filters: string[]) => {
+      if (filters.length > 0) {
+        onFilters(filters);
+      }
+    };
 
     // Update the UI state when the server sends a message
     const handleUpdateUIResponse = (msg: any) => {
@@ -41,6 +50,8 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
       }
       else if (msg.filter !== undefined) {
         console.log('Filter: ', msg.filter);
+        onChosenFilter(msg.filter);
+
       } else {
         onStateChange(msg);
       }
@@ -62,12 +73,14 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
     socket.on('update_ui_response', handleUpdateUIResponse);
     socket.on('show_image', handleArtisticFrame);
     socket.on('hand_position', onHandPosition);
+    socket.on('available_filters', handleAvailableFilters);
 
     return () => {
       socket.off('update_ui_response', handleUpdateUIResponse);
       socket.off('ack', handleAck);
       socket.off('show_image', handleArtisticFrame);
       socket.off('hand_position', onHandPosition);
+      socket.off('available_filters', handleAvailableFilters);
     };
   }, [socket]);
 

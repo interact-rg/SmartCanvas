@@ -1,6 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 
-const FilterFrames: React.FC = () => {
+interface FilterFramesProps {
+  availableFilters: string[];
+  chosenFilter: string | '';
+}
+
+const FilterFrames: React.FC<FilterFramesProps> = ({availableFilters, chosenFilter}) => {
   const filters = [
     "/images/Anime_filter.jpg",
     "/images/Mosaic_art_filter.jpg",
@@ -15,9 +20,16 @@ const FilterFrames: React.FC = () => {
     "/images/Cartoon_filter.jpg",
     "/images/Oil_painting_filter.jpg",
   ];
+  //console.log("Filters: ", availableFilters);
+  //console.log("Chosen filter: "+ chosenFilter +", index: ", availableFilters.indexOf(chosenFilter));
 
   const [chosenFilterIndex, setChosenFilterIndex] = useState<number>(0); // Max value: filters.length
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // NOTE! This is only a placeholder implementation
+  // This is only to avoid errors and console.log spam when the implementation is not yet actually handling the available and selected filters
+  const thisIsTheFilterIndex = availableFilters.indexOf(chosenFilter);
+  // End placeholder
 
   // This function will center the selected filter and make sure it's fully visible
   const scrollToSelectedFilter = (index: number) => {

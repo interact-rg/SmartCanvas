@@ -15,29 +15,33 @@ const App: React.FC = () => {
   const [handPosition, setHandPosition] = useState<[number, number]>([0, 0]);
   const [progress, setProgress] = useState<number>(0);
   const [painting, setPainting] = useState<number>(0);
+  const [filters, setFilters] = useState<string[]>([]);
+  const [chosenFilter, setChosenFilter] = useState<string>("");
 
-  const handleStateChange = (state: any) => {
-    //console.log("State change received in App: ", state);
-    setAppState(state);
-  };
+  // const handleStateChange = (state: any) => {
+  //   //console.log("State change received in App: ", state);
+  //   setAppState(state);
+  // };
 
   const handleOutboundFrame = (frame: Blob) => {
     setOutboundFrame(frame);
   };
 
-  const handleInboundFrame = (frame: string) => {
-    setInboundFrame(frame);
-  };
+  // const handleInboundFrame = (frame: string) => {
+  //   setInboundFrame(frame);
+  // };
 
   return (
     <div id="mainContainer" className="container_fs">
       <SocketHandler
-        onStateChange={handleStateChange}
+        onStateChange={setAppState}
         videoFrame={outboundFrame}
-        onArtisticFrame={handleInboundFrame}
+        onArtisticFrame={setInboundFrame}
         onHandPosition={setHandPosition}
         onProgress={setProgress}
         onPainting={setPainting}
+        onFilters={setFilters}
+        onChosenFilter={setChosenFilter}
       />
       {/* <div className="header">
                 <h1>Smart Canvas</h1>
@@ -59,7 +63,7 @@ const App: React.FC = () => {
           state={appState}
         />
         <Instructions state={appState} />
-        <FilterFrames />
+        <FilterFrames availableFilters={filters} chosenFilter={chosenFilter}/>
       </div>
     </div>
   );

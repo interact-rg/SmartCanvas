@@ -21,12 +21,12 @@
   align-content: center;
   text-align: center;
   min-width: 1024px;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
+  overflow: hidden;
 }
 
-.camera-feed-container,
-.server-feed-container {
+.camera-feed-container {
   position: relative;
   width: 100vw; 
   height: 100vh;
@@ -40,6 +40,15 @@
   width: 100vw;
   height: 100vh;
   object-fit: cover
+}
+
+.server-feed-container {
+  position: relative;
+  width: 100vw; 
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .server-feed-container canvas {
