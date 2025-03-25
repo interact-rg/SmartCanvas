@@ -8,6 +8,7 @@ from cv2.typing import MatLike
 from cv2 import imencode
 from base64 import b64encode
 from smart_canvas.ui import UI_State
+from smart_canvas.qr_code import create_qr_code
 
 def cv_to_b64(cv_image: MatLike):
     if (cv_image is None):
@@ -26,3 +27,9 @@ def send_ui_state(state: UI_State, sid: str|None):
 
 def send_hand_position(position: tuple[float, float], sid: str|None):
     socketio.emit('hand_position', list(position), to=sid) # convert to list, otherwise it'll be sent as two separate numbers
+
+def send_qr(image_id: int, sid: str|None):
+    # TODO make hostname dynamic
+    cv_qr = create_qr_code(f"localhost:5000/dl_image/{image_id}")
+    mod_message = cv_to_b64(cv_qr)
+    socketio.emit('qr_code', mod_message, to=sid)

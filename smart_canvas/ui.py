@@ -1,7 +1,7 @@
 # Types
 UI_State = dict[str, str|float]
 from cv2.typing import MatLike
-from web.main.common_events import send_ui_state, send_image, send_hand_position
+from web.main.common_events import send_ui_state, send_image, send_hand_position, send_qr
 
 
 
@@ -73,6 +73,9 @@ class UI:
 
     def show_image(self, image: MatLike):
         send_image(image, self.sid)
+
+    def show_qr(self, image_id: int):
+        send_qr(image_id, self.sid)
 
     def set_wrist_position(self, position: tuple[float, float]):
         send_hand_position(position, self.sid)

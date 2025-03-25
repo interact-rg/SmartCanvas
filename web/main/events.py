@@ -26,9 +26,6 @@ from smart_canvas.qr_code import *
 core_threads: dict[str, CanvasCore] = {}
 core_queues: dict[str, Queue[MatLike]] = {}
 
-#HOST_IP = "86.50.168.39"
-HOST_IP = "127.0.0.1"
-
 @socketio.on('connect')
 def connect_web():
     print('[INFO] Web client connected: {}'.format(request.sid))
@@ -61,7 +58,6 @@ def handle_client_message(message: str):
     sid: str = request.sid
     core = core_threads[sid]
     producer_q = core_queues[sid]
-    header = message.split(",")[0]
     b64_frame = message.split(",")[1]
     cv_image = b64_to_cv(b64_frame)
     producer_q.put(cv_image)
@@ -75,17 +71,3 @@ def check_image_processing():
         socketio.emit('imgage_processing_started', '', to=sid)
     if not core.image_processing_active and "ShowPic" in core.get_current_state():
         socketio.emit('imgage_processing_finished', '', to=sid)
-
-@socketio.on('get_dl_link')
-def get_dl_qr(message: str):
-    core = core_threads[request.sid]
-    if core.gdpr_accepted:
-        header = message.split(",")[0]
-        if core.image_id:
-            cv_qr = cv2.resize(create_qr_code(f"{HOST_IP}:5000/dl_image/{core.image_id}"), (200, 200), interpolation = cv2.INTER_AREA)
-            mod_message = header + "," + cv_to_b64(cv_qr)
-            socketio.emit('dl_qr', mod_message, to=request.sid)
-        else:
-            print("Missing image id -> cannot generate link")
-
-
