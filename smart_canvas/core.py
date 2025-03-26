@@ -52,6 +52,7 @@ class CanvasCore:
         self.sid = sid
         # This is initial state
         self.set_state(Startup())
+        print("Core initialized")
 
     def set_state(self, state: State):
         print('State change:', state)
@@ -163,8 +164,7 @@ class Idle(State):
              if (face_present and duration >= 2.0):
               self.core.set_state(Active())
 
-         
-
+        
 class Active(State):
     """
     State class for active on waiting for fingers.
@@ -179,7 +179,6 @@ class Active(State):
         self.last_update_time = 0.0  # debug: simplifying the confirmation progress logic to be based on elapsed time instead of "the time when it's allowed to do an update"
         self.current_gesture = "No gestures yet"
         self.wrist_position = [0,0]
-
 
     # Runs once on init
     def enter(self, tick: float):

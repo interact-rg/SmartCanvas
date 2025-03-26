@@ -19,7 +19,7 @@ class GestureDetection:
             num_hands=1
          )
         
-        self.last_timestamp = time.time() * 1000
+        self.timestamp = time.time() * 1000
 
         self.recognizer = vision.GestureRecognizer.create_from_options(self.options)
 
@@ -31,12 +31,12 @@ class GestureDetection:
         # 2) Create MediaPipe Image
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
 
-        timestamp = int(time.time() * 1000)
-        if timestamp <= self.last_timestamp:
-            timestamp = self.last_timestamp + 1
-            self.last_timestamp = timestamp
+        new_timestamp = int(time.time() * 1000)
+        if new_timestamp <= self.timestamp:
+            new_timestamp = self.timestamp + 1
+        self.timestamp = new_timestamp
 
-        result = self.recognizer.recognize_for_video(mp_image, timestamp)
+        result = self.recognizer.recognize_for_video(mp_image, self.timestamp)
         
 
         if result.gestures:
