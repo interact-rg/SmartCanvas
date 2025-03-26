@@ -2,6 +2,7 @@
  * Component to show different instructions based on the state of the application
  */
 import React from "react";
+import waving_hand from "./five_fingers.png"
 
 interface InstructionsProps {
   state: { [key: string]: any };
@@ -15,7 +16,9 @@ const Instructions: React.FC<InstructionsProps> = ({ state }) => {
           case "Startup":
             return <div>Instructions for Startup state</div>;
           case "Idle":
-            return <div>Instructions for Idle state</div>;
+            return <div>Instructions for Idle state
+              <img src={waving_hand} style={{maxWidth:'20%', marginLeft:'30%'}} />
+            </div>;
           case "Active":
             return <div>Instructions for Active state</div>;
           default:
