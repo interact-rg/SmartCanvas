@@ -189,10 +189,11 @@ class Active(State):
 
     def update(self, tick: float, frame: MatLike):
 
-        finger_count = self.core.hand_detector.count_fingers(frame)[0]
+        finger_count, wrist_position = self.core.hand_detector.count_fingers(frame)
         self.update_filter_trigger(finger_count)
         self.update_filter_carousel(finger_count, tick)
 
+        self.core.ui.set_wrist_position(wrist_position[0])
 
         face_present, duration = self.core.face_detector.detect_face(frame)
         print("Face present:", face_present, "Duration:", str(duration) + "seconds")
@@ -214,6 +215,7 @@ class Active(State):
             self.progress_counter += 0.05
         elif self.progress_counter > 0.0:
             self.progress_counter -= 0.1
+        self.core.ui.set_prog(self.progress_counter)
         if self.progress_counter >= 1.0:
             self.core.set_state(Countdown())
 
