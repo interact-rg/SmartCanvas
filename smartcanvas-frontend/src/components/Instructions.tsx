@@ -3,6 +3,7 @@
  */
 import React, {useState, useEffect } from "react";
 import waving_hand from "../assets/five_fingers.png"
+import "./waving_hand.css"
 
 interface InstructionsProps {
   state: { [key: string]: any };
@@ -42,13 +43,13 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 0 }) => 
             return (
               <div className="top-row">
                 <div className="column" id="column-1">
-                  {isVisible && randomColumn === 1 && <img src={waving_hand} style={{maxWidth:'20%', marginLeft:'30%'}} />}
+                  {isVisible && randomColumn === 1 && <img src={waving_hand} id="hand" style={{maxWidth:'20%', marginLeft:'30%'}} />}
                 </div>
                 <div className="column" id="column-2">
-                  {isVisible && randomColumn === 2 && <img src={waving_hand} style={{maxWidth:'20%', marginLeft:'30%'}} />}
+                  {isVisible && randomColumn === 2 && <img src={waving_hand} id="hand" style={{maxWidth:'20%', marginLeft:'30%'}} />}
                 </div>
                 <div className="column" id="column-3">
-                  {isVisible && randomColumn === 3 && <img src={waving_hand} style={{maxWidth:'20%', marginLeft:'30%'}} />}
+                  {isVisible && randomColumn === 3 && <img src={waving_hand} id="hand" style={{maxWidth:'20%', marginLeft:'30%'}} />}
                 </div>
               </div>
             );
