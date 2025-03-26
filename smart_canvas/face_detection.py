@@ -20,7 +20,7 @@ class FaceDetection:
         if self.detector is None:
             raise RuntimeError("Failed to load face detection model from" + vision.FaceDetectorOptions.base_options.model_asset_path)
         
-        self.stable_time = None
+        self.stable_start_time = None
         self.unstable_start_time = None
 
         self.timestamp = time.time() * 1000
@@ -46,14 +46,16 @@ class FaceDetection:
         current_time = time.time()
 
         if face_present:
-            # If this is the first frame in which a face appears, record the time
-            if self.stable_time is None:
+            # If this is the first frame in which a face appears, start stable timer
+            if self.stable_start_time is None:
                 self.unstable_start_time = None
-                self.stable_time = current_time
-            stable_for = (current_time - self.stable_time)
+                self.stable_start_time = current_time
+
+            # Calculate time for which face has been stable    
+            stable_for = (current_time - self.stable_start_time)
             return face_present, stable_for
         else:
-            self.stable_time = None
+            self.stable_start_time = None
             if self.unstable_start_time is None:
                 self.unstable_start_time = current_time
             unstable_for = current_time - self.unstable_start_time

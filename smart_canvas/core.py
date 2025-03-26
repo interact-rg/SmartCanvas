@@ -39,7 +39,7 @@ class CanvasCore:
         self.filters = FilterCarousel()
         self.fg_masker = ForegroundMask()
         self.hand_detector = HandDetect()
-        self.gesture_detector = GestureDetection().detect_gestures
+        self.gesture_detector = GestureDetection()
         self.face_detector = FaceDetection()
         self.database = Database()
         self.image_id: None|int = None
@@ -50,6 +50,11 @@ class CanvasCore:
         self.filtered_frame: None|MatLike = None
         self.is_webapp = webapp
         self.sid = sid
+
+
+        self.last_print_time = 0 # for debugging to keep the print rate reasonable
+        
+
         # This is initial state
         self.set_state(Startup())
         print("Core initialized")
@@ -160,7 +165,9 @@ class Idle(State):
     def update(self, tick: float, frame: MatLike):
         
              face_present, duration = self.core.face_detector.detect_face(frame)
-             print("Face present:", face_present, "Duration:", str(duration) + "seconds")
+             if tick - self.core.last_print_time >= 1:
+                 print("Face present:", face_present, "Duration:", str(duration) + "seconds")
+
              if (face_present and duration >= 2.0):
               self.core.set_state(Active())
 
@@ -188,22 +195,36 @@ class Active(State):
 
     def update(self, tick: float, frame: MatLike):
 
-        finger_count, wrist_position = self.core.hand_detector.count_fingers(frame)
-        self.update_filter_trigger(finger_count)
-        self.update_filter_carousel(finger_count, tick)
+       # finger_count, wrist_position = self.core.hand_detector.count_fingers(frame)
+       # self.update_filter_trigger(finger_count)
         
-        if wrist_position:
-            self.core.ui.set_wrist_position(wrist_position[0])
+        self.current_gesture, self.wrist_position, duration = self.core.gesture_detector.detect_gestures(frame)
 
+        if self.wrist_position:
+            self.core.ui.set_wrist_position(self.wrist_position)
+            # DEBUG print
+            print(f"Detected gesture: {self.current_gesture} with wrist at position: {self.wrist_position[0]}x {self.wrist_position[1]}y. Stable for {duration} seconds.")
+            self.core.last_print_time = tick
+
+        # checks if a face is present for X seconds and moves to idle state if not
         face_present, duration = self.core.face_detector.detect_face(frame)
-        print("Face present:", face_present, "Duration:", str(duration) + "seconds")
+
+        # DEBUG print
+        if tick - self.core.last_print_time >= 2:
+            print("Face present:", face_present, "Duration:", str(duration) + "seconds")
+            self.core.last_print_time = tick
+
         if (face_present == False and (duration > 5.0)):
             self.core.set_state(Idle())
+
+        self.update_filter_carousel(self.current_gesture, tick)
+        self.update_filter_trigger(self.current_gesture)
+
 
     def update_filter_carousel(self, finger_count: int, tick: float):
 
         #TODO Gesture detection for swiping
-        if finger_count == 2:
+        if self.current_gesture == "Victory":
             if self.change_filter_time - tick <= 0 and self.progress_counter <= 0:
                 self.change_filter_time = tick + 1.5
                 self.core.filters.next_filter()
@@ -211,13 +232,14 @@ class Active(State):
                 print('Current filter is' + self.core.filters.get_filter_name())
 
     def update_filter_trigger(self, finger_count: int):
-        if finger_count == 5:
+        if self.current_gesture == "Open_Palm":
             self.progress_counter += 0.05
         elif self.progress_counter > 0.0:
             self.progress_counter -= 0.1
         self.core.ui.set_prog(self.progress_counter)
         if self.progress_counter >= 1.0:
             self.core.set_state(Countdown())
+    
 
 class Countdown(State):
     def __init__(self):
