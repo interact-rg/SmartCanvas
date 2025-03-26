@@ -38,7 +38,7 @@ class CanvasCore:
         self.tick = time.time()
         self.filters = FilterCarousel()
         self.fg_masker = ForegroundMask()
-        self.hand_detector = HandDetect()
+      #  self.hand_detector = HandDetect()
         self.gesture_detector = GestureDetection()
         self.face_detector = FaceDetection()
         self.database = Database()
@@ -195,9 +195,7 @@ class Active(State):
 
     def update(self, tick: float, frame: MatLike):
 
-       # finger_count, wrist_position = self.core.hand_detector.count_fingers(frame)
-       # self.update_filter_trigger(finger_count)
-        
+       
         self.current_gesture, self.wrist_position, duration = self.core.gesture_detector.detect_gestures(frame)
 
         if self.wrist_position:
@@ -217,11 +215,11 @@ class Active(State):
         if (face_present == False and (duration > 5.0)):
             self.core.set_state(Idle())
 
-        self.update_filter_carousel(self.current_gesture, tick)
+        self.update_filter_carousel( tick)
         self.update_filter_trigger(self.current_gesture)
 
 
-    def update_filter_carousel(self, finger_count: int, tick: float):
+    def update_filter_carousel(self, tick: float):
 
         #TODO Gesture detection for swiping
         if self.current_gesture == "Victory":
@@ -231,7 +229,7 @@ class Active(State):
                 self.core.ui.set_filter(self.core.filters.get_filter_name())
                 print('Current filter is' + self.core.filters.get_filter_name())
 
-    def update_filter_trigger(self, finger_count: int):
+    def update_filter_trigger(self, open_palm: str):
         if self.current_gesture == "Open_Palm":
             self.progress_counter += 0.05
         elif self.progress_counter > 0.0:
@@ -296,15 +294,16 @@ class ShowPic(State):
 
     def __init__(self):
         self.name = "ShowPic"
-        self.show_image_time = 0.0
+        self.show_image_duration = 15
         self.progress_counter = 0.0
         self.change_filter_time = 0.0
-        self.finger_frame_interval = 0.0
+        self.current_gesture = "No gestures yet"
 
     def enter(self, tick: float):
         self.core.image_processing_active = False
+        self.show_image_end_time = time.time() + self.show_image_duration
+        print ("Entering ShowPic state...")  #debug
 
-        self.show_image_time = time.time() + 15
         # Frame does not change so update only once
         if self.core.filtered_frame is not None and self.core.image_id is not None:
             self.core.ui.show_image(self.core.filtered_frame)
@@ -313,20 +312,19 @@ class ShowPic(State):
 
 
     def update(self, tick: float, frame: MatLike):
-        if self.show_image_time - tick < 0:
+
+        if time.time() >=  tick + self.show_image_end_time:
             self.core.set_state(Active())
+            self.core.ui.hide("image")
+            return
+        
+        self.current_gesture, self.wrist_position, duration = self.core.gesture_detector.detect_gestures(frame)
+        self.update_filter_trigger(self.current_gesture)
+        self.core.ui.set_wrist_position(self.wrist_position)
+        self.core.ui.set_prog(self.progress_counter)
 
-        # Detect fingers 10 times in a second
-        # Using timer here because frame rate can differ
-        if self.finger_frame_interval - tick < 0:
-            finger_count, _ = self.core.hand_detector.count_fingers(frame)
-            self.finger_frame_interval = tick + 0.1
-            self.update_filter_trigger(finger_count)
-
-            self.core.ui.set_prog(self.progress_counter)
-
-    def update_filter_trigger(self, finger_count: int):
-        if finger_count == 5:
+    def update_filter_trigger(self, current_gesture: str):
+        if self.current_gesture == "Closed_Palm":
             self.progress_counter += 0.05
         elif self.progress_counter > 0.0:
             self.progress_counter -= 0.1
