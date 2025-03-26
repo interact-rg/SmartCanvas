@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import "./styles/style.css";
 import CameraFeed from "./components/CameraFeed";
 import SocketHandler from "./components/SocketHandler";
-//import useSocket from "./hooks/useSocket";
 import Instructions from "./components/Instructions";
 import ServerFeed from "./components/ServerFeed";
 import FilterFrames from "./components/FilterFrames";
@@ -34,10 +33,6 @@ const App: React.FC = () => {
     setOutboundFrame(frame);
   };
 
-  // const handleInboundFrame = (frame: string) => {
-  //   setInboundFrame(frame);
-  // };
-
   const handleQrCode = (qr: string) => {
     setQrCode(qr);
     clearTimeout(qrTimeout);
@@ -59,10 +54,6 @@ const App: React.FC = () => {
         onChosenFilter={setChosenFilter}
         onQrCode={handleQrCode}
       />
-      {/* <div className="header">
-                <h1>Smart Canvas</h1>
-                <img src="https://interact.oulu.fi/site/files/make4change/interact-logo.png" className="logo" />
-            </div> */}
 
       <div
         className={`${appState.ShowPic ? "server-feed-container" : "hidden"}`}>

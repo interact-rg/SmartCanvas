@@ -15,11 +15,8 @@ const FilterFrames: React.FC<FilterFramesProps> = ({
       ? availableFilters.map((filterName) => `/images/${filterName}.jpg`)
       : ["/images/anime style.jpg"];
 
-  console.log("Filters: ", availableFilters);
-  console.log(
-    "Chosen filter: " + chosenFilter + ", index: ",
-    availableFilters.indexOf(chosenFilter)
-  );
+  //console.log("Filters: ", availableFilters);
+  //console.log( "Chosen filter: " + chosenFilter + ", index: ", availableFilters.indexOf(chosenFilter));
 
   const [chosenFilterIndex, setChosenFilterIndex] = useState<number>(0); // Max value: filters.length
   const containerRef = useRef<HTMLDivElement>(null);

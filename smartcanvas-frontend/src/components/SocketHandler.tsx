@@ -99,7 +99,7 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
 
         // Compare the current frame with the previous frame to avoid duplicates
         if (currentFrame !== previousFrameRef.current) {
-          console.log('Sending frame to the server...');
+          //console.log('Sending frame to the server...');
           socket.emit('produce', currentFrame);
           previousFrameRef.current = currentFrame; // Update the previous frame
           setCanSendFrame(false); // Prevent sending until ack is received
