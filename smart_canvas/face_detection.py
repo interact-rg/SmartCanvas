@@ -23,7 +23,7 @@ class FaceDetection:
         self.stable_time = None
         self.unstable_start_time = None
 
-        self.last_timestamp = time.time() * 1000
+        self.timestamp = time.time() * 1000
 
 
     def detect_face(self, frame: MatLike) -> tuple[bool, float]:
@@ -34,12 +34,13 @@ class FaceDetection:
         #convert to mediapipe image
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
         
-        timestamp = int(time.time() * 1000)
-        if timestamp <= self.last_timestamp:
-            timestamp = self.last_timestamp + 1
-            self.last_timestamp = timestamp
+        #ensures new timestamp is always greater than the previous one
+        new_timestamp = int(time.time() * 1000)
+        if new_timestamp <= self.timestamp:
+            new_timestamp = self.timestamp + 1
+        self.timestamp = new_timestamp
 
-        detection_result = self.detector.detect_for_video(mp_image, timestamp)
+        detection_result = self.detector.detect_for_video(mp_image, self.timestamp)
 
         face_present = bool(detection_result and detection_result.detections)
         current_time = time.time()
