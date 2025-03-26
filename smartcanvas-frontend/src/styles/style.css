@@ -8,7 +8,7 @@
   display: none;
 }
 
- .logo {
+.logo {
   height: 10em;
   padding: 1.5em;
 }
@@ -28,7 +28,7 @@
 
 .camera-feed-container {
   position: relative;
-  width: 100vw; 
+  width: 100vw;
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -39,12 +39,12 @@
 .camera-feed-container canvas {
   width: 100vw;
   height: 100vh;
-  object-fit: cover
+  object-fit: cover;
 }
 
 .server-feed-container {
   position: relative;
-  width: 100vw; 
+  width: 100vw;
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -54,7 +54,7 @@
 .server-feed-container canvas {
   width: 100vw;
   height: 100vh;
-  object-fit: cover
+  object-fit: cover;
 }
 
 /* .instructions {
@@ -135,19 +135,10 @@
 }
 
 #progress-circle {
-  transition: top 0.5s, right 0.5s, --progress 0.5s, visible 0.5s;
   position: absolute;
   right: var(--right);
-  top: var(--top);
-  width: 250px;
-  height: 250px;
-  transform: translateY(-250px);
-  background: conic-gradient(
-    purple var(--progress),
-    rgba(255, 255, 255, 0.25) 0deg
-  );
+  top: var(--top) + 10;
   z-index: 1;
-  border-radius: 50%;
   opacity: var(--visible);
 }
 
@@ -202,4 +193,3 @@
     aspect-ratio: 16/9;
   }
 }
-
