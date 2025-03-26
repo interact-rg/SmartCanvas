@@ -12,7 +12,7 @@ interface SocketHandlerProps {
   onArtisticFrame: (frame: string) => void;
   onHandPosition: (position: [number, number]) => void;
   onProgress: (progress: number) => void;
-  onPainting: (hold: number) => void;
+  onPainting: (timer: number) => void;
   onFilters: (filters: string[]) => void;
   onChosenFilter: (filter: string) => void;
   onQrCode: (qrCode: string) => void;
@@ -35,22 +35,22 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
 
     // Update the UI state when the server sends a message
     const handleUpdateUIResponse = (msg: any) => {
-      console.log('Received update_ui_response: ', msg);
+      //console.log('Received update_ui_response: ', msg);
 
       // Counter to hold your hand still
       if (msg.hold_timer !== undefined) {
-        console.log('Hold timer: ', msg.hold_timer);
+        //console.log('Hold timer: ', msg.hold_timer);
         onProgress(msg.hold_timer);
         return;
       }
       // Counter to keep still when the image is "being painted"
       else if (msg.timer !== undefined) {
-        console.log('Timer: ', msg.timer);
+        //console.log('Timer: ', msg.timer);
         onPainting(msg.timer);
         return;
       }
       else if (msg.filter !== undefined) {
-        console.log('Filter: ', msg.filter);
+        //console.log('Filter: ', msg.filter);
         onChosenFilter(msg.filter);
 
       } else {
@@ -66,7 +66,7 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
 
     // Handle the processed artistic image from the server
     const handleArtisticFrame = (frame: string) => {
-      console.log('Received artistic frame from the server: ', frame);
+      //console.log('Received artistic frame from the server: ', frame);
       onArtisticFrame(frame);
     };
 

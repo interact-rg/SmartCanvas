@@ -21,7 +21,7 @@ const App: React.FC = () => {
   let qrTimeout: number|undefined = undefined;
 
   const handleStateChange = (state: any) => {
-    console.log("State change received in App: ", state);
+    //console.log("State change received in App: ", state);
     if (state.Countdown) {
       clearTimeout(qrTimeout);
       setQrCode(null);
@@ -41,6 +41,11 @@ const App: React.FC = () => {
     }, 60000);
   };
 
+  const handlePainting = (timer: number) => {
+    setPainting(timer);
+    //console.log("Painting timer: ", timer);
+  };
+
   return (
     <div id="mainContainer" className="container_fs">
       <SocketHandler
@@ -49,7 +54,7 @@ const App: React.FC = () => {
         onArtisticFrame={setInboundFrame}
         onHandPosition={setHandPosition}
         onProgress={setProgress}
-        onPainting={setPainting}
+        onPainting={handlePainting}
         onFilters={setFilters}
         onChosenFilter={setChosenFilter}
         onQrCode={handleQrCode}
@@ -69,7 +74,7 @@ const App: React.FC = () => {
           height={720}
           state={appState}
         />
-        <Instructions state={appState} />
+        <Instructions state={appState} countdown={painting} />
         <FilterFrames availableFilters={filters} chosenFilter={chosenFilter}/>
       </div>
 

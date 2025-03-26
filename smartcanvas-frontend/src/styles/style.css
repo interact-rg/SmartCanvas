@@ -1,8 +1,3 @@
-body {
-  overflow: hidden;
-}
-
-
 /* Component specific styligs */
 
 .visible {
@@ -62,10 +57,11 @@ body {
   object-fit: cover
 }
 
-.instructions {
+/* .instructions {
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); 
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -74,6 +70,57 @@ body {
   text-align: center;
   color: white;
   z-index: 10;
+} */
+
+.instructions {
+  display: grid;
+  grid-template-rows: 85vh 15vh; /* Divide into 2 rows */
+  width: 100vw;
+  height: 100vh;
+  position: absolute; /* Position it on top of the container */
+  top: 0;
+  left: 0;
+  pointer-events: none; /* Allow clicks to pass through */
+  color: white;
+  text-align: center;
+  z-index: 10;
+  background: transparent;
+}
+
+.full-container {
+  grid-row: 1 / span 2; /* Make it span both rows */
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent; /* Optional: Add a semi-transparent background */
+  pointer-events: auto; /* Enable interaction */
+}
+
+.top-row {
+  display: grid;
+  grid-template-columns: 33vw 33vw 33vw; /* Divide into 3 columns */
+  pointer-events: auto; /* Enable interaction for the columns */
+}
+
+.column {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bottom-row {
+  display: grid;
+  grid-column: 1 / span 3; /* Make it span all 3 columns */
+  grid-template-columns: 33vw 33vw 33vw; /* Divide into 3 columns */
+  pointer-events: auto; /* Enable interaction for the bottom row */
+}
+
+.big-text {
+  font-size: 4em;
+  font-weight: 500;
+  margin: 0.5em;
 }
 
 @property --progress {
