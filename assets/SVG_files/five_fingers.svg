@@ -9,7 +9,7 @@
    id="svg1"
    inkscape:version="1.4 (86a8ad7, 2024-10-11)"
    sodipodi:docname="five_fingers.svg"
-   inkscape:export-filename="..\five_fingers.png"
+   inkscape:export-filename="..\five_fingers.svg"
    inkscape:export-xdpi="300"
    inkscape:export-ydpi="300"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -26,9 +26,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="0.43295455"
-     inkscape:cx="255.2231"
-     inkscape:cy="554.33071"
+     inkscape:zoom="0.8659091"
+     inkscape:cx="381.10236"
+     inkscape:cy="593.59579"
      inkscape:window-width="1280"
      inkscape:window-height="730"
      inkscape:window-x="-6"
@@ -61,8 +61,8 @@
      id="layer1">
     <path
        id="path1"
-       style="fill:#ffde34;fill-opacity:1;stroke-width:0.333879"
-       d="M 65.05081 172.94448 A 40.486111 40.486111 0 0 0 105.26386 209.61098 A 40.486111 40.486111 0 0 0 145.47691 172.94448 L 65.05081 172.94448 z " />
+       style="fill:#ffde34;fill-opacity:1;stroke-width:0.334445"
+       d="m 65.05081,172.94448 a 40.623462,40.486111 0 0 0 40.34947,36.6665 40.623462,40.486111 0 0 0 40.34948,-36.6665 z" />
     <rect
        style="fill:#ffde34;fill-opacity:1;stroke-width:0.264583"
        id="rect1"
