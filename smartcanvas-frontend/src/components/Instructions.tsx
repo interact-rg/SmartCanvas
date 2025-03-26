@@ -3,7 +3,8 @@
  */
 import React, {useState, useEffect } from "react";
 import waving_hand from "../assets/five_fingers.png"
-import "./waving_hand.css"
+import "./hand.css"
+import swiping_hand from "../assets/swiping_hand.png"
 
 interface InstructionsProps {
   state: { [key: string]: any };
@@ -58,7 +59,9 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 0 }) => 
               <div>
                 <div className="top-row">
                   <div className="column" id="column-1"></div>
-                  <div className="column" id="column-2"></div>
+                  <div className="column" id="column-2">
+                    <img src={swiping_hand} id="two_fingers_icon" style={{maxWidth: '20%'}}  />
+                  </div>
                   <div className="column" id="column-3">hold palm up</div>
                 </div>
                 <div className="bottom-row">swipe filters</div>
