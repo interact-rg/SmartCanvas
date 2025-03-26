@@ -188,6 +188,11 @@ class Active(State):
 
     def update(self, tick: float, frame: MatLike):
 
+        finger_count = self.core.hand_detector.count_fingers(frame)[0]
+        self.update_filter_trigger(finger_count)
+        self.update_filter_carousel(finger_count, tick)
+
+
         face_present, duration = self.core.face_detector.detect_face(frame)
         print("Face present:", face_present, "Duration:", str(duration) + "seconds")
         if (face_present == False and (duration > 5.0)):
