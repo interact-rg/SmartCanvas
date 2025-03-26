@@ -124,6 +124,7 @@ class Startup(State):
 
     def enter(self, tick: float):
         self.ui = self.core.ui
+        self.core.ui.set_filter(self.core.filters.get_filter_name())
 
         # Creating database
         if os.path.exists(r"database.db"):
