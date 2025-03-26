@@ -1,9 +1,8 @@
+import time
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision, BaseOptions
 import mediapipe as mp
 import cv2
-from cv2.typing import MatLike
-# Types
 from cv2.typing import MatLike
 from typing import Protocol, Literal, Any
 
@@ -16,9 +15,12 @@ class GestureDetection:
         # Setup the new GestureRecognizer model
         self.options = vision.GestureRecognizerOptions(
             base_options=BaseOptions(model_asset_buffer=open("models/gesture_recognizer.task", "rb").read()),
-            running_mode=vision.RunningMode.IMAGE,  
+            running_mode=vision.RunningMode.VIDEO,  
             num_hands=1
          )
+        
+        self.last_timestamp = time.time() * 1000
+
         self.recognizer = vision.GestureRecognizer.create_from_options(self.options)
 
     def detect_gestures(self, frame: MatLike) -> tuple[str, tuple[float, float]]:
@@ -29,8 +31,13 @@ class GestureDetection:
         # 2) Create MediaPipe Image
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
 
+        timestamp = int(time.time() * 1000)
+        if timestamp <= self.last_timestamp:
+            timestamp = self.last_timestamp + 1
+            self.last_timestamp = timestamp
 
-        result = self.recognizer.recognize(mp_image)
+        result = self.recognizer.recognize_for_video(mp_image, timestamp)
+        
 
         if result.gestures:
             top_gesture = result.gestures[0][0].category_name
