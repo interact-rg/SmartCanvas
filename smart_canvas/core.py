@@ -146,7 +146,6 @@ class Startup(State):
 # This is one state of state machine. We move from state to state by setting different classes as core._state instance
 class Idle(State):
     
-    # Waiting or idle function for smartcanvas, waiting for commands from fingers. 
     # Next state is Active.
     # State holds its own variables and these are not persistent after a state change
     def __init__(self):
@@ -174,7 +173,6 @@ class Idle(State):
         
 class Active(State):
     """
-    State class for active on waiting for fingers.
     Next state is Filter. Handles filter change and starts filtering
     """
 
@@ -313,7 +311,9 @@ class ShowPic(State):
 
     def update(self, tick: float, frame: MatLike):
 
-        if time.time() >=  tick + self.show_image_end_time:
+        print("updating ShowPic state...")
+
+        if time.time() >= self.show_image_end_time:
             self.core.set_state(Active())
             self.core.ui.hide("image")
             return
@@ -328,6 +328,6 @@ class ShowPic(State):
             self.progress_counter += 0.05
         elif self.progress_counter > 0.0:
             self.progress_counter -= 0.1
-        if self.progress_counter >= 0.1:
+        if self.progress_counter >= 1.0:
             self.core.ui.hide("image")
             self.core.set_state(Active())
