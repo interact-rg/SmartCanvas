@@ -13,10 +13,10 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
     return null;
   }
 
-  const strokeDasharray = 565.48;
+  const strokeDasharray = 659.4;
   const strokeDashoffset = strokeDasharray * ((100 - progress * 100) / 100); // Formula for the progress on circle
-  const progressColor = `rgb(${140 + 120 * progress}, ${
-    255 - 90 * progress
+  const progressColor = `rgb(${235 - 90 * progress}, ${
+    155 + 125 * progress
   }, 0)`;
   return (
     <svg
@@ -36,7 +36,7 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
       id="progress-circle"
     >
       <circle
-        r="90"
+        r="105"
         cx="100"
         cy="100"
         fill="transparent"
@@ -44,7 +44,7 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
         strokeWidth="16px"
       ></circle>
       <circle
-        r="90"
+        r="105"
         cx="100"
         cy="100"
         stroke={progressColor}
@@ -52,7 +52,7 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
         strokeLinecap="round"
         strokeDashoffset={strokeDashoffset}
         fill="transparent"
-        strokeDasharray="565.48px"
+        strokeDasharray={strokeDasharray}
       ></circle>
     </svg>
   );
