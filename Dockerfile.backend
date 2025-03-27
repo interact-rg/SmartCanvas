@@ -34,8 +34,6 @@ ENV FLASK_ENV=development
 ENV FLASK_DEBUG=1
 ENV PYTHONUNBUFFERED=1
 
-# Expose the Flask port
-EXPOSE 5000
 
 # Start Flask server
 CMD ["poetry", "run", "flask", "run", "--host=0.0.0.0", "--debug"]

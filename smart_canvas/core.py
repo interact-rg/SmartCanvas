@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from queue import Queue
     from cv2.typing import MatLike
-    from .gesture_detection import H_Gesture
 
 # Default packages
 
@@ -18,7 +17,6 @@ import os
 
 # Internal packages
 from smart_canvas.background import ForegroundMask
-from smart_canvas.gesture_detection import HandDetect
 from smart_canvas.gesture_detection_using_model import GestureDetection
 from smart_canvas.filters.carousel import FilterCarousel
 from smart_canvas.ui import UI
@@ -45,7 +43,6 @@ class CanvasCore:
         self.image_id: None|int = None
         self.ui = UI(sid, is_webapp=webapp)
         self.win_size = screensize
-        self.gdpr_accepted = True
         self.image_processing_active = False
         self.filtered_frame: None|MatLike = None
         self.is_webapp = webapp
