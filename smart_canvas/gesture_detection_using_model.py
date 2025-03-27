@@ -28,7 +28,12 @@ class GestureDetection:
 
     def detect_gestures(self, frame: MatLike) -> GestureResult:
         # Convert BGR to RGB
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        try:
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        except Exception as e:
+            print("Error during frame preparation")
+            return "No hands detected", [0.0, 0.0], 0.0
 
         # Create MediaPipe Image
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)

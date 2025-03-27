@@ -29,7 +29,11 @@ class FaceDetection:
     def detect_face(self, frame: MatLike) -> tuple[bool, float]:
         
         # Convert BGR to RGB
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        try:
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        except Exception as e:
+            print("Error during frame preparation")
+            return "No hands detected", [0.0, 0.0], 0.0
 
         #convert to mediapipe image
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)

@@ -1,28 +1,63 @@
-import numpy as np
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense
-from sklearn.model_selection import train_test_split
-from tensorflow.keras.utils import to_categorical
+import os
+import tensorflow as tf
+assert tf.__version__.startswith('2')
 
-data = np.load("gesture_landmarks_dataset.npz")['data']
-labels = np.load("gesture_landmarks_dataset.npz")['labels']
+# Check for GPU availability
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+    print("GPU is available:", gpus)
+else:
+    print("GPU is not available. Running on CPU.")
 
-X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, random_state=42)
+from mediapipe_model_maker import gesture_recognizer
+import matplotlib.pyplot as plt
 
-y_train_cat = to_categorical(y_train)
-y_test_cat = to_categorical(y_test)
+# Define the local dataset directory (this should be mounted into the container)
+DATASET_DIR = "dataset"
+if not os.path.exists(DATASET_DIR):
+    raise ValueError(f"Dataset directory '{DATASET_DIR}' does not exist. Please mount your dataset.")
 
-model = Sequential([
-    LSTM(64, input_shape=(X_train.shape[1], X_train.shape[2]), return_sequences=False),
-    Dense(32, activation='relu'),
-    Dense(2, activation='softmax')
-])
+# Optionally, list the labels (assumes subdirectories per label)
+labels = [d for d in os.listdir(DATASET_DIR) if os.path.isdir(os.path.join(DATASET_DIR, d))]
+print("Found labels:", labels)
 
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+# Load the dataset using the hand data preprocessing parameters
+print("Loading dataset...")
+data = gesture_recognizer.Dataset.from_folder(
+    dirname=DATASET_DIR,
+    hparams=gesture_recognizer.HandDataPreprocessingParams()
+)
+print("Dataset loaded successfully.")
 
-model.fit(X_train, y_train_cat, epochs=20, batch_size=8, validation_split=0.2)
+# Split the dataset: 80% train, 10% validation, 10% test.
+train_data, rest_data = data.split(0.8)
+validation_data, test_data = rest_data.split(0.5)
+print("Dataset split into training, validation, and test sets.")
 
-loss, acc = model.evaluate(X_test, y_test_cat)
-print(f"Accuracy: {acc:.4f}")
+# Set training hyperparameters (adjust batch_size, epochs, etc. as needed)
+hparams = gesture_recognizer.HParams(
+    export_dir="exported_model",  # This directory is mounted to your host to persist the model
+    batch_size=4,
+    epochs=5
+)
+options = gesture_recognizer.GestureRecognizerOptions(hparams=hparams)
 
-model.save("gesture_landmark_model.h5")
+# Train the gesture recognizer model
+print("Starting model training...")
+model = gesture_recognizer.GestureRecognizer.create(
+    train_data=train_data,
+    validation_data=validation_data,
+    options=options
+)
+print("Model training complete.")
+
+# Evaluate the trained model on the test set
+print("Evaluating model...")
+loss, accuracy = model.evaluate(test_data, batch_size=1)
+print(f"Test Loss: {loss}, Test Accuracy: {accuracy}")
+
+# Export the model to TFLite format (includes model metadata)
+print("Exporting model...")
+model.export_model()
+print("Model exported successfully. Exported files:")
+print(os.listdir("exported_model"))
