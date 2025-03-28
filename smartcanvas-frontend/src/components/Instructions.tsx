@@ -14,6 +14,7 @@ interface InstructionsProps {
 const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 0 }) => {
   const [randomColumn, setRandomColumn] = useState<number>(1); // Random column (1, 2, or 3)
   const [isVisible, setIsVisible] = useState<boolean>(true); // Toggle visibility
+  const [swipeIsVisible, setSwipeVisible] = useState<boolean>(true); //instructions (swiping_hand) should be invisible for n seconds after filter is changed (user has learned how to switch filters, so instructions don't need to be visible)
 
   // Function to generate a random column ID (1, 2, or 3)
   const getRandomColumn = () => Math.floor(Math.random() * 3) + 1;
@@ -29,6 +30,10 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 0 }) => 
 
     return () => clearInterval(interval); // Cleanup interval on unmount
   }, [isVisible]);
+
+  useEffect (() => {
+    
+  }, [])
   
   const renderInstructions = () => {
     for (const [key, value] of Object.entries(state)) {
@@ -60,7 +65,7 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 0 }) => 
                 <div className="top-row">
                   <div className="column" id="column-1"></div>
                   <div className="column" id="column-2">
-                    <img src={swiping_hand} id="two_fingers_icon" style={{maxWidth: '20%'}}  />
+                    {swipeIsVisible && <img src={swiping_hand} id="two_fingers_icon" style={{maxWidth: '20%'}}  />}
                   </div>
                   <div className="column" id="column-3">hold palm up</div>
                 </div>
@@ -93,6 +98,17 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 0 }) => 
       return Math.ceil(countdown);
     }
   };
+
+  const hideSwipingHand = () => {
+    setSwipeVisible((prev) => !prev);
+    console.log("swiping_hand set invisible (should be false): " + swipeIsVisible)
+    setTimeout( function () {
+      console.log("swiping_hand set invisible (should be false): " + swipeIsVisible)
+      setSwipeVisible((prev) => !prev);
+      console.log("Swiping hand visible (should be true): " + swipeIsVisible)
+    }, 5000);
+    
+  }
 
   return (
     <div className="instructions">
