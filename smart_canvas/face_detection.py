@@ -32,8 +32,11 @@ class FaceDetection:
         try:
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         except Exception as e:
-            print("Error during frame preparation")
-            return False, 0.0
+            print("Error during frame preparation (face detection)")
+            self.stable_start_time = None
+            self.unstable_start_time = current_time
+            unstable_for = current_time - self.unstable_start_time
+            return False, unstable_for 
 
         #convert to mediapipe image
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)

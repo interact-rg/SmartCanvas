@@ -32,7 +32,7 @@ class GestureDetection:
         try:
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         except Exception as e:
-            print("Error during frame preparation")
+            print("Error during frame preparation (gesture detection)")
             return "No hands detected", [0.0, 0.0], 0.0
 
         # Create MediaPipe Image
