@@ -135,11 +135,25 @@
 }
 
 #progress-circle {
+  transition: 
+    right 0.5s cubic-bezier(.47,1.64,.41,.8),
+    top 0.5s cubic-bezier(.47,1.64,.41,.8),
+    opacity 0.1s ease;
   position: absolute;
-  right: var(--right);
-  top: var(--top) + 10;
+  right: calc(var(--right) - 100px);
+  top: calc(var(--top) - 20%);
   z-index: 1;
   opacity: var(--visible);
+
+  #progress-circle-bar {
+    stroke-dashoffset: var(--strokeDashoffset);
+    stroke-dasharray: var(--strokeDasharray);
+    stroke: var(--progressColor);
+    transition: all 0.5s linear;
+    stroke-width: 16px;
+    stroke-linecap: round;
+    fill: transparent;
+  }
 }
 
 @property --qr-timeout {

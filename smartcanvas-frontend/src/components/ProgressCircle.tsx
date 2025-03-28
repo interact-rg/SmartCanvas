@@ -7,7 +7,7 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
   progress,
   position,
 }) => {
-  const visible = progress > 0 && progress < 1 ? 1 : 0;
+  const visible = progress > 0 ? 1 : 0;
   //TODO: Make the bar stick around for a bit when no position or progress?
   if (position[0] === 0 && position[1] === 0) {
     return null;
@@ -44,15 +44,15 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
         strokeWidth="16px"
       ></circle>
       <circle
+        id="progress-circle-bar"
         r="105"
         cx="100"
         cy="100"
-        stroke={progressColor}
-        strokeWidth="16px"
-        strokeLinecap="round"
-        strokeDashoffset={strokeDashoffset}
-        fill="transparent"
-        strokeDasharray={strokeDasharray}
+        style={{
+          "--strokeDashoffset": strokeDashoffset,
+          "--strokeDasharray": strokeDasharray,
+          "--progressColor": progressColor,
+        } as React.CSSProperties}
       ></circle>
     </svg>
   );
