@@ -1,63 +1,61 @@
 import os
+import datetime
+import glob
 import tensorflow as tf
-assert tf.__version__.startswith('2')
+from PIL import Image
 
-# Check for GPU availability
-gpus = tf.config.list_physical_devices('GPU')
-if gpus:
-    print("GPU is available:", gpus)
-else:
-    print("GPU is not available. Running on CPU.")
 
 from mediapipe_model_maker import gesture_recognizer
-import matplotlib.pyplot as plt
 
-# Define the local dataset directory (this should be mounted into the container)
-DATASET_DIR = "dataset"
-if not os.path.exists(DATASET_DIR):
-    raise ValueError(f"Dataset directory '{DATASET_DIR}' does not exist. Please mount your dataset.")
+print("code is running..")
+# Check for GPU
+if tf.config.list_physical_devices('GPU'):
+    print("GPU detected.")
+else:
+    print("No GPU detected. Training on CPU.")
 
-# Optionally, list the labels (assumes subdirectories per label)
-labels = [d for d in os.listdir(DATASET_DIR) if os.path.isdir(os.path.join(DATASET_DIR, d))]
-print("Found labels:", labels)
+dataset_path = "/app/dataset"
 
-# Load the dataset using the hand data preprocessing parameters
-print("Loading dataset...")
+print(dataset_path)
+labels = []
+for i in os.listdir(dataset_path):
+  if os.path.isdir(os.path.join(dataset_path, i)):
+    labels.append(i)
+print(labels)
+
+# Load the dataset from the folder
 data = gesture_recognizer.Dataset.from_folder(
-    dirname=DATASET_DIR,
+    dirname=dataset_path,
     hparams=gesture_recognizer.HandDataPreprocessingParams()
 )
-print("Dataset loaded successfully.")
 
-# Split the dataset: 80% train, 10% validation, 10% test.
+# Split the dataset: 80% for training, 10% for validation, and 10% for testing.
 train_data, rest_data = data.split(0.8)
 validation_data, test_data = rest_data.split(0.5)
-print("Dataset split into training, validation, and test sets.")
 
-# Set training hyperparameters (adjust batch_size, epochs, etc. as needed)
-hparams = gesture_recognizer.HParams(
-    export_dir="exported_model",  # This directory is mounted to your host to persist the model
-    batch_size=4,
-    epochs=5
-)
+# Create a timestamp-based subfolder inside the mapped /app/exported_model directory.
+timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+export_subfolder = f"model_{timestamp}"  # e.g. "model_2025-03-29_14-12-05"
+export_dir = os.path.join("/app/exported_model", export_subfolder)
+os.makedirs(export_dir, exist_ok=True)
+
+# Create a model with the default hyperparameters
+hparams = gesture_recognizer.HParams(export_dir=export_dir)
 options = gesture_recognizer.GestureRecognizerOptions(hparams=hparams)
-
-# Train the gesture recognizer model
-print("Starting model training...")
 model = gesture_recognizer.GestureRecognizer.create(
     train_data=train_data,
     validation_data=validation_data,
     options=options
 )
-print("Model training complete.")
 
-# Evaluate the trained model on the test set
-print("Evaluating model...")
-loss, accuracy = model.evaluate(test_data, batch_size=1)
-print(f"Test Loss: {loss}, Test Accuracy: {accuracy}")
 
-# Export the model to TFLite format (includes model metadata)
-print("Exporting model...")
+
+print(f"Exporting model to: {export_dir}")
 model.export_model()
-print("Model exported successfully. Exported files:")
-print(os.listdir("exported_model"))
+print(f"Export finished. Check {export_dir} inside the container or './exported_model/{export_subfolder}' on your host.")
+
+
+
+loss, acc = model.evaluate(test_data, batch_size=1)
+print(f"Test loss:{loss}, Test accuracy:{acc}")
+

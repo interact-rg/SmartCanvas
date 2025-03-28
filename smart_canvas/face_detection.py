@@ -27,7 +27,8 @@ class FaceDetection:
 
 
     def detect_face(self, frame: MatLike) -> tuple[bool, float]:
-        
+
+        current_time = time.time()
         # Convert BGR to RGB
         try:
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -50,7 +51,6 @@ class FaceDetection:
         detection_result = self.detector.detect_for_video(mp_image, self.timestamp)
 
         face_present = bool(detection_result and detection_result.detections)
-        current_time = time.time()
 
         if face_present:
             # If this is the first frame in which a face appears, start stable timer

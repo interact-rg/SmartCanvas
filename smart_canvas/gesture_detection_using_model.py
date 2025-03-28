@@ -23,6 +23,7 @@ class GestureDetection:
         # Initialize stable duration, i.e. the time for which a gesture has been stable
         self.stable_start_time = None
         self.previous_gesture = "Unrecognized gesture"
+        self.previous_fingertip_x = None
 
     GestureResult = Tuple[str, Tuple[float, float], float]
 
@@ -48,7 +49,6 @@ class GestureDetection:
 
         if result.gestures:
             
-
             top_gesture = result.gestures[0][0].category_name
             wrist_location = (result.hand_landmarks[0][0].x, result.hand_landmarks[0][0].y)
 
@@ -65,3 +65,20 @@ class GestureDetection:
             return top_gesture, wrist_location, 0.0
         else:
             return "No hands detected", [0.0, 0.0], 0.0
+        
+    def finger_swipe(self, gesture: str, middle_finger_tip_x) -> None:
+
+        if gesture == "Finger_Swipe":
+         if self.previous_x is not None:
+
+            movement_threshold = 0.1 # Modify this to change the sensitivity of the detection
+            
+            if middle_finger_tip_x - self.previous_x > movement_threshold:
+                print("Swiping right...")
+                return "Swipe_Right"
+            elif self.previous_x - middle_finger_tip_x > movement_threshold:
+                return "Swipe_Left"
+            else:
+                return "No_Swipe"
+
+        self.previous_x = middle_finger_tip_x
