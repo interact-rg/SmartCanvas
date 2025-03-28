@@ -231,6 +231,7 @@ class Active(State):
             self.progress_counter -= 0.1
         self.core.ui.set_prog(self.progress_counter)
         if self.progress_counter >= 1.0:
+            self.core.ui.set_prog(0.0)
             self.core.set_state(Countdown())
     
 
