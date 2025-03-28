@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  gesture-training:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # If you want the code from the image, remove the next line:
+    # - ./:/app
+    volumes:
+      - ./dataset:/app/dataset
+      - ./exported_model:/app/exported_model
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

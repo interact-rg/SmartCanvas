@@ -181,6 +181,7 @@ class Active(State):
         self.last_update_time = 0.0  # debug: simplifying the confirmation progress logic to be based on elapsed time instead of "the time when it's allowed to do an update"
         self.current_gesture = "No gestures yet"
         self.wrist_position = [0,0]
+        self.previous_gesture = None
 
     # Runs once on init
     def enter(self, tick: float):
@@ -190,37 +191,38 @@ class Active(State):
 
     def update(self, tick: float, frame: MatLike):
 
-       
         self.current_gesture, self.wrist_position, duration = self.core.gesture_detector.detect_gestures(frame)
 
         if self.wrist_position:
             self.core.ui.set_wrist_position(self.wrist_position)
-            # DEBUG print
-            print(f"Detected gesture: {self.current_gesture} with wrist at position: {self.wrist_position[0]}x {self.wrist_position[1]}y. Stable for {duration} seconds.")
-            self.core.last_print_time = tick
+        if self.current_gesture != self.previous_gesture:
+            self.previous_gesture = self.current_gesture
+            print("Current gesture:", self.current_gesture, "Wrist position:", self.wrist_position, "Duration:", str(duration) + "seconds")
 
         # checks if a face is present for X seconds and moves to idle state if not
         face_present, duration = self.core.face_detector.detect_face(frame)
-
-        # DEBUG print
-        if tick - self.core.last_print_time >= 2:
-            print("Face present:", face_present, "Duration:", str(duration) + "seconds")
-            self.core.last_print_time = tick
-
         if (face_present == False and (duration > 5.0)):
+            print("Face present:", face_present, "Duration:", str(duration) + "seconds")
             self.core.set_state(Idle())
-
-        self.update_filter_carousel( tick)
+        if (self.current_gesture == "Finger_Swipe"):
+            self.update_filter_carousel( tick)
         self.update_filter_trigger(self.current_gesture)
 
 
     def update_filter_carousel(self, tick: float):
+        swipe_direction = self.core.gesture_detector.finger_swipe()
+
 
         #TODO Gesture detection for swiping
-        if self.current_gesture == "Victory":
-            if self.change_filter_time - tick <= 0 and self.progress_counter <= 0:
-                self.change_filter_time = tick + 1.5
+        if (swipe_direction == "Swipe_Right"):
+
                 self.core.filters.next_filter()
+                self.core.ui.set_filter(self.core.filters.get_filter_name())
+                print('Current filter is' + self.core.filters.get_filter_name())
+
+        elif (swipe_direction == "Swipe_Left"):
+
+                self.core.filters.previous_filter()
                 self.core.ui.set_filter(self.core.filters.get_filter_name())
                 print('Current filter is' + self.core.filters.get_filter_name())
 

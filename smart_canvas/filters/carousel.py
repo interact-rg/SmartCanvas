@@ -1,7 +1,8 @@
+from collections import deque
 """ __init__.py """
 
 # Default packages
-import itertools
+# import itertools
 
 # Internal modules
 from smart_canvas.filters.painterly import painterly_filter
@@ -31,13 +32,22 @@ class FilterCarousel:
         'pointillism': pointillism,
         'testfilter': testfilter
     }
-    carousel = itertools.cycle(catalog)
-
+    # carousel = itertools.cycle(catalog)
+    carousel: deque[str] = deque(catalog.keys())
     def __init__(self, **kwargs):
-        self.next_filter()
-
+        self.current_name = self.carousel[0]
+        self.current_filter = self.catalog[self.current_name]
+        
     def next_filter(self):
-        self.current_name = next(self.carousel)
+        # Rotate left by 1 (moves first item to end)
+        self.carousel.rotate(-1)
+        self.current_name = self.carousel[0]
+        self.current_filter = self.catalog[self.current_name]
+
+    def previous_filter(self):
+        # Rotate right by 1 (moves last item to front)
+        self.carousel.rotate(1)
+        self.current_name = self.carousel[0]
         self.current_filter = self.catalog[self.current_name]
 
     def get_filter_name(self):
