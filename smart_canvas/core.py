@@ -314,8 +314,11 @@ class ShowPic(State):
         print("updating ShowPic state...")
 
         if time.time() >= self.show_image_end_time:
-            self.core.set_state(Active())
             self.core.ui.hide("image")
+            self.core.ui.hide("qr")     
+            self.core.filtered_frame = None
+            self.core.image_id = None
+            self.core.set_state(Active())
             return
         
         self.current_gesture, self.wrist_position, duration = self.core.gesture_detector.detect_gestures(frame)
@@ -329,5 +332,8 @@ class ShowPic(State):
         elif self.progress_counter > 0.0:
             self.progress_counter -= 0.1
         if self.progress_counter >= 1.0:
+            self.core.filtered_frame = None
+            self.core.image_id = None
+            self.progress_counter = 0.0
             self.core.ui.hide("image")
             self.core.set_state(Active())
