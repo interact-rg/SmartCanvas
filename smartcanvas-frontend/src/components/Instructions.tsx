@@ -11,7 +11,7 @@ interface InstructionsProps {
   countdown: number;
 }
 
-const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 0 }) => {
+const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4 }) => {
   const [randomColumn, setRandomColumn] = useState<number>(1); // Random column (1, 2, or 3)
   const [isVisible, setIsVisible] = useState<boolean>(true); // Toggle visibility
   const [swipeIsVisible, setSwipeVisible] = useState<boolean>(true); //instructions (swiping_hand) should be invisible for n seconds after filter is changed (user has learned how to switch filters, so instructions don't need to be visible)
@@ -61,15 +61,13 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 0 }) => 
             );
           case "Active":
             return (
-              <div>
+              <div className="instructions">
                 <div className="top-row">
                   <div className="column" id="column-1"></div>
-                  <div className="column" id="column-2">
-                    {swipeIsVisible && <img src={swiping_hand} id="two_fingers_icon" style={{maxWidth: '20%'}}  />}
-                  </div>
+                  <div className="column" id="column-2">{swipeIsVisible && <img src={swiping_hand} id="two_fingers_icon" style={{maxWidth: '20%'}}  />}</div>
                   <div className="column" id="column-3">hold palm up</div>
                 </div>
-                <div className="bottom-row">swipe filters</div>
+                <div className="bottom-row"></div>
               </div>
             );
           case "Countdown":

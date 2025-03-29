@@ -6,9 +6,10 @@ import React, { useEffect, useRef } from 'react';
 
 interface ServerFeedProps {
   artisticFrame: string | null;
+  visible: boolean;
 }
 
-const ServerFeed: React.FC<ServerFeedProps> = ({ artisticFrame }) => {
+const ServerFeed: React.FC<ServerFeedProps> = ({ artisticFrame, visible = false }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -25,7 +26,31 @@ const ServerFeed: React.FC<ServerFeedProps> = ({ artisticFrame }) => {
     };
 
     image.src = `data:image/jpeg;base64,${artisticFrame}`;
+
+    // Cleanup function to clear the canvas on unmount
+    return () => {
+      if (context) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    };
+
   }, [artisticFrame]);
+
+  useEffect(() => {
+    if (visible === false) {
+      const canvas = canvasRef.current;
+      if (!canvas) {
+        return;
+      }
+      const context = canvas.getContext('2d');
+      
+      // Clear canvas when not visible
+      if (context) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+  }, [visible]);
+
 
   return (
     <div className="server-feed">

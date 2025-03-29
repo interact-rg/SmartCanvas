@@ -18,6 +18,7 @@ const App: React.FC = () => {
   const [painting, setPainting] = useState<number>(0);
   const [filters, setFilters] = useState<string[]>([]);
   const [chosenFilter, setChosenFilter] = useState<string>("");
+  const [serverFeedVisible, setServerFeedVisible] = useState<boolean>(false);
   let qrTimeout: number|undefined = undefined;
 
   const handleStateChange = (state: any) => {
@@ -25,7 +26,14 @@ const App: React.FC = () => {
     if (state.Countdown) {
       clearTimeout(qrTimeout);
       setQrCode(null);
+      setInboundFrame("");
     }
+    if (state.ShowPic) {
+      setServerFeedVisible(true);
+    } else {
+      setServerFeedVisible(false);
+    }
+
     setAppState(state);
   };
 
@@ -38,6 +46,7 @@ const App: React.FC = () => {
     clearTimeout(qrTimeout);
     qrTimeout = setTimeout(() => {
       setQrCode(null);
+      setInboundFrame("");
     }, 60000);
   };
 
@@ -61,8 +70,8 @@ const App: React.FC = () => {
       />
 
       <div
-        className={`${appState.ShowPic ? "server-feed-container" : "hidden"}`}>
-        <ServerFeed artisticFrame={inboundFrame} />
+        className={`${serverFeedVisible ? "server-feed-container" : "hidden"}`}>
+        <ServerFeed artisticFrame={inboundFrame} visible={serverFeedVisible} />
       </div>
 
       <div

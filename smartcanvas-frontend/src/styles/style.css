@@ -111,10 +111,10 @@
 }
 
 .bottom-row {
-  display: grid;
-  grid-column: 1 / span 3; /* Make it span all 3 columns */
-  grid-template-columns: 33vw 33vw 33vw; /* Divide into 3 columns */
-  pointer-events: auto; /* Enable interaction for the bottom row */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent; /* Optional: Add a semi-transparent background */
 }
 
 .big-text {
