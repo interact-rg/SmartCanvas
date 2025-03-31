@@ -49,7 +49,7 @@ class CanvasCore:
         self.sid = sid
 
 
-        self.last_print_time = 0 # for debugging to keep the print rate reasonable
+        self.last_print_time = 0.0 # for debugging to keep the print rate reasonable
         
 
         # This is initial state
@@ -249,16 +249,16 @@ class Countdown(State):
             pass
         else:
             self.core.ui.hide("countdown")
-            self.core.set_state(Filter())
+            self.core.set_state(Painting())
 
-class Filter(State):
+class Painting(State):
     """
     State class for applying filter to image. First show countdown and after that apply filter.
     Next state is ShowPic
     """
 
     def __init__(self):
-        self.name = "Filter"
+        self.name = "Painting"
 
     def enter(self, tick: float):
         self.core.image_processing_active = True
