@@ -10,11 +10,10 @@ class GestureDetection:
     def __init__(self):
         # Setup the new GestureRecognizer model
         self.options = vision.GestureRecognizerOptions(
-        base_options=BaseOptions(model_asset_buffer=open("models/gesture_recognizer.task", "rb").read()),
-        running_mode=vision.RunningMode.VIDEO,
-        num_hands=1,
+            base_options=BaseOptions(model_asset_buffer=open("models/gesture_recognizer.task", "rb").read()),
+            running_mode=vision.RunningMode.VIDEO,
+            num_hands=1,
         )
-
 
         self.recognizer = vision.GestureRecognizer.create_from_options(self.options)
 
@@ -24,6 +23,8 @@ class GestureDetection:
         self.stable_start_time = None
         self.previous_gesture = "Unrecognized gesture"
         self.previous_fingertip_x = None
+        self.swipe_timer = None
+        self.current_fingertip_x = None
 
     GestureResult = Tuple[str, Tuple[float, float], float]
 
@@ -48,9 +49,9 @@ class GestureDetection:
         result = self.recognizer.recognize_for_video(mp_image, self.timestamp)
 
         if result.gestures:
-            
             top_gesture = result.gestures[0][0].category_name
             wrist_location = (result.hand_landmarks[0][0].x, result.hand_landmarks[0][0].y)
+            self.current_fingertip_x = result.hand_landmarks[0][8].x
 
             if self.stable_start_time is None:
                 self.stable_start_time = time.time()
@@ -65,20 +66,25 @@ class GestureDetection:
             return top_gesture, wrist_location, 0.0
         else:
             return "No hands detected", [0.0, 0.0], 0.0
-        
-    def finger_swipe(self, gesture: str, middle_finger_tip_x) -> None:
 
-        if gesture == "Finger_Swipe":
-         if self.previous_x is not None:
+    def finger_swipe(self):
+        movement_threshold = 0.05  # Modify this to change the sensitivity of the detection
 
-            movement_threshold = 0.1 # Modify this to change the sensitivity of the detection
-            
-            if middle_finger_tip_x - self.previous_x > movement_threshold:
-                print("Swiping right...")
-                return "Swipe_Right"
-            elif self.previous_x - middle_finger_tip_x > movement_threshold:
-                return "Swipe_Left"
-            else:
-                return "No_Swipe"
+        swipe = None
+        if self.swipe_timer is None:
+            self.swipe_timer = time.time()
+        if  (time.time() - self.swipe_timer > 1.5):
+            if self.previous_fingertip_x is not None:
 
-        self.previous_x = middle_finger_tip_x
+                if self.previous_fingertip_x - self.current_fingertip_x > movement_threshold:
+                    print("Swiping right...")
+                    swipe = "Swipe_Right"
+                    self.swipe_timer = None
+
+                elif self.current_fingertip_x - self.previous_fingertip_x > movement_threshold:
+                    print("Swiping left...")
+                    swipe = "Swipe_Left"
+                    self.swipe_timer = None
+
+        self.previous_fingertip_x = self.current_fingertip_x
+        return swipe

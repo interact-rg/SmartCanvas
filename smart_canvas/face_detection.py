@@ -27,8 +27,8 @@ class FaceDetection:
 
 
     def detect_face(self, frame: MatLike) -> tuple[bool, float]:
-
         current_time = time.time()
+
         # Convert BGR to RGB
         try:
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
