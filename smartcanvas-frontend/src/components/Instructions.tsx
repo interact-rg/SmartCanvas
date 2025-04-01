@@ -5,6 +5,7 @@ import React, {useState, useEffect } from "react";
 import waving_hand from "../assets/five_fingers.png"
 import "./hand.css"
 import swiping_hand from "../assets/swiping_hand.png"
+import ImagePainter from "./ImagePainter";
 
 interface InstructionsProps {
   state: { [key: string]: any };
@@ -79,7 +80,8 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4 }) => 
           case "Painting":
             return (
               <div className="full-container">
-                show an animation of an artist or paintbrush?
+                {/* <img src="/images/canvas.jpg"></img> */}
+                <ImagePainter filter={state.filter || "/images/testfilter.jpg"} />
               </div>
             );
           default:
