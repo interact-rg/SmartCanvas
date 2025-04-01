@@ -80,7 +80,7 @@ def create_app(test_config: dict[str, Any]|None = None):
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    socketio.init_app(app)
+    socketio.init_app(app, max_http_buffer_size=4000000)
     app.config["socketio"] = socketio
 
     return app
