@@ -37,7 +37,7 @@ const ImagePainter: React.FC<ImagePainterProps> = ({ filter }) => {
       const yOffset = row * spacing + spacing * 0.5;
       const y = Math.sin(t / 10) * spacing * 0.4 + yOffset;
 
-      if (row === 2) {
+      if (row == 2) {
         cancelAnimationFrame(animationFrame);
         return;
       }
