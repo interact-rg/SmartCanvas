@@ -80,7 +80,7 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4 }) => 
           case "Painting":
             return (
               <div className="full-container">
-                {/* <img src="/images/canvas.jpg"></img> */}
+                <img src="/images/canvas.jpg"></img>
                 <ImagePainter filter={state.filter || "/images/testfilter.jpg"} />
               </div>
             );
