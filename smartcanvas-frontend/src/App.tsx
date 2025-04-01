@@ -75,7 +75,7 @@ const App: React.FC = () => {
       </div>
 
       <div
-        className={`${appState.ShowPic ? "hidden" : "camera-feed-container"}`}>
+        className={`${serverFeedVisible ? "hidden" : "camera-feed-container"}`}>
         <ProgressCircle position={handPosition} progress={progress} />
         <CameraFeed
           onFrameCapture={handleOutboundFrame}

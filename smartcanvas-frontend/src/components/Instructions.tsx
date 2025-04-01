@@ -76,7 +76,7 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4 }) => 
                   <div className="big-text">{renderCountdown()}</div>
               </div>
             );
-          case "Filter":
+          case "Painting":
             return (
               <div className="full-container">
                 show an animation of an artist or paintbrush?
