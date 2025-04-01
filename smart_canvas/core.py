@@ -49,7 +49,7 @@ class CanvasCore:
         self.sid = sid
 
 
-        self.last_print_time = 0 # for debugging to keep the print rate reasonable
+        self.last_print_time = 0.0 # for debugging to keep the print rate reasonable
         
 
         # This is initial state
@@ -251,16 +251,16 @@ class Countdown(State):
             pass
         else:
             self.core.ui.hide("countdown")
-            self.core.set_state(Filter())
+            self.core.set_state(Painting())
 
-class Filter(State):
+class Painting(State):
     """
     State class for applying filter to image. First show countdown and after that apply filter.
     Next state is ShowPic
     """
 
     def __init__(self):
-        self.name = "Filter"
+        self.name = "Painting"
 
     def enter(self, tick: float):
         self.core.image_processing_active = True
@@ -314,8 +314,11 @@ class ShowPic(State):
         print("updating ShowPic state...")
 
         if time.time() >= self.show_image_end_time:
-            self.core.set_state(Active())
             self.core.ui.hide("image")
+            self.core.ui.hide("qr")     
+            self.core.filtered_frame = None
+            self.core.image_id = None
+            self.core.set_state(Active())
             return
         
         self.current_gesture, self.wrist_position, duration = self.core.gesture_detector.detect_gestures(frame)
@@ -329,5 +332,8 @@ class ShowPic(State):
         elif self.progress_counter > 0.0:
             self.progress_counter -= 0.1
         if self.progress_counter >= 1.0:
+            self.core.filtered_frame = None
+            self.core.image_id = None
+            self.progress_counter = 0.0
             self.core.ui.hide("image")
             self.core.set_state(Active())

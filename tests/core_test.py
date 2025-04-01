@@ -2,7 +2,7 @@
 
 from time import sleep
 import pytest
-from smart_canvas.core import CanvasCore, Filter, Idle, ShowPic, Startup, GPDR_consent, Active
+from smart_canvas.core import CanvasCore, Painting, Idle, ShowPic, Startup, GPDR_consent, Active
 from queue import Queue
 import cv2
 import time
@@ -49,10 +49,10 @@ class TestCoreState:
         assert type(core._state) is type(Active())
         queue.put(five_fingers)
         timeout = 0
-        while type(core._state) is not type(Filter()) and timeout < 20:
+        while type(core._state) is not type(Painting()) and timeout < 20:
             queue.put(five_fingers)
             timeout += 1
             time.sleep(0.1)
-        assert type(core._state) is type(Filter())
+        assert type(core._state) is type(Painting())
 
 
