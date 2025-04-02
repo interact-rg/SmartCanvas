@@ -63,7 +63,7 @@ const FilterFrames: React.FC<FilterFramesProps> = ({
       style={{
         position: "absolute",
         bottom: "10px", // Adjust this to move the box higher or lower
-        left: "50%",
+        left: "55%",
         transform: "translateX(-50%)",
         display: "flex",
         overflowX: "hidden", // Hide the scrollbar
@@ -71,6 +71,7 @@ const FilterFrames: React.FC<FilterFramesProps> = ({
         width: "90%", // Increase the width of the box
         maxWidth: "1000px",
         scrollBehavior: "smooth", // Enable smooth scrolling
+        scrollbarWidth: "none",
       }}
     >
       {filters.map((filter, index) => (
@@ -79,16 +80,21 @@ const FilterFrames: React.FC<FilterFramesProps> = ({
           src={filter}
           alt={`frame-${index}`}
           style={{
-            width: "100px", // Width of images
-            height: "100px",
-            margin: "0 10px", // Margin between images
-            borderRadius: "10px", // Make corners rounder
+            width: chosenFilterIndex === index ? "120px" : "80px",
+            height: chosenFilterIndex === index ? "120px" : "80px",
+            margin: "0 10px",
+            borderRadius: "10px",
             border: `solid ${
               chosenFilterIndex === index ? "#ff6347 4px" : "#ccc 2px"
-            }`, // Apply bigger border if selected
+            }`,
             cursor: "pointer",
             boxSizing: "border-box",
-            transition: "border 0.3s ease", // Smooth transition for border change
+            transition: "all 0.3s ease",
+            opacity: chosenFilterIndex === index ? 1 : 0.5,
+            transform:
+              chosenFilterIndex === index
+                ? "translateY(0)"
+                : "translateY(15px)",
           }}
         />
       ))}
