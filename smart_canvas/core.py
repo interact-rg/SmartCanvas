@@ -16,7 +16,7 @@ from abc import ABC, abstractmethod
 import os
 
 # Internal packages
-from smart_canvas.background import ForegroundMask
+from smart_canvas.masker import ForegroundMask
 from smart_canvas.gesture_detection_using_model import GestureDetection
 from smart_canvas.filters.carousel import FilterCarousel
 from smart_canvas.ui import UI
@@ -272,9 +272,8 @@ class Painting(State):
 
     def apply_filter(self, frame: MatLike):
 
-        masked_frame: MatLike = self.core.fg_masker.apply(frame)
-        filtered_frame: MatLike = self.core.filters.current_filter(masked_frame)
-        self.core.filtered_frame = self.core.fg_masker.changeBackground(filtered_frame, self.core.filters.current_name)
+        mask: MatLike = self.core.fg_masker.apply(frame)
+        self.core.filtered_frame = self.core.filters.current_filter.filter_frame(frame, mask)
 
         # upload image to database if consent was given
         if self.core.filtered_frame.any():
