@@ -9,7 +9,7 @@ class Filter:
     bg_root: str = "smart_canvas/backgrounds/"
     dimensions: tuple[int, int] = (1280, 720)
     bg_image: MatLike
-    background: str|None = "None.png"
+    background: str|None = None
     
     def __init__(self):
         if self.background is not None:
@@ -47,3 +47,9 @@ class Filter:
 
         print(self.bg_image)
         return output_image
+    
+    def get_background(self) -> MatLike:
+        """ Returns the background image. """
+        if self.bg_image is None:
+            return np.zeros((self.dimensions[1], self.dimensions[0], 3), dtype=np.uint8)
+        return self.bg_image
