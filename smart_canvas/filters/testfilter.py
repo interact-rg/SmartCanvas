@@ -7,6 +7,7 @@ class TestFilter(Filter):
     background = 'testimage.jpg'
 
     def filter(self, frame: MatLike) -> MatLike:
+        #frame = cv2.fastNlMeansDenoisingColored(frame,None,10,10,7,21)
         image = cv2.blur(frame,(5,5))
         return image
 
