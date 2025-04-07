@@ -1,21 +1,37 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from "react";
+import ArrowIcon from "../../public/arrow-down-solid.svg";
 
 interface DownloadPromptProps {
-    image: string | null;
-    downloadQr: string | null;
-};
+  image: string | null;
+  downloadQr: string | null;
+}
 
-const DownloadPrompt: React.FC<DownloadPromptProps> = ({ image, downloadQr }) => {
-    return (
-        <div id="qr-popup" className={`${image && downloadQr ? "active" : "dismissed"}`}>
-            <div id="qr-wrapper">
-                <img src={`data:image/jpeg;base64,${image}`} alt="" id="download-image"/>
-                {/* Get bespoke icon? */}
-                <span>⬇️</span>
-                <img src={`data:image/jpeg;base64,${downloadQr}`} alt="" id="qr-code"/>
-            </div>
-        </div>
-    );
+const DownloadPrompt: React.FC<DownloadPromptProps> = ({
+  image,
+  downloadQr,
+}) => {
+  return (
+    <div
+      id="qr-popup"
+      className={`${image && downloadQr ? "active" : "dismissed"}`}
+    >
+      <div id="qr-wrapper">
+        <img
+          src={`data:image/jpeg;base64,${image}`}
+          alt=""
+          id="download-image"
+        />
+        {/* Get bespoke icon? */}
+        {/* <span>⬇️</span> */}
+        <img
+          src={ArrowIcon}
+          alt="Arrow"
+          style={{ width: "30px", height: "30px" }}
+        />
+        <img src={`data:image/jpeg;base64,${downloadQr}`} alt="" id="qr-code" />
+      </div>
+    </div>
+  );
 };
 
 export default DownloadPrompt;

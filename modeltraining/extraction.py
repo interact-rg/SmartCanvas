@@ -1,6 +1,6 @@
 import os, cv2
 
-ds = "dataset"  # folder containing your videos
+ds = "C:/Users/juho/Pictures/Camera Roll"  # folder containing your videos
 exts = ('.mp4','.avi','.mov','.mkv','.flv','.wmv')
 
 for f in os.listdir(ds):
@@ -19,7 +19,7 @@ for f in os.listdir(ds):
             ret, frame = cap.read()
             if not ret:
                 break
-            cv2.imwrite(os.path.join(out_dir, f"frame_{idx:04d}.jpg"), frame)
+            cv2.imwrite(os.path.join(out_dir, f"{os.path.splitext(f)[0] + "_"}frame_{idx:04d}.jpg"), frame)
             idx += 1
             t += 1 / 3
         cap.release()

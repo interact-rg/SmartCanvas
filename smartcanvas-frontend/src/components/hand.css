@@ -9,14 +9,18 @@
 }
 
 @keyframes swipe {
-    0% {rotate: -70deg; translate: -100%;}
-    100% {rotate: 70deg; translate: 100%;}
+    0% {translate: 100%; transform: rotateX(0deg); }
+    40% {transform: rotateX(0deg); }
+    60% {transform: rotateX(180deg); }
+    90% {opacity: 1;}
+    100% {opacity: 0; translate: -100%; transform: rotateX(180deg); }
 }
 
 #two_fingers_icon {
-    animation: 2s ease-in-out 0s infinite alternate swipe;
+    animation: 3s ease-in-out infinite swipe;
+    rotate: 90deg; 
     transform-origin: 50% 100%;
-    margin-top: 95%;
+    margin-top: 90%;
 }
 
 #hand {

@@ -5,32 +5,33 @@ from collections import deque
 # import itertools
 
 # Internal modules
-from smart_canvas.filters.painterly import painterly_filter
-from smart_canvas.filters.watercolor import watercolor
-from smart_canvas.filters.oil_painting import oil_painting
-from smart_canvas.filters.mosaic import mosaic_filter
-from smart_canvas.filters.gs_cartoon import gs_cartoon_filter
+from smart_canvas.filters.base import Filter
+
+from smart_canvas.filters.painterly import Painterly
+from smart_canvas.filters.watercolor import Watercolor
+from smart_canvas.filters.oil_painting import OilPainting
+from smart_canvas.filters.mosaic import Mosaic
+from smart_canvas.filters.gs_cartoon import GSCartoon
 from .animefilter.animestyle import AnimeFilter
-from .pointillism.pointillism import pointillism
-from smart_canvas.filters.testfilter import testfilter
+from .pointillism.pointillism import Pointillism
+from smart_canvas.filters.testfilter import TestFilter
 
 from typing import Callable, Any
-
+from cv2.typing import MatLike
 
 class FilterCarousel:
-    animeFilter = AnimeFilter()
     current_name: str
-    current_filter: Callable[..., Any]
+    current_filter: Filter
 
-    catalog: dict[str, Callable[..., Any]] = {
-        'painterly': painterly_filter,
-        'watercolor': watercolor,
-        'oil painting': oil_painting,
-        'mosaic': mosaic_filter,
-        'grayscale cartoon': gs_cartoon_filter,
-        'anime style': animeFilter.filter,
-        'pointillism': pointillism,
-        'testfilter': testfilter
+    catalog: dict[str, Filter] = {
+        'painterly': Painterly(),
+        'watercolor': Watercolor(),
+        'oil painting': OilPainting(),
+        'mosaic': Mosaic(),
+        'grayscale cartoon': GSCartoon(),
+        'anime style': AnimeFilter(),
+        'pointillism': Pointillism(),
+        'testfilter': TestFilter(),
     }
     # carousel = itertools.cycle(catalog)
     carousel: deque[str] = deque(catalog.keys())

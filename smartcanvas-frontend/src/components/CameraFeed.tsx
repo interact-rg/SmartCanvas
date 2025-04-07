@@ -63,7 +63,7 @@ const CameraFeed: React.FC<CameraFeedProps> = ({ onFrameCapture, width = 1280, h
         };
 
         // Adjust the interval based on the app state
-        const intervalTime = state.Idle ? 500 : 100;
+        const intervalTime = state.Idle ? 500 : 33; // 500ms for Idle state, 33ms for other states (30 FPS)
 
         const interval = setInterval(() => {
             if (videoReady) {

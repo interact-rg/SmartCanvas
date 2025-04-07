@@ -30,16 +30,16 @@ const ImagePainter: React.FC<ImagePainterProps> = ({ filter }) => {
     let t = 0;
     let animationFrame: number;
     let row = 0;
-    const spacing = Math.min(height, width) * 0.3;
+    const spacing = Math.min(height, width) * 0.5;
     const brushSize = Math.min(width, height) * 0.3;
     let previousX = -1;
 
     const draw = () => {
       const x = (t * 2) % width;
-      const yOffset = row * spacing - 50;
-      const y = Math.sin(t / 10) * spacing * 0.5 + yOffset;
+      const yOffset = row * spacing + spacing * 0.5;
+      const y = Math.sin(t / 10) * spacing * 0.4 + yOffset;
 
-      if (x < previousX && y > height - 30) {
+      if (row == 2) {
         cancelAnimationFrame(animationFrame);
         return;
       }
@@ -61,7 +61,7 @@ const ImagePainter: React.FC<ImagePainterProps> = ({ filter }) => {
       }
       previousX = x;
 
-      t += 3;
+      t += 2;
       animationFrame = requestAnimationFrame(draw);
     };
 
