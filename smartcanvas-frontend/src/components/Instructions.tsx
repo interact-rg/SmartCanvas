@@ -15,7 +15,7 @@ interface InstructionsProps {
 
 const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4, filter }) => {
   const [randomColumn, setRandomColumn] = useState<number>(1); // Random column (1, 2, or 3)
-  const [isVisible, setIsVisible] = useState<boolean>(true); // Toggle visibility
+  const [waveIsVisible, setWaveIsVisible] = useState<boolean>(true); // Toggle visibility of the waving hand
   const [swipeIsVisible, setSwipeVisible] = useState<boolean>(true); //instructions (swiping_hand) should be invisible for n seconds after filter is changed (user has learned how to switch filters, so instructions don't need to be visible)
 
   // Function to generate a random column ID (1, 2, or 3)
@@ -24,18 +24,27 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4, filte
   useEffect(() => {
     // Timer to toggle visibility and randomize column every N seconds
     const interval = setInterval(() => {
-      setIsVisible((prev) => !prev); // Toggle visibility
-      if (!isVisible) {
+      setWaveIsVisible((prev) => !prev); // Toggle visibility
+      if (!waveIsVisible) {
         setRandomColumn(getRandomColumn()); // Randomize column when becoming visible
       }
     }, 5000);
 
     return () => clearInterval(interval); // Cleanup interval on unmount
-  }, [isVisible]);
+  }, [waveIsVisible]);
 
   useEffect (() => {
-    
-  }, [])
+    if (state.Idle) {
+      setSwipeVisible(true); // Reset swiping hand visibility when Idle state is active
+    }    
+  }, [state]);
+
+  useEffect(() => {
+    if (state.Active) {
+      // Hide swiping hand after the filter is changed
+      setSwipeVisible(false);
+    }
+  }, [filter]);
   
   const renderInstructions = () => {
     for (const [key, value] of Object.entries(state)) {
@@ -51,13 +60,13 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4, filte
             return (
               <div className="top-row">
                 <div className="column" id="column-1">
-                  {isVisible && randomColumn === 1 && <img src={waving_hand} id="hand" style={{maxWidth:'20%', marginLeft:'30%'}} />}
+                  {waveIsVisible && randomColumn === 1 && <img src={waving_hand} id="hand" style={{maxWidth:'20%', marginLeft:'30%'}} />}
                 </div>
                 <div className="column" id="column-2">
-                  {isVisible && randomColumn === 2 && <img src={waving_hand} id="hand" style={{maxWidth:'20%', marginLeft:'30%'}} />}
+                  {waveIsVisible && randomColumn === 2 && <img src={waving_hand} id="hand" style={{maxWidth:'20%', marginLeft:'30%'}} />}
                 </div>
                 <div className="column" id="column-3">
-                  {isVisible && randomColumn === 3 && <img src={waving_hand} id="hand" style={{maxWidth:'20%', marginLeft:'30%'}} />}
+                  {waveIsVisible && randomColumn === 3 && <img src={waving_hand} id="hand" style={{maxWidth:'20%', marginLeft:'30%'}} />}
                 </div>
               </div>
             );
@@ -113,14 +122,9 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4, filte
 
   return (
     <div className="instructions">
-      {/* <h2>
-        Current State:{" "}
-        {Object.keys(state).find((key) => state[key]) || "Unknown"}
-      </h2> */}
       
         {renderInstructions()}
       
-
     </div>
   );
 };
