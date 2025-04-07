@@ -20,7 +20,6 @@ class Filter:
 
     def filter_frame(self, frame: MatLike, mask: MatLike) -> MatLike:
         """ End to end filter function. """
-        print("Filtering", self.background)
         filtered_frame = self.filter(frame)
         filtered_bg = self.background_filter(frame)
         masked = self.mask_background(filtered_frame, filtered_bg, mask)
@@ -39,13 +38,11 @@ class Filter:
         condition: ArrayLike = np.stack((mask, ) * 3, axis=-1) > 0.1
 
         try:
-            output_image = np.where(condition, background, frame)
+            output_image = np.where(condition, frame, background)
         except:
             print('[Warn] Frame and background shape mismatch!')
             temp_bg_image = cv2.resize(background, (frame.shape[1], frame.shape[0]))
             output_image = np.where(condition, frame, temp_bg_image)
-
-        print(self.bg_image)
         return output_image
     
     def get_background(self) -> MatLike:
