@@ -83,7 +83,7 @@ const App: React.FC = () => {
           height={720}
           state={appState}
         />
-        <Instructions state={appState} countdown={painting} />
+        <Instructions state={appState} countdown={painting} filter={chosenFilter} />
         <FilterFrames availableFilters={filters} chosenFilter={chosenFilter}/>
       </div>
 

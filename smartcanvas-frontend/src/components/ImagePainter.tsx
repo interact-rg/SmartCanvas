@@ -17,7 +17,9 @@ const ImagePainter: React.FC<ImagePainterProps> = ({ filter }) => {
 
     const image = new Image();
     const brush = new Image();
-    image.src = "/images/painterly.jpg";
+
+    // Get the image from currently selected filter
+    image.src = `/images/${filter}.jpg`;
     brush.src = brushImg;
 
     const maskCanvas = document.createElement("canvas");

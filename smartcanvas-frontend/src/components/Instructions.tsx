@@ -10,9 +10,10 @@ import ImagePainter from "./ImagePainter";
 interface InstructionsProps {
   state: { [key: string]: any };
   countdown: number;
+  filter: string;
 }
 
-const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4 }) => {
+const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4, filter }) => {
   const [randomColumn, setRandomColumn] = useState<number>(1); // Random column (1, 2, or 3)
   const [isVisible, setIsVisible] = useState<boolean>(true); // Toggle visibility
   const [swipeIsVisible, setSwipeVisible] = useState<boolean>(true); //instructions (swiping_hand) should be invisible for n seconds after filter is changed (user has learned how to switch filters, so instructions don't need to be visible)
@@ -81,7 +82,7 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4 }) => 
             return (
               <div className="full-container">
                 <img src="/images/canvas.jpg"></img>
-                <ImagePainter filter={state.filter || "/images/testfilter.jpg"} />
+                <ImagePainter filter={filter || "painterly"} />
               </div>
             );
           default:
