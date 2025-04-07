@@ -3,7 +3,7 @@
  */
 import React, {useState, useEffect } from "react";
 import waving_hand from "../assets/five_fingers.png"
-import "./hand.css"
+import "../styles/hand.css"
 import swiping_hand from "../assets/swiping_hand.png"
 import ImagePainter from "./ImagePainter";
 
