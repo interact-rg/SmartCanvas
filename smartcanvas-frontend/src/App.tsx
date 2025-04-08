@@ -19,6 +19,7 @@ const App: React.FC = () => {
   const [paintingTimer, setPaintingTimer] = useState<number>(10); // Timer for the painting
   const [filters, setFilters] = useState<string[]>([]);
   const [chosenFilter, setChosenFilter] = useState<string>("");
+  const [chosenFilterPerformance, setChosenFilterPerformance] = useState<number>(0);
   const [serverFeedVisible, setServerFeedVisible] = useState<boolean>(false);
   let qrTimeout: number | undefined = undefined;
   const intervalRef = useRef<number | null>(null); // Ref to store the interval ID
@@ -107,6 +108,7 @@ const App: React.FC = () => {
         onHoldStill={handleHoldStill}
         onFilters={setFilters}
         onChosenFilter={setChosenFilter}
+        onFilterPerformance={setChosenFilterPerformance}
         onQrCode={handleQrCode}
       />
 

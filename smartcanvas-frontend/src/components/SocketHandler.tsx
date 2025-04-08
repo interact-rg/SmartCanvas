@@ -15,10 +15,11 @@ interface SocketHandlerProps {
   onHoldStill: (timer: number) => void;
   onFilters: (filters: string[]) => void;
   onChosenFilter: (filter: string) => void;
+  onFilterPerformance: (performance: number) => void;
   onQrCode: (qrCode: string) => void;
 }
 
-const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress, onHoldStill: onPainting, onFilters, onChosenFilter, onQrCode }) => {
+const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress, onHoldStill: onPainting, onFilters, onChosenFilter, onFilterPerformance, onQrCode }) => {
   const socket = useSocket('http://localhost:5000');
   const [canSendFrame, setCanSendFrame] = useState(true);
   const previousFrameRef = useRef<string | null>(null);
@@ -48,11 +49,6 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
         //console.log('Timer: ', msg.timer);
         onPainting(msg.timer);
         return;
-      }
-      else if (msg.filter !== undefined) {
-        //console.log('Filter: ', msg.filter);
-        onChosenFilter(msg.filter);
-
       } else {
         onStateChange(msg);
       }
@@ -63,6 +59,15 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
       //console.log('Received ack, ready to send new frame');
       setCanSendFrame(true);
     };
+
+    const handleFilter = (message: any) => {
+      if (message.name) {
+        onChosenFilter(message.name);
+      }
+      if (message.performance) {
+        onFilterPerformance(message.performance);
+      }
+    }
 
     // Handle the processed artistic image from the server
     const handleArtisticFrame = (frame: string) => {
@@ -76,6 +81,7 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
     socket.on('hand_position', onHandPosition);
     socket.on('available_filters', handleAvailableFilters);
     socket.on('qr_code', onQrCode);
+    socket.on('filter', handleFilter);
 
     return () => {
       socket.off('update_ui_response', handleUpdateUIResponse);
