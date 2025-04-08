@@ -1,7 +1,7 @@
 /**
  * Component to show different instructions based on the state of the application
  */
-import React, {useState, useEffect } from "react";
+import React, {useState, useEffect, use } from "react";
 import waving_hand from "../assets/five_fingers.png"
 import "../styles/hand.css"
 import swiping_hand from "../assets/swiping_hand.png"
@@ -17,7 +17,8 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4, filte
   const [randomColumn, setRandomColumn] = useState<number>(1); // Random column (1, 2, or 3)
   const [waveIsVisible, setWaveIsVisible] = useState<boolean>(true); // Toggle visibility of the waving hand
   const [swipeIsVisible, setSwipeVisible] = useState<boolean>(true); //instructions (swiping_hand) should be invisible for n seconds after filter is changed (user has learned how to switch filters, so instructions don't need to be visible)
-
+  const [swipeUsed, setSwipeUsed] = useState<boolean>(false); // Flag to track if swiping hand has been used
+  const [holdHandVisible, setHoldHandVisible] = useState<boolean>(false); // Flag to track if hold hand still instruction is visible
   // Function to generate a random column ID (1, 2, or 3)
   const getRandomColumn = () => Math.floor(Math.random() * 3) + 1;
 
@@ -36,13 +37,31 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4, filte
   useEffect (() => {
     if (state.Idle) {
       setSwipeVisible(true); // Reset swiping hand visibility when Idle state is active
-    }    
-  }, [state]);
+      setSwipeUsed(false); // Reset the flag when Idle state is active
+    } else if (state.Active && !swipeUsed) {
+      // Show swiping hand every 5 seconds only if it hasn't been used yet
+      const interval = setInterval(() => {
+        setSwipeVisible((prev) => !prev); // Toggle visibility
+      }, 5000);
+    
+      return () => clearInterval(interval); // Cleanup interval on unmount
+    }
+  }, [state, swipeUsed]);
+
+  useEffect(() => {
+    // Timer to toggle visibility of hold hand symbol every 6 seconds
+    const interval = setInterval(() => {
+      setHoldHandVisible((prev) => !prev); // Toggle visibility  
+    }, 6000);
+
+    return () => clearInterval(interval); // Cleanup interval on unmount
+  }, [holdHandVisible]);
 
   useEffect(() => {
     if (state.Active) {
       // Hide swiping hand after the filter is changed
       setSwipeVisible(false);
+      setSwipeUsed(true); // Set the flag to indicate that swiping hand has been used
     }
   }, [filter]);
   
@@ -76,7 +95,7 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4, filte
                 <div className="top-row">
                   <div className="column" id="column-1"></div>
                   <div className="column" id="column-2">{swipeIsVisible && <img src={swiping_hand} id="two_fingers_icon" style={{maxWidth: '20%'}}  />}</div>
-                  <div className="column" id="column-3">hold palm up</div>
+                  <div className="column" id="column-3">{holdHandVisible && <img src={waving_hand} id="hand_still" style={{maxWidth:'20%', marginLeft:'30%'}} />}</div>
                 </div>
                 <div className="bottom-row"></div>
               </div>
@@ -87,13 +106,13 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4, filte
                   <div className="big-text">{renderCountdown()}</div>
               </div>
             );
-          case "Painting":
-            return (
-              <div className="full-container">
-                <img src="/images/canvas.jpg"></img>
-                <ImagePainter filter={filter || "painterly"} />
-              </div>
-            );
+          // case "Painting":
+          //   return (
+          //     <div className="full-container">
+          //       <img src="/images/canvas.jpg"></img>
+          //       <ImagePainter filter={filter || "painterly"} />
+          //     </div>
+          //   );
           default:
             return <></>;
         }
@@ -105,7 +124,7 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4, filte
   const renderCountdown = () => {
     if (countdown > 0) {
       // Round the countdown up to the nearest integer
-      return Math.ceil(countdown);
+      return Math.round(countdown);
     }
   };
 

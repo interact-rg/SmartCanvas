@@ -1,13 +1,19 @@
 interface ProgressCircleProps {
+  idle: boolean;
   progress: number;
   position: [number, number];
 }
 
 const ProgressCircle: React.FC<ProgressCircleProps> = ({
+  idle = false,
   progress,
   position,
 }) => {
   const visible = progress > 0 ? 1 : 0;
+    if (idle) {
+      return null;
+    }
+  
   //TODO: Make the bar stick around for a bit when no position or progress?
   if (position[0] === 0 && position[1] === 0) {
     return null;
@@ -15,9 +21,8 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
 
   const strokeDasharray = 659.4;
   const strokeDashoffset = strokeDasharray * ((100 - progress * 100) / 100); // Formula for the progress on circle
-  const progressColor = `rgb(${235 - 90 * progress}, ${
-    155 + 125 * progress
-  }, 0)`;
+  const progressColor = `rgb(${235 - 90 * progress}, ${155 + 125 * progress
+    }, 0)`;
   return (
     <svg
       width="200"

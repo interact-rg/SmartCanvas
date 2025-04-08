@@ -12,13 +12,13 @@ interface SocketHandlerProps {
   onArtisticFrame: (frame: string) => void;
   onHandPosition: (position: [number, number]) => void;
   onProgress: (progress: number) => void;
-  onPainting: (timer: number) => void;
+  onHoldStill: (timer: number) => void;
   onFilters: (filters: string[]) => void;
   onChosenFilter: (filter: string) => void;
   onQrCode: (qrCode: string) => void;
 }
 
-const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress, onPainting, onFilters, onChosenFilter, onQrCode }) => {
+const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress, onHoldStill: onPainting, onFilters, onChosenFilter, onQrCode }) => {
   const socket = useSocket('http://localhost:5000');
   const [canSendFrame, setCanSendFrame] = useState(true);
   const previousFrameRef = useRef<string | null>(null);
