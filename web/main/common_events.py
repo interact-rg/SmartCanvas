@@ -25,6 +25,9 @@ def send_image(image: MatLike, sid: str|None):
 def send_ui_state(state: UI_State, sid: str|None):
     socketio.emit('update_ui_response', state, to=sid)
 
+def send_filter(filter_name: str, performance: float, sid: str|None):
+    socketio.emit('filter', {'name': filter_name, 'performance': performance}, to=sid)
+
 def send_hand_position(position: tuple[float, float], sid: str|None):
     socketio.emit('hand_position', list(position), to=sid) # convert to list, otherwise it'll be sent as two separate numbers
 
@@ -33,3 +36,6 @@ def send_qr(image_id: int, sid: str|None):
     cv_qr = create_qr_code(f"localhost:5000/dl_image/{image_id}")
     mod_message = cv_to_b64(cv_qr)
     socketio.emit('qr_code', mod_message, to=sid)
+
+def send_acknowledge(sid: str|None):
+    socketio.emit('ack', to=sid)

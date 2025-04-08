@@ -2,14 +2,16 @@ from cv2.typing import MatLike
 from numpy.typing import ArrayLike
 import numpy as np
 import cv2
+from time import perf_counter
 
 class Filter:
     """Base class for all filters."""
-
     bg_root: str = "smart_canvas/backgrounds/"
     dimensions: tuple[int, int] = (1280, 720)
     bg_image: MatLike
     background: str|None = None
+    timing_samples: list[float] = []
+    average_time: float = 0
     
     def __init__(self):
         if self.background is not None:
@@ -20,9 +22,14 @@ class Filter:
 
     def filter_frame(self, frame: MatLike, mask: MatLike) -> MatLike:
         """ End to end filter function. """
+        startTime = perf_counter()
         filtered_frame = self.filter(frame)
         filtered_bg = self.background_filter(frame)
         masked = self.mask_background(filtered_frame, filtered_bg, mask)
+        endTime = perf_counter()
+        self.timing_samples.append(endTime - startTime)
+        if (len(self.timing_samples) > 0):
+            self.average_time = float(np.mean(self.timing_samples)) 
         return masked
 
     def filter(self, frame: MatLike) -> MatLike:

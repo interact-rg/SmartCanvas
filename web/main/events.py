@@ -61,7 +61,6 @@ def handle_client_message(message: str):
     b64_frame = message.split(",")[1]
     cv_image = b64_to_cv(b64_frame)
     producer_q.put(cv_image)
-    socketio.emit('ack', to=sid) #acknowledge sucessful frame processing
 
 @socketio.on('check_image_processing')
 def check_image_processing():

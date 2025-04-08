@@ -50,6 +50,6 @@ class FilterCarousel:
         self.carousel.rotate(1)
         self.current_name = self.carousel[0]
         self.current_filter = self.catalog[self.current_name]
-
-    def get_filter_name(self):
-        return (self.current_name)
+    
+    def get_filter_performance(self) -> float:
+        return self.current_filter.average_time

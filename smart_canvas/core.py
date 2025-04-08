@@ -64,6 +64,7 @@ class CanvasCore:
         # FYI runs state "init"-function
         self.ui.show(state.name)
         self._state.enter(self.tick)
+        self.ui.ready()
 
     def process(self):
         while not self.stopped:
@@ -90,6 +91,9 @@ class CanvasCore:
     def get_available_filters(self) -> list[str]:
         keys = self.filters.catalog.keys()
         return list(keys)
+    
+    def get_current_perf(self) -> float:
+        return self.filters.current_filter.average_time + self.fg_masker.average_time
 
 class State(ABC):
     @property
@@ -127,7 +131,7 @@ class Startup(State):
 
     def enter(self, tick: float):
         self.ui = self.core.ui
-        self.core.ui.set_filter(self.core.filters.get_filter_name())
+        self.core.ui.set_filter(self.core.filters.current_name, self.core.get_current_perf())
 
         # Creating database
         if os.path.exists(r"database.db"):
@@ -138,6 +142,7 @@ class Startup(State):
 
     def update(self, tick: float, frame: MatLike):
         self.core.set_state(Idle())
+        self.core.ui.ready()
 
 
 # This is one state of state machine. We move from state to state by setting different classes as core._state instance
@@ -160,12 +165,13 @@ class Idle(State):
     # Update is called on new frame
     def update(self, tick: float, frame: MatLike):
         
-             face_present, duration = self.core.face_detector.detect_face(frame)
-             if tick - self.core.last_print_time >= 1:
-                 print("Face present:", face_present, "Duration:", str(duration) + "seconds")
+        face_present, duration = self.core.face_detector.detect_face(frame)
+        if tick - self.core.last_print_time >= 1:
+            print("Face present:", face_present, "Duration:", str(duration) + "seconds")
 
-             if (face_present and duration >= 2.0):
-              self.core.set_state(Active())
+        if (face_present and duration >= 2.0):
+            self.core.set_state(Active())
+        self.core.ui.ready()
 
         
 class Active(State):
@@ -187,7 +193,7 @@ class Active(State):
     def enter(self, tick: float):
         self.core.ui.set_prog(0.0)
         print("Entering active state")
-        self.core.ui.set_filter(self.core.filters.get_filter_name())
+        self.core.ui.set_filter(self.core.filters.current_name, self.core.get_current_perf())
 
     def update(self, tick: float, frame: MatLike):
 
@@ -207,6 +213,7 @@ class Active(State):
         if (self.current_gesture == "Finger_Swipe"):
             self.update_filter_carousel( tick)
         self.update_filter_trigger(self.current_gesture)
+        self.core.ui.ready()
 
 
     def update_filter_carousel(self, tick: float):
@@ -217,14 +224,14 @@ class Active(State):
         if (swipe_direction == "Swipe_Right"):
 
                 self.core.filters.next_filter()
-                self.core.ui.set_filter(self.core.filters.get_filter_name())
-                print('Current filter is' + self.core.filters.get_filter_name())
+                self.core.ui.set_filter(self.core.filters.current_name, self.core.get_current_perf())
+                print('Current filter is' + self.core.filters.current_name)
 
         elif (swipe_direction == "Swipe_Left"):
 
                 self.core.filters.previous_filter()
-                self.core.ui.set_filter(self.core.filters.get_filter_name())
-                print('Current filter is' + self.core.filters.get_filter_name())
+                self.core.ui.set_filter(self.core.filters.current_name, self.core.get_current_perf())
+                print('Current filter is' + self.core.filters.current_name)
 
     def update_filter_trigger(self, open_palm: str):
         if self.current_gesture == "Open_Palm":
@@ -248,10 +255,10 @@ class Countdown(State):
     def update(self, tick: float, frame: MatLike):
         if self.countdown_time - tick > 0:
             self.core.ui.set_timer(self.countdown_time - tick)
-            pass
         else:
             self.core.ui.hide("countdown")
             self.core.set_state(Painting())
+        self.core.ui.ready()
 
 class Painting(State):
     """
@@ -268,6 +275,8 @@ class Painting(State):
     def update(self, tick: float, frame: MatLike):
         self.apply_filter(frame)
         self.core.set_state(ShowPic())
+        self.core.ui.ready()
+
 
 
     def apply_filter(self, frame: MatLike):
@@ -324,6 +333,7 @@ class ShowPic(State):
         self.update_filter_trigger(self.current_gesture)
         self.core.ui.set_wrist_position(self.wrist_position)
         self.core.ui.set_prog(self.progress_counter)
+        self.core.ui.ready()
 
     def update_filter_trigger(self, current_gesture: str):
         if self.current_gesture == "Closed_Palm":

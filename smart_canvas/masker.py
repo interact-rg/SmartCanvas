@@ -13,6 +13,8 @@ class ForegroundMask:
     """
     Class that gives the foreground mask.
     """
+    timing_samples: list[float] = []
+    average_time: float = 0
 
     def __init__(self):
         self.selfie_segmentation = SelfieSegmentation(model_selection=1)
@@ -41,4 +43,10 @@ class ForegroundMask:
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
         self.mask = self.remove_isolated_pixels(results.segmentation_mask)
+
+        end_time = perf_counter()
+        self.timing_samples.append(end_time - start_time)
+        if len(self.timing_samples) > 0:
+            self.average_time = float(np.mean(self.timing_samples))
+        
         return self.mask
