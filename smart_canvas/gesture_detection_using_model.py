@@ -23,17 +23,21 @@ class GestureDetection:
 
         # Initialize stable duration, i.e. the time for which a gesture has been stable
         self.stable_start_time = None
-        self.previous_gesture = "Unrecognized gesture"
-        self.swipe_timer = None
+        self.previous_gesture = "No gesture detected"
+        #self.swipe_timer = None
         self.current_fingertip_x = None
+        self.previous_fingertip_x = None
+        self.armed_fingertip_x = None
         self.stable_duration = 0.0
+        self.hand_width = 0.0
+
+        self.movement_stable_start_time = None
+        self.movement_stable_duration = 0.0
+
         self.gesture = "No gesture detected"
         self.wrist_location = (0.0, 0.0)
-        self.buffer_size = 5  # Number of frames to buffer
-        self.fingertip_buffer = collections.deque(maxlen=self.buffer_size)
-
-        self.swipe_right_cooldown = 0.0
-        self.swipe_left_cooldown = 0.0
+        self.swipe_armed = False
+        self.swipe_arming_time = 0.0
 
 
     GestureResult = Tuple[str, Tuple[float, float], float]
@@ -58,67 +62,71 @@ class GestureDetection:
 
         result = self.recognizer.recognize_for_video(mp_image, self.timestamp)
 
-        if result.gestures:
+        if not result.hand_landmarks:
+    # No hands are detected, skip further processing
+         return "No hands detected", (0.0, 0.0), 0.0
+        
+        if result.gestures[0][0].category_name:
 
             self.gesture = result.gestures[0][0].category_name
             if self.stable_start_time is None:
                 self.stable_start_time = time.time()
             elif self.gesture != self.previous_gesture:
-                # Reset stable start time for new gesture
                 self.stable_start_time = time.time()
                 self.previous_gesture = self.gesture
             else:
                 self.stable_duration = time.time() - self.stable_start_time
 
-        else:
-            # No recognized gesture
-            self.gesture = "No gesture detected"
 
-        if result.hand_landmarks:
-            # Get the coordinates of the wrist and fingertip landmarks
+
+
+            self.previous_fingertip_x = self.current_fingertip_x
             self.current_fingertip_x = result.hand_landmarks[0][8].x
+            x_coords = [lm.x for lm in result.hand_landmarks[0]]
+            self.hand_width = max(x_coords) - min(x_coords)
+
+            if self.movement_stable_start_time is None or abs(self.current_fingertip_x - self.previous_fingertip_x) > 0.1 * self.hand_width:
+                self.movement_stable_start_time = time.time()
+                self.movement_stable_duration = 0.0
+                print("Finger movement detected above treshold...")
+            else:
+                self.movement_stable_duration = time.time() - self.movement_stable_start_time
+    
             self.wrist_location = (result.hand_landmarks[0][0].x, result.hand_landmarks[0][0].y)
-            self.fingertip_buffer.append(self.current_fingertip_x)
-
-        else:
-            self.current_fingertip_x = None
-            self.wrist_location = (0.0, 0.0)
-            self.stable_start_time = None
-            self.stable_duration = 0.0
             
-
         return self.gesture, self.wrist_location, self.stable_duration
 
     def finger_swipe(self):
-        movement_threshold = 0.2 # Modify this to change the sensitivity of the detection
+        
         swipe = None
-        base_cooldown = 0.3 # seconds
-        if self.swipe_timer is None:
-            self.swipe_timer = time.time()
+        if self.gesture == "Swipe" or self.gesture == "Swipe_Armed" or self.gesture =="Closed_Fist":
+            if (self.swipe_armed == False or time.time() - self.swipe_arming_time  > 3.0) and self.movement_stable_duration >= 1.0:
+                self.swipe_armed = True
+                self.armed_fingertip_x = self.current_fingertip_x
+                self.swipe_arming_time = time.time()
 
-        if len(self.fingertip_buffer) >= 2:
-            oldest_x = self.fingertip_buffer[0]
-            newest_x = self.fingertip_buffer[-1]
-            net_movement = newest_x - oldest_x
+                print("Swipe has been armed...")
+                return "Swipe_Armed"
+        
+        if self.swipe_armed == True:
+            dynamic_threshold = self.hand_width * 0.7
+            net_movement = self.current_fingertip_x - self.armed_fingertip_x
 
-        # Swipe Right
-            if net_movement < -movement_threshold:
-                if time.time() - self.swipe_timer >= base_cooldown + self.swipe_right_cooldown :
-                    self.swipe_right_cooldown = 0.0
-                    self.swipe_left_cooldown = 0.5
-                    print("Swiping right...")
-                    swipe = "Swipe_Right"
-                    self.fingertip_buffer.clear()
-                    self.swipe_timer = None
+            if net_movement < -dynamic_threshold:
+ 
+                        print("Swiping right...")
+                        swipe = "Swipe_Right"
+                        self.swipe_armed = False
+                        self.swipe_arming_time = time.time()
 
-        # Swipe Left
-            elif net_movement > movement_threshold:
-                if time.time() - self.swipe_timer >= base_cooldown + self.swipe_left_cooldown:
-                    self.swipe_left_cooldown = 0.0
-                    self.swipe_right_cooldown = 0.5
-                    print("Swiping left...")
-                    swipe = "Swipe_Left"
-                    self.fingertip_buffer.clear()
-                    self.swipe_timer = None
 
-        return swipe
+            elif net_movement > dynamic_threshold:
+
+                        print("Swiping left...")
+                        swipe = "Swipe_Left"
+                        self.swipe_armed = False
+                        self.swipe_arming_time = time.time()
+
+
+
+            return swipe

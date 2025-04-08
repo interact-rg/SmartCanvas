@@ -203,22 +203,22 @@ class Active(State):
             self.core.ui.set_wrist_position(self.wrist_position)
         if self.current_gesture != self.previous_gesture:
             self.previous_gesture = self.current_gesture
-            print("Current gesture:", self.current_gesture, "Wrist position:", self.wrist_position, "Duration:", str(duration) + "seconds")
+            print("Gesture changed. Current gesture:", self.current_gesture, "Wrist position:", self.wrist_position, "Duration:", str(duration) + "seconds")
 
         # checks if a face is present for X seconds and moves to idle state if not
         face_present, duration = self.core.face_detector.detect_face(frame)
         if (face_present == False and (duration > 5.0)):
             print("Face present:", face_present, "Duration:", str(duration) + "seconds")
             self.core.set_state(Idle())
-        if (self.current_gesture == "Finger_Swipe"):
-            self.update_filter_carousel( tick)
+       
+        self.update_filter_carousel( tick)
         self.update_filter_trigger(self.current_gesture)
         self.core.ui.ready()
 
 
     def update_filter_carousel(self, tick: float):
-        swipe_direction = self.core.gesture_detector.finger_swipe()
 
+        swipe_direction = self.core.gesture_detector.finger_swipe()
 
         #TODO Gesture detection for swiping
         if (swipe_direction == "Swipe_Right"):

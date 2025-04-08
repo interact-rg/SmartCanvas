@@ -40,7 +40,7 @@ export_dir = os.path.join("/app/exported_model", export_subfolder)
 os.makedirs(export_dir, exist_ok=True)
 
 # Create a model with the default hyperparameters
-hparams = gesture_recognizer.HParams(export_dir=export_dir)
+hparams = gesture_recognizer.HParams(export_dir=export_dir, epochs=20, batch_size=16)
 options = gesture_recognizer.GestureRecognizerOptions(hparams=hparams)
 model = gesture_recognizer.GestureRecognizer.create(
     train_data=train_data,
