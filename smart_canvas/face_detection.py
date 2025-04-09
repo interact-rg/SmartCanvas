@@ -1,6 +1,5 @@
 import time
-from mediapipe.tasks import python
-from mediapipe.tasks.python import vision
+from mediapipe.tasks.python import vision, BaseOptions
 import mediapipe as mp
 from cv2.typing import MatLike
 import cv2
@@ -9,11 +8,11 @@ class FaceDetection:
 
     def __init__(self):
 
-
+        asset_path = "models/blaze_face_short_range.tflite"
         self.options = vision.FaceDetectorOptions(
-            base_options=python.BaseOptions(model_asset_path='models/blaze_face_short_range.tflite'),
-            running_mode=vision.RunningMode.VIDEO,  
-         )
+            base_options=BaseOptions(model_asset_buffer=open(asset_path, "rb").read()),
+            running_mode=vision.RunningMode.VIDEO,
+        )
         self.detector = vision.FaceDetector.create_from_options(self.options)
 
 
