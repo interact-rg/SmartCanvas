@@ -13,14 +13,13 @@ if TYPE_CHECKING:
 from threading import Thread
 import time
 from abc import ABC, abstractmethod
-import os
 
 # Internal packages
 from smart_canvas.masker import ForegroundMask
 from smart_canvas.gesture_detection_using_model import GestureDetection
 from smart_canvas.filters.carousel import FilterCarousel
 from smart_canvas.ui import UI
-from smart_canvas.database import Database
+from smart_canvas.image_store import ImageStore
 from smart_canvas.face_detection import FaceDetection
 
 class CanvasCore:
@@ -29,7 +28,7 @@ class CanvasCore:
     """
     _state = None
 
-    def __init__(self, q_consumer: Queue[MatLike], screensize: tuple[int, int], webapp:bool=False, sid: str = ''):
+    def __init__(self, q_consumer: Queue[MatLike], img_store: ImageStore, webapp:bool=False, sid: str = ''):
         self.q_consumer = q_consumer
         self.stopped = False
         self.tick = time.time()
@@ -38,15 +37,13 @@ class CanvasCore:
       #  self.hand_detector = HandDetect()
         self.gesture_detector = GestureDetection()
         self.face_detector = FaceDetection()
-        self.database = Database()
-        self.image_id: None|int = None
+        self.image_store = img_store
+        self.image_id: None|str = None
         self.ui = UI(sid, is_webapp=webapp)
-        self.win_size = screensize
         self.image_processing_active = False
         self.filtered_frame: None|MatLike = None
         self.is_webapp = webapp
         self.sid = sid
-
 
         self.last_print_time = 0.0 # for debugging to keep the print rate reasonable
         
@@ -68,6 +65,7 @@ class CanvasCore:
         while not self.stopped:
             frame = self.q_consumer.get()
             self.tick = time.time()
+            self.image_store.check_expiry
 
             # update state we are currently in
             self._state.update(self.tick, frame) # type: ignore
@@ -131,13 +129,6 @@ class Startup(State):
     def enter(self, tick: float):
         self.ui = self.core.ui
         self.core.ui.set_filter(self.core.filters.current_name, self.core.get_current_perf())
-
-        # Creating database
-        if os.path.exists(r"database.db"):
-            print("Database already exists, don't create a new one")
-            pass
-        else:
-            self.core.database.create_database()
 
     def update(self, tick: float, frame: MatLike):
         self.core.set_state(Idle())
@@ -279,14 +270,10 @@ class Painting(State):
         mask: MatLike = self.core.fg_masker.apply(frame)
         self.core.filtered_frame = self.core.filters.current_filter.filter_frame(frame, mask)
 
-        # upload image to database if consent was given
+        # Add image to image store
         if self.core.filtered_frame.any():
-            self.core.image_id = self.core.database.insert_blob(self.core.filtered_frame)
-        
-        # delete images from database that are more than 1 day old
-        thread = Thread(target=self.core.database.delete)
-        thread.start()
-        
+            self.core.image_id = self.core.image_store.add_image(self.core.filtered_frame, duration=180)
+                
 
 class ShowPic(State):
     """
@@ -324,7 +311,7 @@ class ShowPic(State):
             self.core.set_state(Active())
             return
         
-        self.current_gesture, self.wrist_position, duration = self.core.gesture_detector.detect_gestures(frame)
+        self.current_gesture, self.wrist_position, _ = self.core.gesture_detector.detect_gestures(frame)
         self.update_filter_trigger(self.current_gesture)
         self.core.ui.set_wrist_position(self.wrist_position)
         self.core.ui.set_prog(self.progress_counter)

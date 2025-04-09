@@ -10,7 +10,6 @@ from typing import Any
 
 from flask import Flask
 from flask_socketio import SocketIO
-from flask_apscheduler.scheduler import APScheduler
 
 socketio = SocketIO(cors_allowed_origins="*")
 
@@ -66,13 +65,7 @@ def create_app(test_config: dict[str, Any]|None = None):
             os.remove(file)
         return
 
-    scheduler = APScheduler()
-    scheduler.init_app(app)
-    scheduler.add_job('cleaner', func=rm_old_files,
-                      trigger="interval", seconds=30)
-    scheduler.start()
 
-    atexit.register(lambda: scheduler.shutdown())
     atexit.register(lambda: os.rmdir(app.config["UPLOAD_FOLDER"]))
     atexit.register(lambda: rm_old_files(
         age=0, files_path=app.config["UPLOAD_FOLDER"]))

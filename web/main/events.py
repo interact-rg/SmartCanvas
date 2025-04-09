@@ -11,27 +11,27 @@ from flask import request
 import numpy as np
 import cv2
 
-from typing import TYPE_CHECKING
-
 # Internal modules
 from .. import socketio
-if TYPE_CHECKING:
-    from cv2.typing import MatLike
+from cv2.typing import MatLike
 
 from smart_canvas.core import CanvasCore
+from smart_canvas.image_store import ImageStore
 from smart_canvas.qr_code import *
-
 
 # Global dicts
 core_threads: dict[str, CanvasCore] = {}
 core_queues: dict[str, Queue[MatLike]] = {}
+image_stores: dict[str, ImageStore] = {}
+
 
 @socketio.on('connect')
 def connect_web():
     print('[INFO] Web client connected: {}'.format(request.sid))
     sid: str = request.sid
     core_queues.update({sid: Queue()})
-    core_threads.update({sid: CanvasCore(q_consumer=core_queues[sid], screensize=(0, 0), webapp=True, sid=sid).start()})
+    image_stores.update({sid: ImageStore()})
+    core_threads.update({sid: CanvasCore(q_consumer=core_queues[sid], img_store=image_stores[sid], webapp=True, sid=sid).start()})
     socketio.emit('available_filters', core_threads[sid].get_available_filters(), to=sid)
 
 
@@ -43,6 +43,7 @@ def disconnect_web():
     core.stop()
     core_queues[sid].put(None)
     core_threads.pop(sid)
+    image_stores.pop(sid)
     core_queues.pop(sid)
 
 

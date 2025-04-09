@@ -71,7 +71,7 @@ class UI:
     def show_image(self, image: MatLike):
         send_image(image, self.sid)
 
-    def show_qr(self, image_id: int):
+    def show_qr(self, image_id: str):
         send_qr(image_id, self.sid)
 
     def set_wrist_position(self, position: tuple[float, float]):

@@ -11,8 +11,6 @@ from smart_canvas.ui import UI_State
 from smart_canvas.qr_code import create_qr_code
 
 def cv_to_b64(cv_image: MatLike):
-    if (cv_image is None):
-        return ''
     _, buffer = imencode('.jpg', cv_image)
     jpg_as_text = b64encode(buffer)
     string_b64 = jpg_as_text.decode("utf-8")
@@ -31,9 +29,9 @@ def send_filter(filter_name: str, performance: float, sid: str|None):
 def send_hand_position(position: tuple[float, float], sid: str|None):
     socketio.emit('hand_position', list(position), to=sid) # convert to list, otherwise it'll be sent as two separate numbers
 
-def send_qr(image_id: int, sid: str|None):
+def send_qr(image_id: str, sid: str|None):
     # TODO make hostname dynamic
-    cv_qr = create_qr_code(f"localhost:5000/dl_image/{image_id}")
+    cv_qr = create_qr_code(f"localhost:5000/dl/{sid}/{image_id}")
     mod_message = cv_to_b64(cv_qr)
     socketio.emit('qr_code', mod_message, to=sid)
 
