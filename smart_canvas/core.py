@@ -204,6 +204,7 @@ class Active(State):
         if self.current_gesture != self.previous_gesture:
             self.previous_gesture = self.current_gesture
             print("Gesture changed. Current gesture:", self.current_gesture, "Wrist position:", self.wrist_position, "Duration:", str(duration) + "seconds")
+     
 
         # checks if a face is present for X seconds and moves to idle state if not
         face_present, duration = self.core.face_detector.detect_face(frame)

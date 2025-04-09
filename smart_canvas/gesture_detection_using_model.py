@@ -62,11 +62,12 @@ class GestureDetection:
 
         result = self.recognizer.recognize_for_video(mp_image, self.timestamp)
 
-        if not result.hand_landmarks:
     # No hands are detected, skip further processing
-         return "No hands detected", (0.0, 0.0), 0.0
-        
-        if result.gestures[0][0].category_name:
+        if result.hand_landmarks:
+            if result.gestures[0][0] and result.gestures[0][0].category_name:
+                        self.gesture = result.gestures[0][0].category_name
+            else:
+                         self.gesture = "Hand Detected"  # Default when landmarks exist but no gesture recognized
 
             self.gesture = result.gestures[0][0].category_name
             if self.stable_start_time is None:
@@ -85,7 +86,7 @@ class GestureDetection:
             x_coords = [lm.x for lm in result.hand_landmarks[0]]
             self.hand_width = max(x_coords) - min(x_coords)
 
-            if self.movement_stable_start_time is None or abs(self.current_fingertip_x - self.previous_fingertip_x) > 0.1 * self.hand_width:
+            if self.movement_stable_start_time is None or abs(self.current_fingertip_x - self.previous_fingertip_x) > 0.15*self.hand_width:
                 self.movement_stable_start_time = time.time()
                 self.movement_stable_duration = 0.0
                 print("Finger movement detected above treshold...")
@@ -99,8 +100,15 @@ class GestureDetection:
     def finger_swipe(self):
         
         swipe = None
-        if self.gesture == "Swipe" or self.gesture == "Swipe_Armed" or self.gesture =="Closed_Fist":
-            if (self.swipe_armed == False or time.time() - self.swipe_arming_time  > 3.0) and self.movement_stable_duration >= 1.0:
+
+        if self.swipe_armed and time.time() - self.swipe_arming_time > 3.0:
+            print("Swipe timed out...")
+            self.swipe_armed = False
+            return None
+
+
+        if self.gesture == "Swipe_Armed":
+            if (self.swipe_armed == False) and self.movement_stable_duration >= 0.4:
                 self.swipe_armed = True
                 self.armed_fingertip_x = self.current_fingertip_x
                 self.swipe_arming_time = time.time()
@@ -109,7 +117,7 @@ class GestureDetection:
                 return "Swipe_Armed"
         
         if self.swipe_armed == True:
-            dynamic_threshold = self.hand_width * 0.7
+            dynamic_threshold = self.hand_width * 0.3
             net_movement = self.current_fingertip_x - self.armed_fingertip_x
 
             if net_movement < -dynamic_threshold:
