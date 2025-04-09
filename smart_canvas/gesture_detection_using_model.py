@@ -4,6 +4,7 @@ import mediapipe as mp
 import cv2
 from cv2.typing import MatLike
 from typing import Tuple
+from collections import deque
 
 class GestureDetection:
     def __init__(self):
@@ -28,8 +29,12 @@ class GestureDetection:
         self.stable_duration = 0.0
         self.hand_width = 0.0
 
+        self.latest_gestures = deque(maxlen=30)
+
+
         self.movement_stable_start_time = None
         self.movement_stable_duration = 0.0
+        
 
         self.gesture = "No gesture detected"
         self.wrist_location = (0.0, 0.0)
@@ -59,12 +64,9 @@ class GestureDetection:
 
         result = self.recognizer.recognize_for_video(mp_image, self.timestamp)
 
-    # No hands are detected, skip further processing
         if result.hand_landmarks:
             if result.gestures[0][0] and result.gestures[0][0].category_name:
                         self.gesture = result.gestures[0][0].category_name
-            else:
-                         self.gesture = "Hand Detected"  # Default when landmarks exist but no gesture recognized
 
             if self.stable_start_time is None:
                 self.stable_start_time = time.time()
@@ -74,21 +76,29 @@ class GestureDetection:
             else:
                 self.stable_duration = time.time() - self.stable_start_time
 
-
+            self.wrist_location = (result.hand_landmarks[0][0].x, result.hand_landmarks[0][0].y)
             self.previous_fingertip_x = self.current_fingertip_x
             self.current_fingertip_x = result.hand_landmarks[0][8].x
+
+
+
             x_coords = [lm.x for lm in result.hand_landmarks[0]]
             self.hand_width = max(x_coords) - min(x_coords)
 
-            if self.movement_stable_start_time is None or abs(self.current_fingertip_x - self.previous_fingertip_x) > 0.05 * self.hand_width:
+            relative_threshold = 0.2 * self.hand_width
+            if self.previous_fingertip_x is not None and abs(self.current_fingertip_x - self.previous_fingertip_x) > relative_threshold:
                 self.movement_stable_start_time = time.time()
                 self.movement_stable_duration = 0.0
                 print("Finger movement detected above treshold...")
             else:
-                self.movement_stable_duration = time.time() - self.movement_stable_start_time
+                if self.movement_stable_start_time is None:
+                    self.movement_stable_start_time = time.time()
+                    self.movement_stable_duration = 0.0
+                else:   
+                    self.movement_stable_duration = time.time() - self.movement_stable_start_time
     
-            self.wrist_location = (result.hand_landmarks[0][0].x, result.hand_landmarks[0][0].y)
-            
+            self.latest_gestures.append(self.gesture)
+
         return self.gesture, self.wrist_location, self.stable_duration
 
     def finger_swipe(self):
@@ -101,7 +111,7 @@ class GestureDetection:
             return None
 
 
-        if self.gesture == "Swipe_Armed":
+        if "Swipe_Armed" in self.latest_gestures:
             if (self.swipe_armed == False) and self.movement_stable_duration >= 0.4:
                 self.swipe_armed = True
                 self.armed_fingertip_x = self.current_fingertip_x
@@ -111,7 +121,7 @@ class GestureDetection:
                 return "Swipe_Armed"
         
         if self.swipe_armed == True:
-            dynamic_threshold = self.hand_width * 0.2
+            dynamic_threshold = self.hand_width * 0.5
             net_movement = self.current_fingertip_x - self.armed_fingertip_x
 
             if net_movement < -dynamic_threshold:
