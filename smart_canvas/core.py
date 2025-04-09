@@ -23,7 +23,6 @@ from smart_canvas.ui import UI
 from smart_canvas.database import Database
 from smart_canvas.face_detection import FaceDetection
 
-
 class CanvasCore:
     """
     Class that processes the frame with a dedicated thread.
@@ -64,7 +63,6 @@ class CanvasCore:
         # FYI runs state "init"-function
         self.ui.show(state.name)
         self._state.enter(self.tick)
-        self.ui.ready()
 
     def process(self):
         while not self.stopped:
@@ -73,6 +71,7 @@ class CanvasCore:
 
             # update state we are currently in
             self._state.update(self.tick, frame) # type: ignore
+            self.ui.ready()
 
     def start(self):
         Thread(target=self.process, args=()).start()
@@ -142,7 +141,6 @@ class Startup(State):
 
     def update(self, tick: float, frame: MatLike):
         self.core.set_state(Idle())
-        self.core.ui.ready()
 
 
 # This is one state of state machine. We move from state to state by setting different classes as core._state instance
@@ -171,7 +169,6 @@ class Idle(State):
 
         if (face_present and duration >= 2.0):
             self.core.set_state(Active())
-        self.core.ui.ready()
 
         
 class Active(State):
@@ -214,7 +211,6 @@ class Active(State):
        
         self.update_filter_carousel( tick)
         self.update_filter_trigger(self.current_gesture)
-        self.core.ui.ready()
 
 
     def update_filter_carousel(self, tick: float):
@@ -259,7 +255,6 @@ class Countdown(State):
         else:
             self.core.ui.hide("countdown")
             self.core.set_state(Painting())
-        self.core.ui.ready()
 
 class Painting(State):
     """
@@ -276,7 +271,6 @@ class Painting(State):
     def update(self, tick: float, frame: MatLike):
         self.apply_filter(frame)
         self.core.set_state(ShowPic())
-        self.core.ui.ready()
 
 
 
@@ -322,7 +316,7 @@ class ShowPic(State):
 
         print("updating ShowPic state...")
 
-        if time.time() >= self.show_image_end_time:
+        if time.time() >= self.show_image_end_time: # TODO: Manual dismiss
             self.core.ui.hide("image")
             self.core.ui.hide("qr")     
             self.core.filtered_frame = None
@@ -334,7 +328,6 @@ class ShowPic(State):
         self.update_filter_trigger(self.current_gesture)
         self.core.ui.set_wrist_position(self.wrist_position)
         self.core.ui.set_prog(self.progress_counter)
-        self.core.ui.ready()
 
     def update_filter_trigger(self, current_gesture: str):
         if self.current_gesture == "Closed_Palm":

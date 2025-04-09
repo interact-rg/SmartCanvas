@@ -1,12 +1,9 @@
-import collections
-from os import wait
 import time
-from mediapipe.tasks import python
 from mediapipe.tasks.python import vision, BaseOptions
 import mediapipe as mp
 import cv2
 from cv2.typing import MatLike
-from typing import Protocol, Literal, Any, NamedTuple, Tuple
+from typing import Tuple
 
 class GestureDetection:
     def __init__(self):
