@@ -66,7 +66,6 @@ class GestureDetection:
             else:
                          self.gesture = "Hand Detected"  # Default when landmarks exist but no gesture recognized
 
-            self.gesture = result.gestures[0][0].category_name
             if self.stable_start_time is None:
                 self.stable_start_time = time.time()
             elif self.gesture != self.previous_gesture:
@@ -76,14 +75,12 @@ class GestureDetection:
                 self.stable_duration = time.time() - self.stable_start_time
 
 
-
-
             self.previous_fingertip_x = self.current_fingertip_x
             self.current_fingertip_x = result.hand_landmarks[0][8].x
             x_coords = [lm.x for lm in result.hand_landmarks[0]]
             self.hand_width = max(x_coords) - min(x_coords)
 
-            if self.movement_stable_start_time is None or abs(self.current_fingertip_x - self.previous_fingertip_x) > 0.15*self.hand_width:
+            if self.movement_stable_start_time is None or abs(self.current_fingertip_x - self.previous_fingertip_x) > 0.05 * self.hand_width:
                 self.movement_stable_start_time = time.time()
                 self.movement_stable_duration = 0.0
                 print("Finger movement detected above treshold...")
@@ -114,7 +111,7 @@ class GestureDetection:
                 return "Swipe_Armed"
         
         if self.swipe_armed == True:
-            dynamic_threshold = self.hand_width * 0.3
+            dynamic_threshold = self.hand_width * 0.2
             net_movement = self.current_fingertip_x - self.armed_fingertip_x
 
             if net_movement < -dynamic_threshold:
