@@ -19,7 +19,7 @@ interface SocketHandlerProps {
   onQrCode: (qrCode: string) => void;
 }
 
-const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress, onHoldStill: onPainting, onFilters, onChosenFilter, onFilterPerformance, onQrCode }) => {
+const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress, onHoldStill, onFilters, onChosenFilter, onFilterPerformance, onQrCode }) => {
   const socket = useSocket('http://localhost:5000');
   const [canSendFrame, setCanSendFrame] = useState(true);
   const previousFrameRef = useRef<string | null>(null);
@@ -47,7 +47,7 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
       // Counter to keep still when the image is "being painted"
       else if (msg.timer !== undefined) {
         //console.log('Timer: ', msg.timer);
-        onPainting(msg.timer);
+        onHoldStill(msg.timer);
         return;
       } else {
         onStateChange(msg);

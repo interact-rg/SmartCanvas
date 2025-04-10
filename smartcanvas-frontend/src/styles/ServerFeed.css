@@ -1,0 +1,19 @@
+/* Default canvas style (stretched to 100%) */
+.canvas {
+    width: 100%;
+    height: 100%;
+    transition: all 0.5s ease; /* Smooth transition for size and position */
+  }
+  
+  /* Canvas style when artisticFrame is active */
+  .canvas.artistic-frame {
+    width: 80%; 
+    height: auto; /* Maintain aspect ratio */
+    border: 1rem solid var(--color-highlight); /* Default color */
+    border-radius: 1rem; 
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5); /* Shadow effect */
+    position: absolute;
+    left: 5%; /* Position on the left */
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%); 
+  }

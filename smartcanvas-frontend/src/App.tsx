@@ -16,7 +16,7 @@ const App: React.FC = () => {
   const [handPosition, setHandPosition] = useState<[number, number]>([0, 0]);
   const [progress, setProgress] = useState<number>(0);
   const [holdStill, setHoldStill] = useState<number>(0);
-  const [paintingTimer, setPaintingTimer] = useState<number>(10); // Timer for the painting
+  const [paintingTimer, setPaintingTimer] = useState<number>(12); // Timer for the painting
   const [filters, setFilters] = useState<string[]>([]);
   const [chosenFilter, setChosenFilter] = useState<string>("");
   const [chosenFilterPerformance, setChosenFilterPerformance] = useState<number>(0);
@@ -25,10 +25,30 @@ const App: React.FC = () => {
   const intervalRef = useRef<number | null>(null); // Ref to store the interval ID
   const paintingTimerRef = useRef<number>(paintingTimer); // Ref to store the painting timer
 
+  // Map filter to highlight color
+  const getHighlightColor = (filter: string) => {
+    switch (filter) {
+      case "mosaic":
+        return "lightskyblue";
+      case "oil painting":
+        return "orange";
+      case "painterly":
+        return "darkgreen";
+      case "pointillism":
+        return "goldenrod";
+      case "watercolor":
+        return "lightsalmon";
+      case "testfilter":
+        return "green";
+      default:
+        return "#706EBD"; // Default purple
+    }
+  };
+
   const handleStateChange = (state: any) => {
     //console.log("State change received in App: ", state);
     if (state.Countdown) {
-      setPaintingTimer(10);
+      setPaintingTimer(12);
       clearTimeout(qrTimeout);
       setQrCode(null);
       setInboundFrame("");
@@ -67,12 +87,12 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    console.log("App state: ", appState);
+    //console.log("App state: ", appState);
   }, [appState]);
 
   useEffect(() => {
     paintingTimerRef.current = paintingTimer;
-    console.log("Painting timer updated:", paintingTimer);
+    //console.log("Painting timer updated:", paintingTimer);
   }, [paintingTimer]);
 
   const handleOutboundFrame = (frame: Blob) => {
@@ -98,7 +118,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div id="mainContainer" className="container_fs">
+    <div id="mainContainer" className="container_fs" style={{ "--color-highlight": getHighlightColor(chosenFilter) } as React.CSSProperties}>
       <SocketHandler
         onStateChange={handleStateChange}
         videoFrame={outboundFrame}

@@ -18,6 +18,8 @@
 
 .html {
   height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 a {
@@ -34,6 +36,7 @@ body {
   background-color: #3c3c3c;
   display: block;
   margin: 0;
+  padding: 0;
   height: 100%;
   overflow: hidden;
 }

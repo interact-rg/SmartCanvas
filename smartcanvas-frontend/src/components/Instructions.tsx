@@ -35,6 +35,9 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4, filte
   }, [waveIsVisible]);
 
   useEffect (() => {
+    if (state.Countdown) {
+      countdown = 4; // Reset countdown to 4 seconds when countdown state is active
+    }
     if (state.Idle) {
       setSwipeVisible(true); // Reset swiping hand visibility when Idle state is active
       setSwipeUsed(false); // Reset the flag when Idle state is active
@@ -123,8 +126,8 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4, filte
 
   const renderCountdown = () => {
     if (countdown > 0) {
-      // Round the countdown up to the nearest integer
-      return Math.round(countdown);
+      // Round the countdown down to the nearest integer
+      return Math.floor(countdown);
     }
   };
 
