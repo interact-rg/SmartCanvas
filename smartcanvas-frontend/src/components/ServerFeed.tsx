@@ -5,6 +5,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ImagePainter from './ImagePainter';
 import backgroundImg from '../assets/canvas.jpg';
+import '../styles/ServerFeed.css'; 
 
 interface ServerFeedProps {
   state: { [key: string]: any };
@@ -100,7 +101,7 @@ const ServerFeed: React.FC<ServerFeedProps> = ({ state, artisticFrame, visible =
     <div className="server-feed">
       {/* TODO: create an awesome frame around the image at some point */}
       {paintingVisible && <ImagePainter canvas={canvasRef.current} filter={filter} interrupt={interrupt} />}
-      <canvas ref={canvasRef} width={1280} height={720} />
+      <canvas ref={canvasRef} width={1280} height={720} className={`canvas ${state.ShowPic ? `artistic-frame` : ''}`}/>
     </div>
   );
 };
