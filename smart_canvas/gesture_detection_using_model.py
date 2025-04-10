@@ -28,9 +28,6 @@ class GestureDetection:
         self.stable_duration = 0.0
         self.hand_width = 0.0
 
-        self.latest_gestures = deque(maxlen=10)
-
-
         self.movement_stable_start_time = None
         self.movement_stable_duration = 0.0
         
@@ -73,7 +70,6 @@ class GestureDetection:
                             self.set_hand_width(result)
                             self.swipe_armed = False
 
-            self.latest_gestures.append(self.gesture)
 
 
             if self.stable_start_time is None:
@@ -94,7 +90,8 @@ class GestureDetection:
             if self.previous_fingertip_x is not None and abs(self.current_fingertip_x - self.previous_fingertip_x) > relative_threshold:
                 self.movement_stable_start_time = time.time()
                 self.movement_stable_duration = 0.0
-                print("Finger movement detected above treshold...")
+                if self.swipe_armed == False:
+                    print("Finger movement detected above treshold...")
             else:
                 if self.movement_stable_start_time is None:
                     self.movement_stable_start_time = time.time()
@@ -117,12 +114,12 @@ class GestureDetection:
             self.swipe_armed = False
             return None 
 
-        if "Swipe_Armed" in self.latest_gestures and not self.gesture == "Open_Palm" or self.gesture == "Italy":
+        if self.gesture == "Swipe_Armed":
             if (self.swipe_armed == False) and self.movement_stable_duration >= 0.6:
                 self.swipe_armed = True
                 self.armed_fingertip_x = self.current_fingertip_x
                 self.swipe_arming_time = time.time()
-
+            
                 print("Swipe has been armed...")
                 return "Swipe_Armed"
         
