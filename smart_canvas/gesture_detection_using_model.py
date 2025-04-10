@@ -64,7 +64,9 @@ class GestureDetection:
 
         result = self.recognizer.recognize_for_video(mp_image, self.timestamp)
 
-        if result.hand_landmarks:
+        if not result.hand_landmarks:
+             return None
+        else:
             if result.gestures[0][0] and result.gestures[0][0].category_name:
                         self.gesture = result.gestures[0][0].category_name
 

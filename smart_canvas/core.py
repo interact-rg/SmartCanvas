@@ -185,23 +185,29 @@ class Active(State):
 
     def update(self, tick: float, frame: MatLike):
 
-        self.current_gesture, self.wrist_position, duration = self.core.gesture_detector.detect_gestures(frame)
-
-        if self.wrist_position:
-            self.core.ui.set_wrist_position(self.wrist_position)
-        if self.current_gesture != self.previous_gesture:
-            self.previous_gesture = self.current_gesture
-            print("Gesture changed. Current gesture:", self.current_gesture, "Wrist position:", self.wrist_position, "Duration:", str(duration) + "seconds")
-     
-
-        # checks if a face is present for X seconds and moves to idle state if not
         face_present, duration = self.core.face_detector.detect_face(frame)
         if (face_present == False and (duration > 5.0)):
-            print("Face present:", face_present, "Duration:", str(duration) + "seconds")
+            print("Face not present for duration:", str(duration) + "seconds")
             self.core.set_state(Idle())
+
+
+        gesture_data = self.core.gesture_detector.detect_gestures(frame)
+        if gesture_data is None:
+            print ("No hand landmarks found. Skipping frame.")
+            return
+        
+        else: 
+            self.current_gesture, self.wrist_position, duration = gesture_data
+
+            if self.wrist_position:
+                self.core.ui.set_wrist_position(self.wrist_position)
+            if self.current_gesture != self.previous_gesture:
+                self.previous_gesture = self.current_gesture
+                print("Gesture changed. Current gesture:", self.current_gesture, "Wrist position:", self.wrist_position, "Duration:", str(duration) + "seconds")
+
        
-        self.update_filter_carousel( tick)
-        self.update_filter_trigger(self.current_gesture)
+            self.update_filter_carousel( tick)
+            self.update_filter_trigger(self.current_gesture)
 
 
     def update_filter_carousel(self, tick: float):
