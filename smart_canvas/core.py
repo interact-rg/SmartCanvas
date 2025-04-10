@@ -45,7 +45,6 @@ class CanvasCore:
         self.is_webapp = webapp
         self.sid = sid
 
-        self.last_print_time = 0.0 # for debugging to keep the print rate reasonable
         
 
         # This is initial state
@@ -155,8 +154,7 @@ class Idle(State):
     def update(self, tick: float, frame: MatLike):
         
         face_present, duration = self.core.face_detector.detect_face(frame)
-        if tick - self.core.last_print_time >= 1:
-            print("Face present:", face_present, "Duration:", str(duration) + "seconds")
+        print("Face present:", face_present, "Duration:", str(duration) + "seconds")
 
         if (face_present and duration >= 2.0):
             self.core.set_state(Active())
@@ -176,6 +174,9 @@ class Active(State):
         self.current_gesture = "No gestures yet"
         self.wrist_position = [0,0]
         self.previous_gesture = None
+        self.stable_for = 0.0
+        self.last_swipe_time = 0.0
+
 
     # Runs once on init
     def enter(self, tick: float):
@@ -185,33 +186,41 @@ class Active(State):
 
     def update(self, tick: float, frame: MatLike):
 
-        face_present, duration = self.core.face_detector.detect_face(frame)
-        if (face_present == False and (duration > 5.0)):
-            print("Face not present for duration:", str(duration) + "seconds")
+  
+        face_present, face_duration = self.core.face_detector.detect_face(frame)
+        if (face_present == False and (face_duration > 5.0)):
+            print("Face not present for duration:", str(face_duration) + "seconds")
             self.core.set_state(Idle())
 
 
         gesture_data = self.core.gesture_detector.detect_gestures(frame)
         if gesture_data is None:
             print ("No hand landmarks found. Skipping frame.")
+            self.core.ui.set_prog(0.0)
+            self.stable_for = 0.0
             return
         
         else: 
-            self.current_gesture, self.wrist_position, duration = gesture_data
+            self.current_gesture, self.wrist_position, self.stable_for = gesture_data
 
             if self.wrist_position:
                 self.core.ui.set_wrist_position(self.wrist_position)
             if self.current_gesture != self.previous_gesture:
                 self.previous_gesture = self.current_gesture
-                print("Gesture changed. Current gesture:", self.current_gesture, "Wrist position:", self.wrist_position, "Duration:", str(duration) + "seconds")
+                print("Gesture changed. Current gesture:", self.current_gesture, "Wrist position:", self.wrist_position, "Duration:", str(self.stable_for) + "seconds")
 
-       
-            self.update_filter_carousel( tick)
-            self.update_filter_trigger(self.current_gesture)
+            self.update_filter_carousel()
+            self.update_countdown_trigger()
+
+            
 
 
-    def update_filter_carousel(self, tick: float):
+    def update_filter_carousel(self):
 
+        # Skip if we haven't waited at least 0.5 seconds since the last swipe
+        if (time.time() - self.last_swipe_time) < 0.5:
+            return
+        
         swipe_direction = self.core.gesture_detector.finger_swipe()
 
         #TODO Gesture detection for swiping
@@ -227,15 +236,23 @@ class Active(State):
                 self.core.ui.set_filter(self.core.filters.current_name, self.core.get_current_perf())
                 print('Current filter is' + self.core.filters.current_name)
 
-    def update_filter_trigger(self, open_palm: str):
+    def update_countdown_trigger(self):
+      
+        hold_required = 3.0
+        fraction = self.stable_for / hold_required
+
         if self.current_gesture == "Open_Palm":
-            self.progress_counter += 0.05
-        elif self.progress_counter > 0.0:
-            self.progress_counter -= 0.1
-        self.core.ui.set_prog(self.progress_counter)
-        if self.progress_counter >= 1.0:
+            self.core.ui.set_prog(fraction)
+            
+        else:
             self.core.ui.set_prog(0.0)
-            self.core.set_state(Countdown())
+
+        if fraction >= 1.0 and self.current_gesture == "Open_Palm":
+                self.core.set_state(Countdown())
+
+
+
+
     
 
 class Countdown(State):
@@ -245,6 +262,7 @@ class Countdown(State):
 
     def enter(self, tick:float):
         self.countdown_time = tick + 4
+        print ("Starting the countdown")
     
     def update(self, tick: float, frame: MatLike):
         if self.countdown_time - tick > 0:
@@ -288,13 +306,12 @@ class ShowPic(State):
 
     def __init__(self):
         self.name = "ShowPic"
-        self.show_image_duration = 15
         self.progress_counter = 0.0
 
 
     def enter(self, tick: float):
+        self.show_image_end_time = time.time()
         self.core.image_processing_active = False
-        self.show_image_end_time = time.time() + self.show_image_duration
         print ("Entering ShowPic state...")  #debug
 
         # Frame does not change so update only once
@@ -307,7 +324,7 @@ class ShowPic(State):
     def update(self, tick: float, frame: MatLike):
 
 
-        if time.time() >= self.show_image_end_time: # TODO: Manual dismiss
+        if time.time() >= self.show_image_end_time + 60: # TODO: Manual dismiss
             self.core.ui.hide("image")
             self.core.ui.hide("qr")     
             self.core.filtered_frame = None
@@ -316,18 +333,22 @@ class ShowPic(State):
             return
         
         gesture_data = self.core.gesture_detector.detect_gestures(frame)
-
     
         if gesture_data is None:
             print ("No hand landmarks found. Skipping frame.")
             return
         else:
+             print ("Gesture data:", gesture_data)
+             # Unpack the gesture data  
+             self.current_gesture = gesture_data[0]
+             self.wrist_position = gesture_data[1]
+             duration = gesture_data[2]
              self.current_gesture, self.wrist_position, duration = gesture_data
-             self.update_filter_trigger(self.current_gesture)
+             self.update_filter_trigger()
              self.core.ui.set_wrist_position(self.wrist_position)
              self.core.ui.set_prog(self.progress_counter)
 
-    def update_filter_trigger(self, current_gesture: str):
+    def update_filter_trigger(self):
         if self.current_gesture == "Closed_Palm":
             self.progress_counter += 0.05
         elif self.progress_counter > 0.0:
