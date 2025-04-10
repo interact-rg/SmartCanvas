@@ -140,7 +140,6 @@ class GestureDetection:
                         swipe = "Swipe_Left"
                         self.swipe_armed = False
                         self.swipe_arming_time = time.time()
-
             return swipe
         
 

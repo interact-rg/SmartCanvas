@@ -243,7 +243,7 @@ class Active(State):
 
     def update_countdown_trigger(self):
       
-        hold_required = 3.0
+        hold_required = 4.0
         fraction = self.stable_for / hold_required
 
         if self.current_gesture == "Open_Palm":
@@ -253,6 +253,7 @@ class Active(State):
             self.core.ui.set_prog(0.0)
 
         if fraction >= 1.0 and self.current_gesture == "Open_Palm":
+                self.core.ui.set_prog(0.0)
                 self.core.set_state(Countdown())
 
 
@@ -311,7 +312,6 @@ class ShowPic(State):
 
     def __init__(self):
         self.name = "ShowPic"
-        self.progress_counter = 0.0
 
 
     def enter(self, tick: float):
@@ -347,20 +347,24 @@ class ShowPic(State):
              # Unpack the gesture data  
              self.current_gesture = gesture_data[0]
              self.wrist_position = gesture_data[1]
-             duration = gesture_data[2]
-             self.current_gesture, self.wrist_position, duration = gesture_data
+             self.current_gesture, self.wrist_position, self.stable_for = gesture_data
              self.update_filter_trigger()
              self.core.ui.set_wrist_position(self.wrist_position)
-             self.core.ui.set_prog(self.progress_counter)
 
     def update_filter_trigger(self):
-        if self.current_gesture == "Closed_Palm":
-            self.progress_counter += 0.05
-        elif self.progress_counter > 0.0:
-            self.progress_counter -= 0.1
-        if self.progress_counter >= 1.0:
-            self.core.filtered_frame = None
-            self.core.image_id = None
-            self.progress_counter = 0.0
-            self.core.ui.hide("image")
-            self.core.set_state(Active())
+
+        hold_required = 1
+        fraction = self.stable_for / hold_required
+
+        if self.current_gesture == "Closed_Fist":
+            self.core.ui.set_prog(fraction)
+            
+        else:
+            self.core.ui.set_prog(0.0)
+
+        if fraction >= 1.0 and self.current_gesture == "Closed_Fist":
+                print("Closed fist detected. Hiding image and QR code.")
+                self.core.ui.hide("image")
+                self.core.ui.hide("qr")     
+
+                self.core.set_state(Active())
