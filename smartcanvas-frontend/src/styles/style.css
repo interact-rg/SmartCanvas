@@ -168,6 +168,7 @@
 #qr-popup.active {
   animation: qr 60s linear;
 }
+
 #qr-popup {
   transition: bottom 0.5s ease-in-out;
   position: absolute;
@@ -175,9 +176,8 @@
   right: 1rem;
   padding: 3px;
   background: conic-gradient(
-   /* rgb(112, 110, 189) max(0%, calc(var(--qr-timeout) - 1%)), */
-   var(--color-highlight) max(0%, calc(var(--qr-timeout) - 1%)),
-    rgb(255, 0, 0) var(--qr-timeout),
+    var(--color-highlight) max(0%, calc(var(--qr-timeout) - 1%)),
+    var(--color-highlight-glow) var(--qr-timeout),
     rgb(0, 0, 0) 0deg
   );
   border-radius: calc(2em + 3px);

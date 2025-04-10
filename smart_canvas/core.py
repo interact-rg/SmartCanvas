@@ -185,23 +185,29 @@ class Active(State):
 
     def update(self, tick: float, frame: MatLike):
 
-        self.current_gesture, self.wrist_position, duration = self.core.gesture_detector.detect_gestures(frame)
-
-        if self.wrist_position:
-            self.core.ui.set_wrist_position(self.wrist_position)
-        if self.current_gesture != self.previous_gesture:
-            self.previous_gesture = self.current_gesture
-            print("Gesture changed. Current gesture:", self.current_gesture, "Wrist position:", self.wrist_position, "Duration:", str(duration) + "seconds")
-     
-
-        # checks if a face is present for X seconds and moves to idle state if not
         face_present, duration = self.core.face_detector.detect_face(frame)
         if (face_present == False and (duration > 5.0)):
-            print("Face present:", face_present, "Duration:", str(duration) + "seconds")
+            print("Face not present for duration:", str(duration) + "seconds")
             self.core.set_state(Idle())
+
+
+        gesture_data = self.core.gesture_detector.detect_gestures(frame)
+        if gesture_data is None:
+            print ("No hand landmarks found. Skipping frame.")
+            return
+        
+        else: 
+            self.current_gesture, self.wrist_position, duration = gesture_data
+
+            if self.wrist_position:
+                self.core.ui.set_wrist_position(self.wrist_position)
+            if self.current_gesture != self.previous_gesture:
+                self.previous_gesture = self.current_gesture
+                print("Gesture changed. Current gesture:", self.current_gesture, "Wrist position:", self.wrist_position, "Duration:", str(duration) + "seconds")
+
        
-        self.update_filter_carousel( tick)
-        self.update_filter_trigger(self.current_gesture)
+            self.update_filter_carousel( tick)
+            self.update_filter_trigger(self.current_gesture)
 
 
     def update_filter_carousel(self, tick: float):
@@ -284,8 +290,7 @@ class ShowPic(State):
         self.name = "ShowPic"
         self.show_image_duration = 15
         self.progress_counter = 0.0
-        self.change_filter_time = 0.0
-        self.current_gesture = "No gestures yet"
+
 
     def enter(self, tick: float):
         self.core.image_processing_active = False
@@ -301,7 +306,6 @@ class ShowPic(State):
 
     def update(self, tick: float, frame: MatLike):
 
-        print("updating ShowPic state...")
 
         if time.time() >= self.show_image_end_time: # TODO: Manual dismiss
             self.core.ui.hide("image")
@@ -311,10 +315,17 @@ class ShowPic(State):
             self.core.set_state(Active())
             return
         
-        self.current_gesture, self.wrist_position, _ = self.core.gesture_detector.detect_gestures(frame)
-        self.update_filter_trigger(self.current_gesture)
-        self.core.ui.set_wrist_position(self.wrist_position)
-        self.core.ui.set_prog(self.progress_counter)
+        gesture_data = self.core.gesture_detector.detect_gestures(frame)
+
+    
+        if gesture_data is None:
+            print ("No hand landmarks found. Skipping frame.")
+            return
+        else:
+             self.current_gesture, self.wrist_position, duration = gesture_data
+             self.update_filter_trigger(self.current_gesture)
+             self.core.ui.set_wrist_position(self.wrist_position)
+             self.core.ui.set_prog(self.progress_counter)
 
     def update_filter_trigger(self, current_gesture: str):
         if self.current_gesture == "Closed_Palm":
