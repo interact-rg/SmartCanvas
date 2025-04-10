@@ -38,6 +38,8 @@ class GestureDetection:
         self.swipe_arming_time = 0.0
 
 
+
+
     GestureResult = Tuple[str, Tuple[float, float], float]
 
     def detect_gestures(self, frame: MatLike) -> GestureResult|None:
@@ -108,14 +110,14 @@ class GestureDetection:
         # If so, return the swipe direction
         
         swipe = None
-
+        
         if (self.swipe_armed and time.time() - self.swipe_arming_time > 3.0):
             print("Swipe timed out...")
             self.swipe_armed = False
             return None 
 
         if self.gesture == "Swipe_Armed":
-            if (self.swipe_armed == False) and self.movement_stable_duration >= 0.6:
+            if (self.swipe_armed == False) and self.movement_stable_duration >= 0.4:
                 self.swipe_armed = True
                 self.armed_fingertip_x = self.current_fingertip_x
                 self.swipe_arming_time = time.time()

@@ -175,7 +175,8 @@ class Active(State):
         self.wrist_position = [0,0]
         self.previous_gesture = None
         self.stable_for = 0.0
-        self.last_swipe_time = 0.0
+        self.left_swipe_cooldown = 0.0
+        self.right_swipe_cooldown = 0.0
 
 
     # Runs once on init
@@ -218,23 +219,27 @@ class Active(State):
     def update_filter_carousel(self):
 
         # Skip if we haven't waited at least 0.5 seconds since the last swipe
-        if (time.time() - self.last_swipe_time) < 0.5:
-            return
+  
         
         swipe_direction = self.core.gesture_detector.finger_swipe()
 
         #TODO Gesture detection for swiping
         if (swipe_direction == "Swipe_Right"):
-
+                # Check if we are in cooldown
+                if time.time() - self.right_swipe_cooldown < 0.5:
+                    return
                 self.core.filters.next_filter()
                 self.core.ui.set_filter(self.core.filters.current_name, self.core.get_current_perf())
                 print('Current filter is' + self.core.filters.current_name)
+                self.left_swipe_cooldown = time.time()
 
         elif (swipe_direction == "Swipe_Left"):
-
+                if time.time() - self.left_swipe_cooldown < 0.5:
+                    return
                 self.core.filters.previous_filter()
                 self.core.ui.set_filter(self.core.filters.current_name, self.core.get_current_perf())
                 print('Current filter is' + self.core.filters.current_name)
+                self.left_swipe_cooldown = time.time()
 
     def update_countdown_trigger(self):
       
