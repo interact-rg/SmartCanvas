@@ -199,3 +199,37 @@
     aspect-ratio: 16/9;
   }
 }
+
+#filter-carousel {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  padding-bottom: 5px;
+  width: 90%; 
+  height: 120px;
+  max-width: 1000px;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+
+  img {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    border: solid 2px var(--color-text);
+    opacity: 0.65;
+  }
+  img.selected {
+    width: 120px;
+    height: 120px;
+    border: solid 4px var(--color-highlight);
+    opacity: 1;
+  }
+}

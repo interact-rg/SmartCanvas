@@ -5,97 +5,56 @@ interface FilterFramesProps {
   chosenFilter: string | "";
 }
 
+type FilterFrame = {
+  image: string;
+  key: number;
+}
+
 const FilterFrames: React.FC<FilterFramesProps> = ({
   availableFilters,
   chosenFilter,
 }) => {
   // Construct filter paths dynamically using availableFilters
-  const filters =
+  const filters: string[] =
     availableFilters.length !== 0
-      ? availableFilters.map((filterName) => `/images/${filterName}.jpg`)
-      : ["/images/anime style.jpg"];
-
-  //console.log("Filters: ", availableFilters);
-  //console.log( "Chosen filter: " + chosenFilter + ", index: ", availableFilters.indexOf(chosenFilter));
+      ? availableFilters.map((filterName) => (`/images/${filterName}.jpg`))
+      : ["/images/anime style.jpg"]; // Default filter if availableFilters is empty
 
   const [chosenFilterIndex, setChosenFilterIndex] = useState<number>(0); // Max value: filters.length
   const containerRef = useRef<HTMLDivElement>(null);
+  const [paddedList, setPaddedList] = useState<FilterFrame[]>([]);
+  const MAX_FILTERS = 5; // number of filters to display on both sides
 
   // Update chosenFilterIndex when chosenFilter changes
   useEffect(() => {
-    const newChosenFilterIndex = availableFilters.indexOf(chosenFilter);
+    const filterIndex = availableFilters.indexOf(chosenFilter);
     // Only update if the chosenFilter is found in the availableFilters
-    if (newChosenFilterIndex >= 0) {
-      setChosenFilterIndex(newChosenFilterIndex);
+    if (filterIndex >= 0) {
+      setChosenFilterIndex(filterIndex);
+      let list: FilterFrame[] = [];
+
+      for (let i = -MAX_FILTERS; i <= MAX_FILTERS; i++) {
+        list.push({
+          image: filters[(filterIndex + i + filters.length) % filters.length],
+          key: filterIndex + i
+        });
+      }
+      setPaddedList(list);
     }
   }, [chosenFilter, availableFilters]); // Re-run this effect when chosenFilter or availableFilters change
 
-  // This function will center the selected filter and make sure it's fully visible
-  const scrollToSelectedFilter = (index: number) => {
-    if (containerRef.current) {
-      const container = containerRef.current;
-      const selectedFilter = container.children[index] as HTMLElement;
-
-      // Calculate the left offset of the selected filter
-      const filterOffset = selectedFilter.offsetLeft;
-      const containerWidth = container.offsetWidth;
-
-      // Make sure the filter image is fully visible by adjusting the scroll position
-      const scrollPosition =
-        filterOffset - containerWidth / 2 + selectedFilter.offsetWidth / 2;
-
-      // Scroll to the calculated position with smooth behavior
-      container.scrollTo({
-        left: scrollPosition,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  // Automatically center the selected filter when the component is mounted or the index changes
-  useEffect(() => {
-    scrollToSelectedFilter(chosenFilterIndex);
-  }, [chosenFilterIndex]);
-
   return (
-    <div
+    <div id="filter-carousel"
       ref={containerRef}
-      style={{
-        position: "absolute",
-        bottom: "10px", // Adjust this to move the box higher or lower
-        left: "55%",
-        transform: "translateX(-50%)",
-        display: "flex",
-        overflowX: "hidden", // Hide the scrollbar
-        paddingBottom: "5px", // Add more padding at the bottom
-        width: "90%", // Increase the width of the box
-        maxWidth: "1000px",
-        scrollBehavior: "smooth", // Enable smooth scrolling
-        scrollbarWidth: "none",
-      }}
     >
-      {filters.map((filter, index) => (
+      {/* TODO: carousel "snaps" when looping over */}
+      {paddedList.map((filter) => (
         <img
-          key={index}
-          src={filter}
-          alt={`frame-${index}`}
-          style={{
-            width: chosenFilterIndex === index ? "120px" : "80px",
-            height: chosenFilterIndex === index ? "120px" : "80px",
-            margin: "0 10px",
-            borderRadius: "10px",
-            border: `solid ${
-              chosenFilterIndex === index ? "#ff6347 4px" : "#ccc 2px"
-            }`,
-            cursor: "pointer",
-            boxSizing: "border-box",
-            transition: "all 0.3s ease",
-            opacity: chosenFilterIndex === index ? 1 : 0.5,
-            transform:
-              chosenFilterIndex === index
-                ? "translateY(0)"
-                : "translateY(15px)",
-          }}
+          key={filter.key}
+          src={filter.image}
+          className={
+            filter.key === chosenFilterIndex ? "selected" : ""
+          }
         />
       ))}
     </div>
