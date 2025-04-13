@@ -2,9 +2,11 @@
  * This element displays the processed images sent by the server.
  */
 
-import React, { use, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ImagePainter from './ImagePainter';
-import '../styles/ServerFeed.css'; 
+import '../styles/ServerFeed.css';
+import closed_fist from '../assets/closed_fist.png';
+import exit from '../assets/exit.png';
 
 interface ServerFeedProps {
   state: { [key: string]: any };
@@ -12,9 +14,10 @@ interface ServerFeedProps {
   visible: boolean;
   filter: string;
   paintingTimer: number; // Optional prop for painting timer
+  needsInstruction: boolean; // Prop to indicate the need for closed fist instruction
 }
 
-const ServerFeed: React.FC<ServerFeedProps> = ({ state, artisticFrame, visible = false, filter, paintingTimer }) => {
+const ServerFeed: React.FC<ServerFeedProps> = ({ state, artisticFrame, visible = false, filter, paintingTimer, needsInstruction }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [paintingVisible, setPaintingVisible] = useState<boolean>(false);
   const [interrupt, setInterrupt] = useState<boolean>(true); // Flag to interrupt the painting process
@@ -79,10 +82,11 @@ const ServerFeed: React.FC<ServerFeedProps> = ({ state, artisticFrame, visible =
         //setBackground(); // Set the background image
         setInterrupt(false); // Reset the interrupt flag
         setPaintingVisible(true);
-      } 
+      }
       if (state.ShowPic) {
         //console.log("ServerFeed: ShowPic is true, setting interrupt to true.");
         setInterrupt(true); // Set the interrupt flag to true
+        console.log("Needs instruction, showPic active: " + needsInstruction +" " + state.ShowPic);
       }
     }
   }, [visible, state]);
@@ -97,8 +101,14 @@ const ServerFeed: React.FC<ServerFeedProps> = ({ state, artisticFrame, visible =
 
   return (
     <div className="server-feed">
-      {paintingVisible && <ImagePainter canvas={canvasRef.current} filter={filter} interrupt={interrupt} averageTime={paintingTimer} onInterrupt={handleAck}/>}
-      <canvas ref={canvasRef} width={1280} height={720} className={`canvas ${state.ShowPic ? `artistic-frame` : ''}`}/>
+      {paintingVisible && <ImagePainter canvas={canvasRef.current} filter={filter} interrupt={interrupt} averageTime={paintingTimer} onInterrupt={handleAck} />}
+      <canvas ref={canvasRef} width={1280} height={720} className={`canvas ${state.ShowPic ? `artistic-frame` : ''}`} />
+      {/* For testing purposes, show image of exit sign and closed fist as an instruction to the user */}
+      {(needsInstruction && state.ShowPic) &&
+        <div style={{ border: '2px', borderColor: 'black', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', position: 'absolute', top: '10%', right: '1%', height: '10%', width: '10%' }}>
+          <img src={exit} id="exit-sign" style={{ maxWidth: '50%'}} />
+          <img src={closed_fist} id="closed-fist" style={{ maxWidth: '50%' }} />
+        </div>}
     </div>
   );
 };

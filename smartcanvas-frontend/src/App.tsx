@@ -25,6 +25,10 @@ const App: React.FC = () => {
   const intervalRef = useRef<number | null>(null); // Ref to store the interval ID
   const paintingTimerRef = useRef<number>(paintingTimer); // Ref to store the painting timer
 
+  // For testing purposes. Set to true when the core version is set to main (closed fist closes the artistic view)
+  // Set to false when the core version is set to alternate (artistic view closes on a timer)
+  const needsInstruction = true;  
+
   // Map filter to highlight color
   const getHighlightColor = (filter: string) => {
     switch (filter) {
@@ -144,7 +148,7 @@ const App: React.FC = () => {
 
       <div
         className={`${serverFeedVisible ? "server-feed-container" : "hidden"}`}>
-        <ServerFeed state={appState} artisticFrame={inboundFrame} visible={serverFeedVisible} filter={chosenFilter} paintingTimer={chosenFilterPerformance}/>
+        <ServerFeed state={appState} artisticFrame={inboundFrame} visible={serverFeedVisible} filter={chosenFilter} paintingTimer={chosenFilterPerformance} needsInstruction={needsInstruction}/>
       </div>
 
       <div
