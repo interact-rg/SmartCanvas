@@ -1,11 +1,10 @@
 /**
  * Component to show different instructions based on the state of the application
  */
-import React, {useState, useEffect, use } from "react";
+import React, {useState, useEffect } from "react";
 import waving_hand from "../assets/five_fingers.png"
 import "../styles/hand.css"
 import swiping_hand from "../assets/swiping_hand.png"
-import ImagePainter from "./ImagePainter";
 
 interface InstructionsProps {
   state: { [key: string]: any };
@@ -109,13 +108,7 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4, filte
                   <div className="big-text">{renderCountdown()}</div>
               </div>
             );
-          // case "Painting":
-          //   return (
-          //     <div className="full-container">
-          //       <img src="/images/canvas.jpg"></img>
-          //       <ImagePainter filter={filter || "painterly"} />
-          //     </div>
-          //   );
+
           default:
             return <></>;
         }
@@ -131,16 +124,16 @@ const Instructions: React.FC<InstructionsProps> = ({ state, countdown = 4, filte
     }
   };
 
-  const hideSwipingHand = () => {
-    setSwipeVisible((prev) => !prev);
-    console.log("swiping_hand set invisible (should be false): " + swipeIsVisible)
-    setTimeout( function () {
-      console.log("swiping_hand set invisible (should be false): " + swipeIsVisible)
-      setSwipeVisible((prev) => !prev);
-      console.log("Swiping hand visible (should be true): " + swipeIsVisible)
-    }, 5000);
+  // const hideSwipingHand = () => {
+  //   setSwipeVisible((prev) => !prev);
+  //   console.log("swiping_hand set invisible (should be false): " + swipeIsVisible)
+  //   setTimeout( function () {
+  //     console.log("swiping_hand set invisible (should be false): " + swipeIsVisible)
+  //     setSwipeVisible((prev) => !prev);
+  //     console.log("Swiping hand visible (should be true): " + swipeIsVisible)
+  //   }, 5000);
     
-  }
+  // }
 
   return (
     <div className="instructions">

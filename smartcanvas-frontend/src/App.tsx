@@ -27,7 +27,7 @@ const App: React.FC = () => {
 
   // For testing purposes. Set to true when the core version is set to main (closed fist closes the artistic view)
   // Set to false when the core version is set to alternate (artistic view closes on a timer)
-  const needsInstruction = true;  
+  const needsInstruction = false;  
 
   // Map filter to highlight color
   const getHighlightColor = (filter: string) => {

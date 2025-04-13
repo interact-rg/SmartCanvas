@@ -1,4 +1,4 @@
-import React, { use, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import brushImg from "../assets/brush.png";
 
 interface ImagePainterProps {
