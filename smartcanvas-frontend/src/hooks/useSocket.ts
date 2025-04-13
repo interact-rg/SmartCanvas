@@ -5,8 +5,16 @@ import { io, Socket } from "socket.io-client";
 
 let socketInstance: Socket | null = null;
 
-const useSocket = (url: string) => {
-  const [socket, setSocket] = useState<Socket | null>(null);
+const useSocket = (url: string, options?: SocketIoOptions) => {
+  // --------------------------------------
+    const [socket, setSocket] = useState<Socket | null>(null);
+    // Merge default options with passed options
+    const mergedOptions = useRef({
+      reconnection: false, // Your default
+      query: { "version": "alternate" }, // Your default
+      ...options // Spread passed options (e.g., path, transports)
+    });
+  
 
   useEffect(() => {
     if (!socketInstance) {

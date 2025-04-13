@@ -20,7 +20,18 @@ interface SocketHandlerProps {
 }
 
 const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress, onHoldStill, onFilters, onChosenFilter, onFilterPerformance, onQrCode }) => {
-  const socket = useSocket('http://localhost:5000');
+  // --- CHANGE 1: Determine Server URL Dynamically ---
+  const serverHostname = window.location.hostname; // e.g., vm1029.kaj.pouta.csc.fi
+  const protocol = window.location.protocol;     // e.g., https:
+  const serverUrl = `${protocol}//${serverHostname}`; // Connect via Caddy (no port)
+  // -------------------------------------------------
+
+  // --- CHANGE 2: Pass URL and Options to useSocket ---
+  // This requires useSocket hook to be modified to accept the second argument
+  const socket = useSocket(serverUrl, {
+    path: "/socket.io/", // Specify the path for Caddy routing
+    transports: ['websocket', 'polling'] // Standard transports
+  });
   const [canSendFrame, setCanSendFrame] = useState(true);
   const previousFrameRef = useRef<string | null>(null);
 
