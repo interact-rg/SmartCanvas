@@ -33,7 +33,7 @@ const App: React.FC = () => {
       case "oil painting":
         return "orange";
       case "painterly":
-        return "darkgreen";
+        return "darkblue";
       case "pointillism":
         return "goldenrod";
       case "watercolor":
@@ -48,7 +48,6 @@ const App: React.FC = () => {
   const handleStateChange = (state: any) => {
     //console.log("State change received in App: ", state);
     if (state.Countdown) {
-      setPaintingTimer(12);
       clearTimeout(qrTimeout);
       setQrCode(null);
       setInboundFrame("");
@@ -72,7 +71,7 @@ const App: React.FC = () => {
         }, 1000);
       }
       else if (state.ShowPic && paintingTimerRef.current > 0) {
-        console.log("Painting timer: ", paintingTimerRef.current);
+        console.log("Painting timer left: ", paintingTimerRef.current);
         setTimeout(() => {
           setAppState(state);
         }, paintingTimerRef.current * 1000);
@@ -87,8 +86,19 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    //console.log("App state: ", appState);
+    console.log("App state: ", appState);
   }, [appState]);
+
+  useEffect(() => {
+    // Set painting timer to the chosen filter performance
+    if (chosenFilterPerformance > 0) {
+      setPaintingTimer(Math.floor(chosenFilterPerformance));
+      console.log("Painting timer set to: ", Math.floor(chosenFilterPerformance) -4); // Subtract 4 seconds for the countdown
+    } else {
+      setPaintingTimer(12);
+      console.log("Painting timer set to default 12 seconds");
+    }
+  }, [chosenFilterPerformance]);
 
   useEffect(() => {
     paintingTimerRef.current = paintingTimer;
@@ -134,7 +144,7 @@ const App: React.FC = () => {
 
       <div
         className={`${serverFeedVisible ? "server-feed-container" : "hidden"}`}>
-        <ServerFeed state={appState} artisticFrame={inboundFrame} visible={serverFeedVisible} filter={chosenFilter} />
+        <ServerFeed state={appState} artisticFrame={inboundFrame} visible={serverFeedVisible} filter={chosenFilter} paintingTimer={chosenFilterPerformance}/>
       </div>
 
       <div
@@ -150,7 +160,7 @@ const App: React.FC = () => {
         <FilterFrames availableFilters={filters} chosenFilter={chosenFilter} />
       </div>
 
-      {paintingTimer == 0 && <DownloadPrompt
+      {!(appState.Painting == true || appState.Painting == false) && <DownloadPrompt
         image={inboundFrame}
         downloadQr={qrCode}
       />}

@@ -2,9 +2,8 @@
  * This element displays the processed images sent by the server.
  */
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { use, useEffect, useRef, useState } from 'react';
 import ImagePainter from './ImagePainter';
-import backgroundImg from '../assets/canvas.jpg';
 import '../styles/ServerFeed.css'; 
 
 interface ServerFeedProps {
@@ -12,12 +11,14 @@ interface ServerFeedProps {
   artisticFrame: string | null;
   visible: boolean;
   filter: string;
+  paintingTimer: number; // Optional prop for painting timer
 }
 
-const ServerFeed: React.FC<ServerFeedProps> = ({ state, artisticFrame, visible = false, filter }) => {
+const ServerFeed: React.FC<ServerFeedProps> = ({ state, artisticFrame, visible = false, filter, paintingTimer }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [paintingVisible, setPaintingVisible] = useState<boolean>(false);
   const [interrupt, setInterrupt] = useState<boolean>(true); // Flag to interrupt the painting process
+  const [ack, setAck] = useState<boolean>(false); // Flag for ImagePainter to ack the interrupt
 
   useEffect(() => {
     // Check if the artistic frame is available, the canvas is ready and the painting process in not active
@@ -60,6 +61,8 @@ const ServerFeed: React.FC<ServerFeedProps> = ({ state, artisticFrame, visible =
   useEffect(() => {
     if (!visible) {
       setPaintingVisible(false); // Hide the painting component when not visible
+      setInterrupt(true); // Set the interrupt flag to true
+      setAck(false); // Reset the ack flag
       const canvas = canvasRef.current;
       if (!canvas) {
         return;
@@ -78,29 +81,23 @@ const ServerFeed: React.FC<ServerFeedProps> = ({ state, artisticFrame, visible =
         setPaintingVisible(true);
       } 
       if (state.ShowPic) {
+        console.log("ServerFeed: ShowPic is true, setting interrupt to true.");
         setInterrupt(true); // Set the interrupt flag to true
-        //setPaintingVisible(false); // Hide the painting component when ShowPic is true
       }
     }
   }, [visible, state]);
 
-  function setBackground() {
-    // TODO: make this work
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      return;
+  const handleAck = (nack: boolean) => {
+    console.log("Ack received: ", nack);
+    setAck(nack); // Update the ack state
+    if (ack) {
+      setPaintingVisible(false); // Hide the painting component
     }
-    const context = canvas.getContext('2d');
-    const background = new Image();
-    background.src = backgroundImg;
-    context?.clearRect(0, 0, canvas.width, canvas.height);
-    context?.drawImage(background, 0, 0, canvas.width, canvas.height);
   }
 
   return (
     <div className="server-feed">
-      {/* TODO: create an awesome frame around the image at some point */}
-      {paintingVisible && <ImagePainter canvas={canvasRef.current} filter={filter} interrupt={interrupt} />}
+      {paintingVisible && <ImagePainter canvas={canvasRef.current} filter={filter} interrupt={interrupt} averageTime={paintingTimer} onInterrupt={handleAck}/>}
       <canvas ref={canvasRef} width={1280} height={720} className={`canvas ${state.ShowPic ? `artistic-frame` : ''}`}/>
     </div>
   );
