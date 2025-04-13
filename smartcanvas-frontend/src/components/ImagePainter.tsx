@@ -17,11 +17,11 @@ const ImagePainter: React.FC<ImagePainterProps> = ({ canvas, filter, interrupt, 
   // Update the interrupt ref whenever the interrupt prop changes
   useEffect(() => {
     interruptRef.current = interrupt;
-    console.log("Interrupt updated in ImagePainter:", interrupt);
+    //console.log("Interrupt updated in ImagePainter:", interrupt);
 
     // Stop the animation immediately if interrupt is true
     if (interrupt) {
-      console.log("Animation stopped due to interrupt.");
+      //console.log("Animation stopped due to interrupt.");
       onInterrupt(true); // Notify the parent component about the interrupt
     }
   }, [interrupt]);
@@ -67,7 +67,7 @@ const ImagePainter: React.FC<ImagePainterProps> = ({ canvas, filter, interrupt, 
 
     const spacing = Math.min(height, width) * (1 / maxRows); // Base spacing based on the maximum number of rows
     const brushSize = Math.min(width, height) * 0.3; // Brush size
-    console.log("Spacing:", spacing, "Brush Size:", brushSize, "Max Rows:", maxRows);
+    //console.log("Spacing:", spacing, "Brush Size:", brushSize, "Max Rows:", maxRows);
 
     let previousX = -1;
 
@@ -75,7 +75,7 @@ const ImagePainter: React.FC<ImagePainterProps> = ({ canvas, filter, interrupt, 
       if (interruptRef.current) {
         // Interrupt received from the parent component
         if (animationRef.current !== null) {
-          console.log("Animation interrupted.");
+          //console.log("Animation interrupted.");
           cancelAnimationFrame(animationRef.current);
           animationRef.current = null;
           onInterrupt(true); // Notify the parent component about the interrupt
@@ -124,12 +124,12 @@ const ImagePainter: React.FC<ImagePainterProps> = ({ canvas, filter, interrupt, 
 
     return () => {
       // Cleanup animation on unmount
-      console.log("ImagePainter unmounted, cleaning up animation.");
+      //console.log("ImagePainter unmounted, cleaning up animation.");
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
         animationRef.current = null;
         onInterrupt(true); // Notify the parent component about the interrupt
-        console.log("Ack sent by cleanup function.");
+        //console.log("Ack sent by cleanup function.");
       }
     };
   }, [filter, canvas]);

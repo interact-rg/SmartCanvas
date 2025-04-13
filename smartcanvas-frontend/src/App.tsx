@@ -86,17 +86,17 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    console.log("App state: ", appState);
+    //console.log("App state: ", appState);
   }, [appState]);
 
   useEffect(() => {
     // Set painting timer to the chosen filter performance
     if (chosenFilterPerformance > 0) {
-      setPaintingTimer(Math.floor(chosenFilterPerformance));
-      console.log("Painting timer set to: ", Math.floor(chosenFilterPerformance) -4); // Subtract 4 seconds for the countdown
+      setPaintingTimer(Math.floor(chosenFilterPerformance) - 4); // Subtract 4 seconds for the countdown
+      //console.log("Painting timer set to: ", Math.floor(chosenFilterPerformance) -4); 
     } else {
       setPaintingTimer(12);
-      console.log("Painting timer set to default 12 seconds");
+      //console.log("Painting timer set to default 12 seconds");
     }
   }, [chosenFilterPerformance]);
 

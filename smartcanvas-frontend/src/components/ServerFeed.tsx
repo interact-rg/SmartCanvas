@@ -81,14 +81,14 @@ const ServerFeed: React.FC<ServerFeedProps> = ({ state, artisticFrame, visible =
         setPaintingVisible(true);
       } 
       if (state.ShowPic) {
-        console.log("ServerFeed: ShowPic is true, setting interrupt to true.");
+        //console.log("ServerFeed: ShowPic is true, setting interrupt to true.");
         setInterrupt(true); // Set the interrupt flag to true
       }
     }
   }, [visible, state]);
 
   const handleAck = (nack: boolean) => {
-    console.log("Ack received: ", nack);
+    //console.log("Ack received: ", nack);
     setAck(nack); // Update the ack state
     if (ack) {
       setPaintingVisible(false); // Hide the painting component
