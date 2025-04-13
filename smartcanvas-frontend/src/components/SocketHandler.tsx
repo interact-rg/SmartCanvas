@@ -1,7 +1,3 @@
-/**
- * Code to handle socket connection and receive data from the server
- * 
- * */
 
 import React, { useEffect, useState, useRef } from 'react';
 import useSocket from '../hooks/useSocket';
@@ -19,53 +15,51 @@ interface SocketHandlerProps {
   onQrCode: (qrCode: string) => void;
 }
 
-const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress, onHoldStill, onFilters, onChosenFilter, onFilterPerformance, onQrCode }) => {
-  const serverHostname = window.location.hostname;
-  const protocol = window.location.protocol;
-  // Construct the server URL using the same protocol
-  const serverUrl = `${protocol}//${serverHostname}:5000`;
+const SocketHandler: React.FC<SocketHandlerProps> = ({
+  onStateChange,
+  videoFrame,
+  onArtisticFrame,
+  onHandPosition,
+  onProgress,
+  onHoldStill,
+  onFilters,
+  onChosenFilter,
+  onFilterPerformance,
+  onQrCode,
+}) => {
+  // CHANGED LINE: use same origin + /socket.io path instead of localhost:5000
+  const socket = useSocket(`${window.location.origin}/socket.io`);
 
-
-  const socket = useSocket(serverUrl); // Use the dynamic URL
   const [canSendFrame, setCanSendFrame] = useState(true);
   const previousFrameRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!socket) return;
 
-    // Handle the list of available filters received from the server
+    // Handle the list of available filters
     const handleAvailableFilters = (filters: string[]) => {
       if (filters.length > 0) {
         onFilters(filters);
       }
     };
 
-    // Update the UI state when the server sends a message
+    // Update the UI state
     const handleUpdateUIResponse = (msg: any) => {
-      //console.log('Received update_ui_response: ', msg);
-
-      // Counter to hold your hand still
       if (msg.hold_timer !== undefined) {
-        //console.log('Hold timer: ', msg.hold_timer);
         onProgress(msg.hold_timer);
-        return;
-      }
-      // Counter to keep still when the image is "being painted"
-      else if (msg.timer !== undefined) {
-        //console.log('Timer: ', msg.timer);
+      } else if (msg.timer !== undefined) {
         onHoldStill(msg.timer);
-        return;
       } else {
         onStateChange(msg);
       }
     };
 
-    // Handle frame received acknowledgement from the server
+    // Ack from server
     const handleAck = () => {
-      //console.log('Received ack, ready to send new frame');
       setCanSendFrame(true);
     };
 
+    // Filter info
     const handleFilter = (message: any) => {
       if (message.name) {
         onChosenFilter(message.name);
@@ -73,11 +67,10 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
       if (message.performance) {
         onFilterPerformance(message.performance);
       }
-    }
+    };
 
-    // Handle the processed artistic image from the server
+    // Artistic frame from server
     const handleArtisticFrame = (frame: string) => {
-      //console.log('Received artistic frame from the server: ', frame);
       onArtisticFrame(frame);
     };
 
@@ -96,27 +89,22 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
       socket.off('hand_position', onHandPosition);
       socket.off('available_filters', handleAvailableFilters);
       socket.off('qr_code', onQrCode);
+      socket.off('filter', handleFilter);
     };
   }, [socket]);
 
   useEffect(() => {
-    // Try to send frame to the server
     const sendFrame = (frame: Blob) => {
-      if (!socket || !canSendFrame) return; // Wait for ack before sending a new frame
+      if (!socket || !canSendFrame) return;
 
-      // Convert blob to base64 string
+      // Convert blob to base64
       const reader = new FileReader();
       reader.onloadend = () => {
         const currentFrame = reader.result as string;
-
-        // Compare the current frame with the previous frame to avoid duplicates
         if (currentFrame !== previousFrameRef.current) {
-          //console.log('Sending frame to the server...');
           socket.emit('produce', currentFrame);
-          previousFrameRef.current = currentFrame; // Update the previous frame
-          setCanSendFrame(false); // Prevent sending until ack is received
-        } else {
-          // Frame is identical to the previous one. Skipping.
+          previousFrameRef.current = currentFrame;
+          setCanSendFrame(false);
         }
       };
       reader.readAsDataURL(frame);
