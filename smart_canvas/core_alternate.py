@@ -1,5 +1,9 @@
-""" core.py """
+""" core_alternate.py """
 from __future__ import annotations
+
+"""
+This is an alternate version of the core class, useful for testing alternative behavior
+"""
 
 # Types
 from typing import TYPE_CHECKING
@@ -22,7 +26,7 @@ from smart_canvas.ui import UI
 from smart_canvas.image_store import ImageStore
 from smart_canvas.face_detection import FaceDetection
 
-class CanvasCore:
+class CanvasCoreAlternate:
     """
     Class that processes the frame with a dedicated thread.
     """
@@ -93,7 +97,7 @@ class CanvasCore:
 
 class State(ABC):
     @property
-    def core(self) -> CanvasCore:
+    def core(self) -> CanvasCoreAlternate:
         return self._core
     @property
     def name(self) -> str:
@@ -104,7 +108,7 @@ class State(ABC):
         self._name = name
 
     @core.setter
-    def core(self, core: CanvasCore) -> None:
+    def core(self, core: CanvasCoreAlternate) -> None:
         self._core = core
 
     @abstractmethod
@@ -325,46 +329,12 @@ class ShowPic(State):
             self.core.ui.show_qr(self.core.image_id)
 
 
-
+    # ALTERNATE: Rather than a dismiss gesture, simply exit after 45 seconds
     def update(self, tick: float, frame: MatLike):
-
-
-        if time.time() >= self.show_image_end_time + 60: # TODO: Manual dismiss
+        if time.time() >= self.show_image_end_time + 45:
             self.core.ui.hide("image")
             self.core.ui.hide("qr")     
             self.core.filtered_frame = None
             self.core.image_id = None
             self.core.set_state(Active())
             return
-        
-        gesture_data = self.core.gesture_detector.detect_gestures(frame)
-    
-        if gesture_data is None:
-            print ("No hand landmarks found. Skipping frame.")
-            return
-        else:
-             print ("Gesture data:", gesture_data)
-             # Unpack the gesture data  
-             self.current_gesture = gesture_data[0]
-             self.wrist_position = gesture_data[1]
-             self.current_gesture, self.wrist_position, self.stable_for = gesture_data
-             self.update_filter_trigger()
-             self.core.ui.set_wrist_position(self.wrist_position)
-
-    def update_filter_trigger(self):
-
-        hold_required = 1
-        fraction = self.stable_for / hold_required
-
-        if self.current_gesture == "Closed_Fist":
-            self.core.ui.set_prog(fraction)
-            
-        else:
-            self.core.ui.set_prog(0.0)
-
-        if fraction >= 1.0 and self.current_gesture == "Closed_Fist":
-                print("Closed fist detected. Hiding image and QR code.")
-                self.core.ui.hide("image")
-                self.core.ui.hide("qr")     
-
-                self.core.set_state(Active())

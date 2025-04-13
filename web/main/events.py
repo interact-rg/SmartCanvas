@@ -16,11 +16,14 @@ from .. import socketio
 from cv2.typing import MatLike
 
 from smart_canvas.core import CanvasCore
+from smart_canvas.core_alternate import CanvasCoreAlternate
 from smart_canvas.image_store import ImageStore
 from smart_canvas.qr_code import *
 
+type Core = CanvasCore | CanvasCoreAlternate
+
 # Global dicts
-core_threads: dict[str, CanvasCore] = {}
+core_threads: dict[str, Core] = {}
 core_queues: dict[str, Queue[MatLike]] = {}
 image_stores: dict[str, ImageStore] = {}
 
@@ -31,7 +34,13 @@ def connect_web():
     sid: str = request.sid
     core_queues.update({sid: Queue()})
     image_stores.update({sid: ImageStore()})
-    core_threads.update({sid: CanvasCore(q_consumer=core_queues[sid], img_store=image_stores[sid], webapp=True, sid=sid).start()})
+    try: 
+        if request.values['version'] == 'alternate':
+            core_threads.update({sid: CanvasCoreAlternate(q_consumer=core_queues[sid], img_store=image_stores[sid], webapp=True, sid=sid).start()})
+        else:
+            core_threads.update({sid: CanvasCore(q_consumer=core_queues[sid], img_store=image_stores[sid], webapp=True, sid=sid).start()})
+    except Exception as e:
+        core_threads.update({sid: CanvasCore(q_consumer=core_queues[sid], img_store=image_stores[sid], webapp=True, sid=sid).start()})
     socketio.emit('available_filters', core_threads[sid].get_available_filters(), to=sid)
 
 

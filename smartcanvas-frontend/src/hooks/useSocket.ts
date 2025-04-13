@@ -11,7 +11,7 @@ const useSocket = (url: string) => {
   useEffect(() => {
     if (!socketInstance) {
       console.log("Initializing socket...");
-      socketInstance = io(url, { reconnection: false });
+      socketInstance = io(url, { reconnection: false, query: { "version": "main" } });
     }
 
     setSocket(socketInstance);
