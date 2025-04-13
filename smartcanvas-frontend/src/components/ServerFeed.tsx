@@ -4,7 +4,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import ImagePainter from './ImagePainter';
-//import '../styles/ServerFeed.css'; // Decomment for testing version 1
+import '../styles/ServerFeed.css';
 import closed_fist from '../assets/closed_fist.png';
 import exit from '../assets/exit.png';
 
