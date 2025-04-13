@@ -1,25 +1,29 @@
-// Basic listeners for the socket connection
+import { useEffect, useState, useRef } from "react";
+// --- Add necessary types from socket.io-client ---
+import { io, Socket, ManagerOptions, SocketOptions } from "socket.io-client";
 
-import { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
+// Define the type for the options object
+type SocketIoOptions = Partial<ManagerOptions & SocketOptions>;
+// -------------------------------------------------
 
 let socketInstance: Socket | null = null;
 
 const useSocket = (url: string, options?: SocketIoOptions) => {
-  // --------------------------------------
-    const [socket, setSocket] = useState<Socket | null>(null);
-    // Merge default options with passed options
-    const mergedOptions = useRef({
-      reconnection: false, // Your default
-      query: { "version": "alternate" }, // Your default
-      ...options // Spread passed options (e.g., path, transports)
-    });
-  
+  const [socket, setSocket] = useState<Socket | null>(null);
+  // Merge default options with passed options
+  const mergedOptions = useRef({
+    reconnection: false, // Your default
+    query: { "version": "alternate" }, // Your default
+    ...options // Spread passed options (e.g., path, transports)
+  });
+
 
   useEffect(() => {
     if (!socketInstance) {
-      console.log("Initializing socket...");
-      socketInstance = io(url, { reconnection: false, query: { "version": "main" } });
+      // --- FIX: Use mergedOptions.current ---
+      console.log("Initializing socket with options:", mergedOptions.current);
+      socketInstance = io(url, mergedOptions.current);
+      // --------------------------------------
     }
 
     setSocket(socketInstance);
@@ -30,7 +34,8 @@ const useSocket = (url: string, options?: SocketIoOptions) => {
 
     const handleDisconnect = () => {
       console.log("Disconnected");
-      setSocket(null); // Clear state on disconnect
+      // Consider if you really want to setSocket(null) here if using a singleton instance
+      // setSocket(null);
     };
 
     const handleError = (error: any) => {
@@ -41,25 +46,32 @@ const useSocket = (url: string, options?: SocketIoOptions) => {
       console.log("Connect error! " + error);
     };
 
-    const handleConnectTimeout = (error: any) => {
-      console.log("Connect timeout! " + error);
-    };
+    // connect_timeout is less common, can be removed if not needed
+    // const handleConnectTimeout = (error: any) => { ... };
 
-    socketInstance.on("connect", handleConnect);
-    socketInstance.on("disconnect", handleDisconnect);
-    socketInstance.on("error", handleError);
-    socketInstance.on("connect_error", handleConnectError);
-    socketInstance.on("connect_timeout", handleConnectTimeout);
+    // Add listeners only if socketInstance exists
+    if (socketInstance) {
+        socketInstance.on("connect", handleConnect);
+        socketInstance.on("disconnect", handleDisconnect);
+        socketInstance.on("error", handleError);
+        socketInstance.on("connect_error", handleConnectError);
+        // socketInstance.on("connect_timeout", handleConnectTimeout);
+    }
+
 
     return () => {
-      console.log("Cleaning up socket...");
-      socketInstance?.off("connect", handleConnect);
-      socketInstance?.off("disconnect", handleDisconnect);
-      socketInstance?.off("error", handleError);
-      socketInstance?.off("connect_error", handleConnectError);
-      socketInstance?.off("connect_timeout", handleConnectTimeout);
+      console.log("Cleaning up socket listeners...");
+      // Remove listeners only if socketInstance exists
+      if (socketInstance) {
+          socketInstance.off("connect", handleConnect);
+          socketInstance.off("disconnect", handleDisconnect);
+          socketInstance.off("error", handleError);
+          socketInstance.off("connect_error", handleConnectError);
+          // socketInstance.off("connect_timeout", handleConnectTimeout);
+      }
+      // Note: Singleton instance is not disconnected on component unmount here.
     };
-  }, [url]);
+  }, [url]); // Dependency array
 
   return socket;
 };
