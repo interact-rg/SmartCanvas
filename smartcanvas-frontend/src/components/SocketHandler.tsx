@@ -21,7 +21,10 @@ interface SocketHandlerProps {
 
 const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress, onHoldStill, onFilters, onChosenFilter, onFilterPerformance, onQrCode }) => {
   const serverHostname = window.location.hostname;
-  const serverUrl = `http://${serverHostname}:5000`;
+  const protocol = window.location.protocol;
+  // Construct the server URL using the same protocol
+  const serverUrl = `${protocol}//${serverHostname}:5000`;
+
 
   const socket = useSocket(serverUrl); // Use the dynamic URL
   const [canSendFrame, setCanSendFrame] = useState(true);
