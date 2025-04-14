@@ -353,7 +353,7 @@ class ShowPic(State):
 
     def update_filter_trigger(self):
 
-        hold_required = 1
+        hold_required = 2
         fraction = self.stable_for / hold_required
 
         if self.current_gesture == "Closed_Fist":
@@ -366,5 +366,11 @@ class ShowPic(State):
                 print("Closed fist detected. Hiding image and QR code.")
                 self.core.ui.hide("image")
                 self.core.ui.hide("qr")     
-
                 self.core.set_state(Active())
+
+        swipe_direction = self.core.gesture_detector.finger_swipe()
+        if swipe_direction in ["Swipe_Left", "Swipe_Right"]:
+                 print(f"{swipe_direction} detected. Exiting artistic view.")
+                 self.core.ui.hide("image")
+                 self.core.ui.hide("qr")
+                 self.core.set_state(Active())
