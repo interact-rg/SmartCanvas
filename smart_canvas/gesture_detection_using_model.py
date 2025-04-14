@@ -13,6 +13,9 @@ class GestureDetection:
             base_options=BaseOptions(model_asset_buffer=open("models/gesture_recognizer.task", "rb").read()),
             running_mode=vision.RunningMode.VIDEO,
             num_hands=1,
+            min_hand_detection_confidence=0.1,  # Default is 0.5
+            min_hand_presence_confidence=0.1,   # Default is 0.5
+            min_tracking_confidence=0.1  # Default is 0.5
         )
 
         self.recognizer = vision.GestureRecognizer.create_from_options(self.options)
@@ -111,7 +114,7 @@ class GestureDetection:
         
         swipe = None
         
-        if (self.swipe_armed and time.time() - self.swipe_arming_time > 3.0):
+        if (self.swipe_armed and time.time() - self.swipe_arming_time > 2.0):
             print("Swipe timed out...")
             self.swipe_armed = False
             return None 
