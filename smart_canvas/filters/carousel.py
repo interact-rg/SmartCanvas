@@ -15,6 +15,7 @@ from smart_canvas.filters.gs_cartoon import GSCartoon
 from .animefilter.animestyle import AnimeFilter
 from .pointillism.pointillism import Pointillism
 from smart_canvas.filters.testfilter import TestFilter
+from smart_canvas.filters.sketchmodel import SketchModel
 
 from typing import Callable, Any
 from cv2.typing import MatLike
@@ -32,6 +33,7 @@ class FilterCarousel:
         'anime style': AnimeFilter(),
         'pointillism': Pointillism(),
         'testfilter': TestFilter(),
+        'sketch': SketchModel(),  # Placeholder for sketch filter
     }
     # carousel = itertools.cycle(catalog)
     carousel: deque[str] = deque(catalog.keys())

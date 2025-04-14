@@ -7,8 +7,6 @@ class Sketch(Filter):
         sketch = drawing = frame.copy()
         cv2.pencilSketch(frame, sketch, drawing, sigma_s=1, sigma_r=0.01, shade_factor=0.03)
         '''
-
-
         img_gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
         '''
         img_blur= cv2.GaussianBlur(img_gray, (21, 21), 0, 0)
