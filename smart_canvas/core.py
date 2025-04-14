@@ -28,7 +28,7 @@ class CanvasCore:
     """
     _state = None
 
-    def __init__(self, q_consumer: Queue[MatLike], img_store: ImageStore, webapp:bool=False, sid: str = ''):
+    def __init__(self, q_consumer: Queue[MatLike], img_store: ImageStore, sid: str = '', hostname: str = 'localhost'):
         self.q_consumer = q_consumer
         self.stopped = False
         self.tick = time.time()
@@ -39,13 +39,11 @@ class CanvasCore:
         self.face_detector = FaceDetection()
         self.image_store = img_store
         self.image_id: None|str = None
-        self.ui = UI(sid, is_webapp=webapp)
+        self.ui = UI(sid, is_webapp=True)
         self.image_processing_active = False
         self.filtered_frame: None|MatLike = None
-        self.is_webapp = webapp
         self.sid = sid
-
-        
+        self.hostname = hostname
 
         # This is initial state
         self.set_state(Startup())
@@ -322,7 +320,7 @@ class ShowPic(State):
         # Frame does not change so update only once
         if self.core.filtered_frame is not None and self.core.image_id is not None:
             self.core.ui.show_image(self.core.filtered_frame)
-            self.core.ui.show_qr(self.core.image_id)
+            self.core.ui.show_qr(self.core.image_id, self.core.hostname)
 
 
 

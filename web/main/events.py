@@ -36,11 +36,11 @@ def connect_web():
     image_stores.update({sid: ImageStore()})
     try: 
         if request.values['version'] == 'alternate':
-            core_threads.update({sid: CanvasCoreAlternate(q_consumer=core_queues[sid], img_store=image_stores[sid], webapp=True, sid=sid).start()})
+            core_threads.update({sid: CanvasCoreAlternate(q_consumer=core_queues[sid], img_store=image_stores[sid], sid=sid, hostname=request.host).start()})
         else:
-            core_threads.update({sid: CanvasCore(q_consumer=core_queues[sid], img_store=image_stores[sid], webapp=True, sid=sid).start()})
+            core_threads.update({sid: CanvasCore(q_consumer=core_queues[sid], img_store=image_stores[sid], sid=sid, hostname=request.host).start()})
     except Exception as e:
-        core_threads.update({sid: CanvasCore(q_consumer=core_queues[sid], img_store=image_stores[sid], webapp=True, sid=sid).start()})
+        core_threads.update({sid: CanvasCore(q_consumer=core_queues[sid], img_store=image_stores[sid], sid=sid, hostname=request.host).start()})
     socketio.emit('available_filters', core_threads[sid].get_available_filters(), to=sid)
 
 
