@@ -31,7 +31,7 @@ def send_hand_position(position: tuple[float, float], sid: str|None):
 
 def send_qr(image_id: str, sid: str|None, hostname: str):
     # TODO make hostname dynamic
-    cv_qr = create_qr_code(f"{hostname}/dl/{sid}/{image_id}")
+    cv_qr = create_qr_code(f"{hostname}dl/{sid}/{image_id}")
     mod_message = cv_to_b64(cv_qr)
     socketio.emit('qr_code', mod_message, to=sid)
 
