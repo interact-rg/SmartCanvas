@@ -13,7 +13,7 @@ const useSocket = (url: string, options?: SocketIoOptions) => {
   // Merge default options with passed options
   const mergedOptions = useRef({
     reconnection: false, // Your default
-    query: { "version": "alternate" }, // Your default
+    query: { "version": "main" }, // Your default
     ...options // Spread passed options (e.g., path, transports)
   });
 
