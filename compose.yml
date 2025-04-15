@@ -4,24 +4,25 @@ services:
       context: .
       dockerfile: Dockerfile.backend
     ports:
-      - "5000:5000"        # Flask backend exposed on port 5000
+      - "5000:5000"
     volumes:
       - ./smart_canvas:/smart_canvas
       - ./web:/web
       - ./models:/models
-
     environment:
       - FLASK_ENV=development
       - CLIENT_TOKEN=d159f6d5-6bb6-44c3-a2fa-ae5a60b5ce75
+    restart: unless-stopped
 
   frontend:
     build:
       context: .
       dockerfile: Dockerfile.frontend
     ports:
-      - "5173:5173"        # Vite frontend exposed on port 5173
+      - "5173:5173"
     volumes:
       - ./smartcanvas-frontend/src:/smartcanvas-frontend/src
       - ./smartcanvas-frontend/public:/smartcanvas-frontend/public  
     environment:
       - CHOKIDAR_USEPOLLING=true
+    restart: unless-stopped
