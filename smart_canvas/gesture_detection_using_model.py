@@ -73,14 +73,34 @@ class GestureDetection:
              self.stable_start_time = None
              return None
         else:
+            # Store wrist position in history
+            current_wrist = (result.hand_landmarks[0][0].x, result.hand_landmarks[0][0].y)
+            self.position_history.append(current_wrist)
+            
+            # Average the positions for stability
+            if len(self.position_history) > 0:
+                avg_x = sum(pos[0] for pos in self.position_history) / len(self.position_history)
+                avg_y = sum(pos[1] for pos in self.position_history) / len(self.position_history)
+                self.wrist_location = (avg_x, avg_y)
+            else:
+                self.wrist_location = current_wrist
+                
+            # Use gesture voting for stability
             if result.gestures[0][0] and result.gestures[0][0].category_name:
-                        if self.gesture != result.gestures[0][0].category_name:
-                            self.previous_gesture = self.gesture
-                            self.gesture = result.gestures[0][0].category_name
-                            self.set_hand_width(result)
-                            self.swipe_armed = False
-
-
+                current_gesture = result.gestures[0][0].category_name
+                self.gesture_history.append(current_gesture)
+                
+                # Use most common gesture from history
+                if len(self.gesture_history) > 0:
+                    from collections import Counter
+                    gesture_counts = Counter(self.gesture_history)
+                    most_common_gesture = gesture_counts.most_common(1)[0][0]
+                    
+                    if self.gesture != most_common_gesture:
+                        self.previous_gesture = self.gesture
+                        self.gesture = most_common_gesture
+                        self.set_hand_width(result)
+                        self.swipe_armed = False
 
             if self.stable_start_time is None:
                 self.stable_start_time = time.time()
