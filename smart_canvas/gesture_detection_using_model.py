@@ -16,6 +16,7 @@ class GestureDetection:
             min_hand_detection_confidence=0.1,  # Default is 0.5
             min_hand_presence_confidence=0.1,   # Default is 0.5
             min_tracking_confidence=0.1  # Default is 0.5
+            
         )
 
         self.recognizer = vision.GestureRecognizer.create_from_options(self.options)
@@ -39,6 +40,10 @@ class GestureDetection:
         self.wrist_location = (0.0, 0.0)
         self.swipe_armed = False
         self.swipe_arming_time = 0.0
+
+
+        self.position_history = deque(maxlen=5)  # Store last 5 positions
+        self.gesture_history = deque(maxlen=3)   # Store last 3 gestures
 
 
 
@@ -114,13 +119,13 @@ class GestureDetection:
         
         swipe = None
         
-        if (self.swipe_armed and time.time() - self.swipe_arming_time > 2.0):
+        if (self.swipe_armed and time.time() - self.swipe_arming_time > 5.0):
             print("Swipe timed out...")
             self.swipe_armed = False
             return None 
 
         if self.gesture == "Swipe_Armed":
-            if (self.swipe_armed == False) and self.movement_stable_duration >= 0.4:
+            if (self.swipe_armed == False) and self.movement_stable_duration >= 0.3:
                 self.swipe_armed = True
                 self.armed_fingertip_x = self.current_fingertip_x
                 self.swipe_arming_time = time.time()
@@ -143,6 +148,7 @@ class GestureDetection:
                         swipe = "Swipe_Left"
                         self.swipe_armed = False
                         self.swipe_arming_time = time.time()
+            
             return swipe
         
 
