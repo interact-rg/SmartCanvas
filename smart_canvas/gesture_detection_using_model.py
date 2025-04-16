@@ -13,9 +13,9 @@ class GestureDetection:
             base_options=BaseOptions(model_asset_buffer=open("models/gesture_recognizer.task", "rb").read()),
             running_mode=vision.RunningMode.VIDEO,
             num_hands=1,
-            min_hand_detection_confidence=0.1,  # Default is 0.5
-            min_hand_presence_confidence=0.1,   # Default is 0.5
-            min_tracking_confidence=0.1  # Default is 0.5
+            min_hand_detection_confidence=0.3,  # Default is 0.5
+            min_hand_presence_confidence=0.3,   # Default is 0.5
+            min_tracking_confidence=0.3  # Default is 0.5
             
         )
 
@@ -35,6 +35,8 @@ class GestureDetection:
         self.movement_stable_start_time = None
         self.movement_stable_duration = 0.0
         
+        self.rescale_factor = 1.5
+
 
         self.gesture = "No gesture detected"
         self.wrist_location = (0.0, 0.0)
@@ -58,6 +60,16 @@ class GestureDetection:
         except Exception as e:
             print("Error during frame preparation (gesture detection)")
             return "No hands detected", (0.0, 0.0), 0.0
+
+
+        # Upscale to help detect small hands
+        h, w = frame_rgb.shape[:2]
+        frame_rgb = cv2.resize(
+            frame_rgb,
+            (int(w * self.rescale_factor), int(h * self.rescale_factor)),
+            interpolation=cv2.INTER_CUBIC,
+        )
+
 
         # Create MediaPipe Image
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
