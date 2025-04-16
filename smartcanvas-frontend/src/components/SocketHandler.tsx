@@ -22,7 +22,16 @@ interface SocketHandlerProps {
 const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress, onHoldStill, onFilters, onChosenFilter, onFilterPerformance, onQrCode }) => {
   const serverHostname = window.location.hostname; // e.g., vm1029.kaj.pouta.csc.fi
   const protocol = window.location.protocol;     // e.g., https:
-  const serverUrl = `${protocol}//${serverHostname}`; // Connect via Caddy (no port)
+  let serverUrl: string;
+
+  if (serverHostname === 'localhost' || serverHostname === '127.0.0.1') {
+    // Local development: Use explicit port for the backend
+    serverUrl = `${protocol}//${serverHostname}:5000`;
+  } else {
+    // Deployed: Connect via reverse proxy 
+    serverUrl = `${protocol}//${serverHostname}`;
+  }
+
 
   const isSecure = protocol === 'https:';
 
