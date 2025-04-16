@@ -57,6 +57,7 @@ class CanvasCore:
         # FYI runs state "init"-function
         self.ui.show(state.name)
         self._state.enter(self.tick)
+        
 
     def process(self):
         while not self.stopped:
@@ -186,6 +187,8 @@ class Active(State):
     def enter(self, tick: float):
         self.core.ui.set_prog(0.0)
         print("Entering active state")
+        self.core.gesture_detector.reset_state()
+
         self.core.ui.set_filter(self.core.filters.current_name, self.core.get_current_perf())
 
     def update(self, tick: float, frame: MatLike):
@@ -229,7 +232,7 @@ class Active(State):
         #TODO Gesture detection for swiping
         if (swipe_direction == "Swipe_Right"):
                 # Check if we are in cooldown
-                if time.time() - self.right_swipe_cooldown < 0.5:
+                if time.time() - self.right_swipe_cooldown < 0.3:
                     return
                 self.core.filters.next_filter()
                 self.core.ui.set_filter(self.core.filters.current_name, self.core.get_current_perf())
@@ -237,13 +240,13 @@ class Active(State):
                 self.left_swipe_cooldown = time.time()
 
         elif (swipe_direction == "Swipe_Left"):
-                if time.time() - self.left_swipe_cooldown < 0.5:
+                if time.time() - self.left_swipe_cooldown < 0.3:
                     return
                 self.core.filters.previous_filter()
                 self.core.ui.set_filter(self.core.filters.current_name, self.core.get_current_perf())
                 print('Current filter is' + self.core.filters.current_name)
-                self.left_swipe_cooldown = time.time()
-
+                self.right_swipe_cooldown = time.time()
+    
     def update_countdown_trigger(self):
       
         hold_required = 4.0
