@@ -30,7 +30,8 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
   // This requires useSocket hook to be modified to accept the second argument
   const socket = useSocket(serverUrl, {
     path: "/socket.io/", // Specify the path for Caddy routing
-    transports: ['websocket', 'polling'] // Standard transports
+    transports: ['websocket', 'polling'], // Standard transports
+    secure: true
   });
   const [canSendFrame, setCanSendFrame] = useState(true);
   const previousFrameRef = useRef<string | null>(null);
