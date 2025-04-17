@@ -332,7 +332,7 @@ class ShowPic(State):
     def update(self, tick: float, frame: MatLike):
 
 
-        if time.time() >= self.show_image_end_time + 60: # TODO: Manual dismiss
+        if time.time() >= self.show_image_end_time + 60: 
             self.core.ui.hide("image")
             self.core.ui.hide("qr")     
             self.core.filtered_frame = None
@@ -356,7 +356,7 @@ class ShowPic(State):
 
     def update_filter_trigger(self):
 
-        hold_required = 1
+        hold_required = 3
         fraction = self.stable_for / hold_required
 
         if self.current_gesture == "Closed_Fist":
