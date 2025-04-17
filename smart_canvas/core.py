@@ -335,7 +335,7 @@ class ShowPic(State):
     def update(self, tick: float, frame: MatLike):
 
 
-        if time.time() >= self.show_image_end_time + 60: # TODO: Manual dismiss
+        if time.time() >= self.show_image_end_time + 60: 
             self.core.ui.hide("image")
             self.core.ui.hide("qr")     
             self.core.filtered_frame = None

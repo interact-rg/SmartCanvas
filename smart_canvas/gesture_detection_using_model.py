@@ -13,9 +13,9 @@ class GestureDetection:
             base_options=BaseOptions(model_asset_buffer=open("models/gesture_recognizer.task", "rb").read()),
             running_mode=vision.RunningMode.VIDEO,
             num_hands=2,
-            min_hand_detection_confidence=0.3,  # Default is 0.5
-            min_hand_presence_confidence=0.3,   # Default is 0.5
-            min_tracking_confidence=0.3  # Default is 0.5
+            min_hand_detection_confidence=0.1,  # Default is 0.5
+            min_hand_presence_confidence=0.1,   # Default is 0.5
+            min_tracking_confidence=0.1  # Default is 0.5
         )
 
         self.recognizer = vision.GestureRecognizer.create_from_options(self.options)
