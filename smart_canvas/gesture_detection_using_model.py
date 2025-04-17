@@ -3,8 +3,10 @@ from mediapipe.tasks.python import vision, BaseOptions
 import mediapipe as mp
 import cv2
 from cv2.typing import MatLike
-from typing import Tuple
+from typing import List, Tuple
 from collections import deque
+from mediapipe.tasks.python.components.containers.landmark import NormalizedLandmark # <-- Import NormalizedLandmark
+
 
 class GestureDetection:
     def __init__(self):
@@ -12,7 +14,7 @@ class GestureDetection:
         self.options = vision.GestureRecognizerOptions(
             base_options=BaseOptions(model_asset_buffer=open("models/gesture_recognizer.task", "rb").read()),
             running_mode=vision.RunningMode.VIDEO,
-            num_hands=2,
+            num_hands=1,
             min_hand_detection_confidence=0.1,  # Default is 0.5
             min_hand_presence_confidence=0.1,   # Default is 0.5
             min_tracking_confidence=0.1  # Default is 0.5
@@ -43,7 +45,7 @@ class GestureDetection:
 
 
 
-    GestureResult = Tuple[str, Tuple[float, float], float]
+    GestureResult = Tuple[str, Tuple[float, float], float, List[NormalizedLandmark]] # <-- Added List[...]
 
     def detect_gestures(self, frame: MatLike) -> GestureResult|None:
         # Convert BGR to RGB
@@ -52,7 +54,7 @@ class GestureDetection:
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         except Exception as e:
             print("Error during frame preparation (gesture detection)")
-            return "No hands detected", (0.0, 0.0), 0.0
+            return None
 
         # Create MediaPipe Image
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
@@ -70,33 +72,27 @@ class GestureDetection:
             self.stable_start_time = None
             return None
 
-        # skip frames with fewer than 2 hands, but do NOT reset anything
-        if len(landmarks) < 2:
-            return self.gesture, self.wrist_location, self.stable_duration
 
-        # pick the hand that is highest in the frame (min wrist-y)
-        highest_idx = 0
-        highest_y = landmarks[0][0].y
-        for i, lm_list in enumerate(landmarks[1:], start=1):
-            if lm_list and lm_list[0].y < highest_y:
-                highest_y = lm_list[0].y
-                highest_idx = i
+
+    
 
         # alias for clarity
-        hand_lms = landmarks[highest_idx]
-        hand_gs = result.gestures[highest_idx]
+        hand_lms = landmarks[0]
+        hand_gs = result.gestures[0] if result.gestures else None
+
+
 
         if hand_gs and hand_gs[0].category_name:
             if self.gesture != hand_gs[0].category_name:
                 self.previous_gesture = self.gesture
                 self.gesture = hand_gs[0].category_name
-                self.set_hand_width(result, highest_idx)
+                self.set_hand_width(result, 0)
                 self.swipe_armed = False
 
         if self.stable_start_time is None:
             self.stable_start_time = time.time()
         elif self.gesture != self.previous_gesture:
-            self.set_hand_width(result, highest_idx)
+            self.set_hand_width(result)
             self.stable_start_time = time.time()
             self.previous_gesture = self.gesture
         else:
@@ -120,8 +116,10 @@ class GestureDetection:
             else:
                 self.movement_stable_duration = time.time() - self.movement_stable_start_time
 
-        return self.gesture, self.wrist_location, self.stable_duration
+        fingertip_position = (hand_lms[8].x, hand_lms[8].y)
 
+        return self.gesture, self.wrist_location, self.stable_duration, fingertip_position
+    
     def finger_swipe(self) -> str|None:
         # Check if swipe is armed and if the swipe timer has expired          
         # If swipe is armed, check if the finger has moved a certain distance
@@ -199,3 +197,4 @@ class GestureDetection:
 
         # ensure timestamp moves forward
         self.timestamp = int(time.time() * 1000)
+

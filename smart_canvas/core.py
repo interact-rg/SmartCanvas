@@ -205,7 +205,7 @@ class Active(State):
             return
         
         else: 
-            self.current_gesture, self.wrist_position, self.stable_for = gesture_data
+            self.current_gesture, self.wrist_position, self.stable_for, lm = gesture_data
 
             if self.wrist_position:
                 self.core.ui.set_wrist_position(self.wrist_position)
@@ -350,7 +350,7 @@ class ShowPic(State):
              # Unpack the gesture data  
              self.current_gesture = gesture_data[0]
              self.wrist_position = gesture_data[1]
-             self.current_gesture, self.wrist_position, self.stable_for = gesture_data
+             self.current_gesture, self.wrist_position, self.stable_for, fingertip = gesture_data
              self.update_filter_trigger()
              self.core.ui.set_wrist_position(self.wrist_position)
 
