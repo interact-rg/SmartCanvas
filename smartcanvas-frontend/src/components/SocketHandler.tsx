@@ -46,7 +46,6 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
 
   useEffect(() => {
     if (!socket) return;
-
     // Handle the list of available filters received from the server
     const handleAvailableFilters = (filters: string[]) => {
       if (filters.length > 0) {
@@ -126,7 +125,7 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
         // Compare the current frame with the previous frame to avoid duplicates
         if (currentFrame !== previousFrameRef.current) {
           //console.log('Sending frame to the server...');
-          socket.emit('produce', currentFrame);
+          socket.emit('produce', {currentFrame, baseUrl: window.location.origin});
           previousFrameRef.current = currentFrame; // Update the previous frame
           setCanSendFrame(false); // Prevent sending until ack is received
         } else {

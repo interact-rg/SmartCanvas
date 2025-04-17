@@ -64,13 +64,35 @@ def b64_to_cv(jpg_as_text: str):
 
 
 @socketio.on('produce')
-def handle_client_message(message: str):
+def handle_client_message(message: dict):  # Expect a dictionary
     sid: str = request.sid
+    if sid not in core_threads:
+        print(f"Error: Core thread not found for sid {sid} in 'produce' handler.")
+        return
+
     core = core_threads[sid]
     producer_q = core_queues[sid]
-    b64_frame = message.split(",")[1]
-    cv_image = b64_to_cv(b64_frame)
-    producer_q.put(cv_image)
+
+    # Handle baseUrl on the first 'produce' message
+    if core.ui and core.ui.is_webapp and core.ui.base_url is None:
+        received_base_url = message.get('baseUrl')  # Extract baseUrl from the message
+        if received_base_url:
+            print(f"Received base URL from client {sid}: {received_base_url}")
+            core.ui.base_url = received_base_url
+        else:
+            print(f"Warning: 'produce' message from {sid} did not contain 'baseUrl'. QR codes may fail.")
+
+    # Process the frame data
+    base64_data_url = message.get('currentFrame', '')  # Extract currentFrame from the message
+    if base64_data_url and ',' in base64_data_url:
+        b64_frame = base64_data_url.split(",")[1]  # Extract the base64-encoded part
+        try:
+            cv_image = b64_to_cv(b64_frame)
+            producer_q.put(cv_image)
+        except Exception as e:
+            print(f"Error decoding/processing frame from {sid}: {e}")
+    else:
+        print(f"Warning: 'produce' message from {sid} missing or invalid frame data.")
 
 @socketio.on('check_image_processing')
 def check_image_processing():
