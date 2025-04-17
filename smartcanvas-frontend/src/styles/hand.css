@@ -62,7 +62,7 @@
 }
 
 #two_fingers_icon {
-  animation: 3s ease-in-out infinite swipe;
+  animation: 4.5s ease-in-out infinite swipe;
   rotate: 90deg;
   transform-origin: 50% 100%;
   margin-top: 90%;

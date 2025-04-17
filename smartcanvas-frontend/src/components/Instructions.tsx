@@ -45,10 +45,10 @@ const Instructions: React.FC<InstructionsProps> = ({
       setSwipeVisible(true); // Reset swiping hand visibility when Idle state is active
       setSwipeUsed(false); // Reset the flag when Idle state is active
     } else if (state.Active && !swipeUsed) {
-      // Show swiping hand every 5 seconds only if it hasn't been used yet
+      // Show swiping hand every 4.5 seconds only if it hasn't been used yet
       const interval = setInterval(() => {
         setSwipeVisible((prev) => !prev); // Toggle visibility
-      }, 5000);
+      }, 4500);
 
       return () => clearInterval(interval); // Cleanup interval on unmount
     }
