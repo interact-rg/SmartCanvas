@@ -157,7 +157,7 @@ class Idle(State):
     # Update is called on new frame
     def update(self, tick: float, frame: MatLike):
         
-        face_present, duration = self.core.face_detector.detect_face(frame)
+        face_present, duration = self.core.face_detector.detect_face_duration(frame)
         print("Face present:", face_present, "Duration:", str(duration) + "seconds")
 
         if (face_present and duration >= 2.0):
@@ -192,7 +192,7 @@ class Active(State):
     def update(self, tick: float, frame: MatLike):
 
   
-        face_present, face_duration = self.core.face_detector.detect_face(frame)
+        face_present, face_duration = self.core.face_detector.detect_face_duration(frame)
         if (face_present == False and (face_duration > 5.0)):
             print("Face not present for duration:", str(face_duration) + "seconds")
             self.core.set_state(Idle())
