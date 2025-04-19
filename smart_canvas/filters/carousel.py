@@ -16,6 +16,7 @@ from .animefilter.animestyle import AnimeFilter
 from .pointillism.pointillism import Pointillism
 from smart_canvas.filters.testfilter import TestFilter
 from smart_canvas.filters.sketchmodel import SketchModel
+from smart_canvas.filters.toripolliisi import Toripolliisi
 
 from typing import Callable, Any
 from cv2.typing import MatLike
@@ -25,6 +26,7 @@ class FilterCarousel:
     current_filter: Filter
 
     catalog: dict[str, Filter] = {
+        'toripolliisi': Toripolliisi(),
         'painterly': Painterly(),
         'watercolor': Watercolor(),
         'oil painting': OilPainting(),
@@ -52,6 +54,14 @@ class FilterCarousel:
         self.carousel.rotate(1)
         self.current_name = self.carousel[0]
         self.current_filter = self.catalog[self.current_name]
+
+    def set_filter(self, filter_name: str):
+        if filter_name in self.catalog:
+            current_index = self.carousel.index(self.current_name)
+            new_index = self.carousel.index(filter_name)
+            self.carousel.rotate(current_index - new_index)
+        else:
+            raise ValueError(f"Filter '{filter_name}' not found in catalog.")
     
     def get_filter_performance(self) -> float:
         return self.current_filter.average_time
