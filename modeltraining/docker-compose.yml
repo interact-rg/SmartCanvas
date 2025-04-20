@@ -1,18 +1,14 @@
 version: "3.8"
+
 services:
   gesture-training:
     build:
       context: .
       dockerfile: Dockerfile
-    # If you want the code from the image, remove the next line:
-    # - ./:/app
+      args:
+        TF_TAG: "2.15.0"
+        TF_FLAVOR: ""               # ← empty → CPU base image
     volumes:
       - ./dataset:/app/dataset
+      - ./training.py:/app/training.py
       - ./exported_model:/app/exported_model
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]

@@ -1,0 +1,13 @@
+services:
+  gesture-training:
+    build:
+      args:
+        TF_FLAVOR: "gpu"            # override only this line
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

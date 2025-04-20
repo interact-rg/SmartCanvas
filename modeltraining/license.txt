@@ -1,4 +1,1 @@
-https://github.com/hukenovs/hagrid
-https://creativecommons.org/licenses/by-sa/4.0/
-https://github.com/hukenovs/hagrid?tab=readme-ov-file
-https://www.kaggle.com/datasets/imsparsh/gesture-recognition/data CC0: Public Domain
+https://huggingface.co/datasets/CNGR/CN_Gesture_Recognition
