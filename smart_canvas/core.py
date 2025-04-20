@@ -174,15 +174,13 @@ class Active(State):
         self.name = "Active"
         self.progress_counter = 0.0
         self.change_filter_time = 0.0
-        self.last_update_time = 0.0  # debug: simplifying the confirmation progress logic to be based on elapsed time instead of "the time when it's allowed to do an update"
         self.current_gesture = "No gestures yet"
         self.wrist_position = [0,0]
         self.previous_gesture = None
         self.stable_for = 0.0
 
-        self.last_filter_change_time      = 0.0
-        self.filter_cooldown       = 1.0  # seconds
-        self.gesture_hold_required = 0.5  # seconds
+        self.last_filter_change_time = 0.0
+        self.filter_cooldown = 2.0  # seconds
 
 
 
@@ -236,9 +234,7 @@ class Active(State):
             return
 
         now = time.time()
-        # Require it to be held long enough
-        if duration < self.gesture_hold_required:
-            return
+
         
         # Debounce
         if now - self.last_filter_change_time < self.filter_cooldown:
