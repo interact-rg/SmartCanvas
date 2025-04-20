@@ -1,200 +1,136 @@
 import time
-from mediapipe.tasks.python import vision, BaseOptions
-import mediapipe as mp
 import cv2
+import mediapipe as mp
+from mediapipe.tasks.python import vision, BaseOptions
 from cv2.typing import MatLike
-from typing import List, Tuple
-from collections import deque
-from mediapipe.tasks.python.components.containers.landmark import NormalizedLandmark # <-- Import NormalizedLandmark
-
+from typing import Optional, Tuple, List
+from mediapipe.tasks.python.components.containers.landmark import NormalizedLandmark
 
 class GestureDetection:
-    def __init__(self):
-        # Setup the new GestureRecognizer model
+
+
+    GestureResult = Tuple[
+        str,                    # detected gesture category
+        Tuple[float, float],    # wrist (x, y)
+        float,                  # how long it's been stable
+        List[NormalizedLandmark]  # list of hand landmarks
+    ]
+
+    def __init__(self, model_path: str = "models/gesture_recognizer.task"):
+        with open(model_path, "rb") as f:
+            buffer = f.read()
+
         self.options = vision.GestureRecognizerOptions(
-            base_options=BaseOptions(model_asset_buffer=open("models/gesture_recognizer.task", "rb").read()),
+            base_options=BaseOptions(model_asset_buffer=buffer),
             running_mode=vision.RunningMode.VIDEO,
             num_hands=1,
-            min_hand_detection_confidence=0.1,  # Default is 0.5
-            min_hand_presence_confidence=0.1,   # Default is 0.5
-            min_tracking_confidence=0.1  # Default is 0.5
         )
-
         self.recognizer = vision.GestureRecognizer.create_from_options(self.options)
 
         self.timestamp = int(time.time() * 1000)
+        self.previous_gesture: str = ""
+        self.candidate_gesture: str = ""
+        self.candidate_start_time: Optional[float] = None
+        self.stable_start_time: Optional[float] = None
+        self.stable_duration: float = 0.0
+        self.switch_thresh = 0.1
 
-        # Initialize stable duration, i.e. the time for which a gesture has been stable
-        self.stable_start_time = None
-        self.previous_gesture = "No gesture detected"
-        self.current_fingertip_x = None
-        self.previous_fingertip_x = None
-        self.armed_fingertip_x = None
-        self.stable_duration = 0.0
-        self.hand_width = 0.0
+    def detect_gestures(self, frame: MatLike) -> GestureResult | None:
 
-        self.movement_stable_start_time = None
-        self.movement_stable_duration = 0.0
-        
-
-        self.gesture = "No gesture detected"
-        self.wrist_location = (0.0, 0.0)
-        self.swipe_armed = False
-        self.swipe_arming_time = 0.0
-
-
-
-
-    GestureResult = Tuple[str, Tuple[float, float], float, List[NormalizedLandmark]] # <-- Added List[...]
-
-    def detect_gestures(self, frame: MatLike) -> GestureResult|None:
         # Convert BGR to RGB
-
         try:
-            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        except Exception as e:
-            print("Error during frame preparation (gesture detection)")
+            rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        except Exception:
             return None
 
-        # Create MediaPipe Image
-        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+        result = self.recognizer.recognize_for_video(mp_image, self._next_timestamp())
+        
+        
+        # No hand detected
+        if not result.hand_landmarks:
+            self.reset_state()
+            return None
+        # Grab first hand landmarks and gesture
+        hand_lms = result.hand_landmarks[0]
+        gestures = result.gestures or [[]]
+        
+        gesture_name = gestures[0][0].category_name if gestures[0] else "Unknown"
 
-        # Ensure new timestamp is always greater than the previous one
+        if gesture_name == "Point_Finger" or gesture_name == "Point_Gun":
+                direction = self.check_direction(hand_lms)
+                gesture_name = gesture_name + direction
+        
+        now = time.time()
 
-        self.timestamp = self.generate_timestamp()
+        if gesture_name != self.candidate_gesture:
+            self.candidate_gesture = gesture_name
+            self.candidate_start_time = now
 
-        result = self.recognizer.recognize_for_video(mp_image, self.timestamp)
+        
+        cand_dur = now - (self.candidate_start_time or now)
 
-        landmarks = result.hand_landmarks
-        if not landmarks:
-            # no hands: reset stable timers but keep gesture state
+        # 3) only switch “previous_gesture” once candidate has been stable long enough
+        if (self.candidate_gesture != self.previous_gesture
+            and cand_dur >= self.switch_thresh):
+            self.previous_gesture = self.candidate_gesture
+            self.stable_start_time = self.candidate_start_time
+            self.stable_duration = cand_dur
+
+                
+                
+        # 4) if it’s still the same as previous, just update stable_duration
+        elif self.candidate_gesture == self.previous_gesture:
+            self.stable_duration = now - (self.stable_start_time or now)
+        else:
+            # candidate hasn’t yet “locked in” — keep stable_duration at zero  
             self.stable_duration = 0.0
-            self.stable_start_time = None
-            return None
 
-
-
-    
-
-        # alias for clarity
-        hand_lms = landmarks[0]
-        hand_gs = result.gestures[0] if result.gestures else None
-
-
-
-        if hand_gs and hand_gs[0].category_name:
-            if self.gesture != hand_gs[0].category_name:
-                self.previous_gesture = self.gesture
-                self.gesture = hand_gs[0].category_name
-                self.set_hand_width(result, 0)
-                self.swipe_armed = False
-
-        if self.stable_start_time is None:
-            self.stable_start_time = time.time()
-        elif self.gesture != self.previous_gesture:
-            self.set_hand_width(result)
-            self.stable_start_time = time.time()
-            self.previous_gesture = self.gesture
-        else:
-            self.stable_duration = time.time() - self.stable_start_time
-
-        self.wrist_location = (hand_lms[0].x, hand_lms[0].y)
-        self.previous_fingertip_x = self.current_fingertip_x
-        self.current_fingertip_x = hand_lms[8].x
-
-        relative_threshold = 0.4 * self.hand_width
-        if (self.previous_fingertip_x is not None and
-            abs(self.current_fingertip_x - self.previous_fingertip_x) > relative_threshold):
-            self.movement_stable_start_time = time.time()
-            self.movement_stable_duration = 0.0
-            if not self.swipe_armed:
-                print("Finger movement detected above threshold...")
-        else:
-            if self.movement_stable_start_time is None:
-                self.movement_stable_start_time = time.time()
-                self.movement_stable_duration = 0.0
-            else:
-                self.movement_stable_duration = time.time() - self.movement_stable_start_time
-
-        fingertip_position = (hand_lms[8].x, hand_lms[8].y)
-
-        return self.gesture, self.wrist_location, self.stable_duration, fingertip_position
-    
-    def finger_swipe(self) -> str|None:
-        # Check if swipe is armed and if the swipe timer has expired          
-        # If swipe is armed, check if the finger has moved a certain distance
-        # If so, return the swipe direction
+        # Wrist coordinate is landmark 0
+        wrist = (hand_lms[0].x, hand_lms[0].y)
         
-        swipe = None
-        
-        if (self.swipe_armed and time.time() - self.swipe_arming_time > 2.0):
-            print("Swipe timed out...")
-            self.swipe_armed = False
-            return None 
+     
 
-        if self.gesture == "Swipe_Armed":
-            if (self.swipe_armed == False) and self.movement_stable_duration >= 0.4:
-                self.swipe_armed = True
-                self.armed_fingertip_x = self.current_fingertip_x
-                self.swipe_arming_time = time.time()
-            
-                print("Swipe has been armed...")
-                return "Swipe_Armed"
-        
-        if self.swipe_armed == True and self.current_fingertip_x is not None and self.armed_fingertip_x is not None:
-            dynamic_threshold = self.hand_width * 1
-            net_movement = self.current_fingertip_x - self.armed_fingertip_x
+        return self.previous_gesture, wrist, self.stable_duration, hand_lms
 
-            if net_movement < -dynamic_threshold:
- 
-                        print("Swiping right...")
-                        swipe = "Swipe_Right"
-                        self.swipe_armed = False
-                        self.swipe_arming_time = time.time()
-            elif net_movement > dynamic_threshold:
-                        print("Swiping left...")
-                        swipe = "Swipe_Left"
-                        self.swipe_armed = False
-                        self.swipe_arming_time = time.time()
-            return swipe
-        
-
-    def set_hand_width(self, result, idx: int = 0):
-        # now takes an index argument
-        xs = [lm.x for lm in result.hand_landmarks[idx]]
-        self.hand_width = max(xs) - min(xs)
-
-    def generate_timestamp(self) -> int:
-        new_timestamp = int(time.time() * 1000)
-        if new_timestamp <= self.timestamp:
-           new_timestamp = self.timestamp + 1
-        return new_timestamp
-    
     def reset_state(self):
-        """Reset all gesture‐detector state to initial values."""
-        # timing & stability
-        self.stable_start_time = None
-        self.stable_duration = 0.0
-        self.movement_stable_start_time = None
-        self.movement_stable_duration = 0.0
+        """Wipe out *all* in‑flight gesture timing so we start fresh next time."""
+        self.previous_gesture        = ""
+        self.candidate_gesture       = ""
+        self.candidate_start_time    = None
+        self.stable_start_time       = None
+        self.stable_duration         = 0.0
 
-        # gesture tracking
-        self.previous_gesture = "No gesture detected"
-        self.gesture = "No gesture detected"
+    def check_direction(
+        self,
+        hand_lms: List[NormalizedLandmark]
+    ) -> str:
+        """
+        Returns:
+          - "_Right" if the fingertip x > wrist x
+          - "_Left"  if the fingertip x < wrist x
+          - ""        if exactly equal (rare)
+        """
+        # Type‑guard
+        if not hand_lms or len(hand_lms) <= 8:
+            return ""
+        wrist_x = hand_lms[0].x
+        tip_x   = hand_lms[8].x
+    
+        if tip_x > wrist_x:
+            return "_Left"
+        if tip_x < wrist_x:
+            return "_Right"
+        return ""
+        
+        
 
-        # fingertip positions
-        self.current_fingertip_x = None
-        self.previous_fingertip_x = None
-        self.armed_fingertip_x = None
 
-        # swipe state
-        self.swipe_armed = False
-        self.swipe_arming_time = 0.0
 
-        # hand geometry
-        self.hand_width = 0.0
-        self.wrist_location = (0.0, 0.0)
-
-        # ensure timestamp moves forward
-        self.timestamp = int(time.time() * 1000)
-
+    def _next_timestamp(self) -> int:
+        """Ensure strictly increasing timestamps for video frames."""
+        new_ts = int(time.time() * 1000)
+        if new_ts <= self.timestamp:
+            new_ts = self.timestamp + 1
+        self.timestamp = new_ts
+        return new_ts

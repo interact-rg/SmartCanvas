@@ -34,16 +34,16 @@ class CanvasCore:
         self.tick = time.time()
         self.filters = FilterCarousel()
         self.fg_masker = ForegroundMask()
-      #  self.hand_detector = HandDetect()
         self.gesture_detector = GestureDetection()
         self.face_detector = FaceDetection()
         self.image_store = img_store
         self.image_id: None|str = None
-        self.ui = UI(sid, is_webapp=True)
         self.image_processing_active = False
         self.filtered_frame: None|MatLike = None
         self.sid = sid
         self.hostname = hostname
+        self.ui = UI(sid, is_webapp=True, base_url=self.hostname) 
+
 
         # This is initial state
         self.set_state(Startup())
@@ -179,8 +179,11 @@ class Active(State):
         self.wrist_position = [0,0]
         self.previous_gesture = None
         self.stable_for = 0.0
-        self.left_swipe_cooldown = 0.0
-        self.right_swipe_cooldown = 0.0
+
+        self.last_filter_change_time      = 0.0
+        self.filter_cooldown       = 1.0  # seconds
+        self.gesture_hold_required = 0.5  # seconds
+
 
 
     # Runs once on init
@@ -202,7 +205,6 @@ class Active(State):
 
         gesture_data = self.core.gesture_detector.detect_gestures(frame)
         if gesture_data is None:
-            print ("No hand landmarks found. Skipping frame.")
             self.core.ui.set_prog(0.0)
             self.stable_for = 0.0
             return
@@ -216,36 +218,47 @@ class Active(State):
                 self.previous_gesture = self.current_gesture
                 print("Gesture changed. Current gesture:", self.current_gesture, "Wrist position:", self.wrist_position, "Duration:", str(self.stable_for) + "seconds")
 
-            self.update_filter_carousel()
+            self.update_filter_carousel(self.current_gesture, self.stable_for)
             self.update_countdown_trigger()
 
             
 
 
-    def update_filter_carousel(self):
 
-        # Skip if we haven't waited at least 0.5 seconds since the last swipe
-  
+    def update_filter_carousel(self, gesture: str, duration: float):
+        """
+        Change filter on a stable left/right pointing gesture held
+        for at least gesture_hold_required seconds, with a short cooldown.
+        """
+        # We only care about these pointing gestures:
+        if gesture not in ("Point_Finger_Left", "Point_Finger_Right",
+                           "Point_Gun_Left",    "Point_Gun_Right"):
+            return
+
+        now = time.time()
+        # Require it to be held long enough
+        if duration < self.gesture_hold_required:
+            return
         
-        swipe_direction = self.core.gesture_detector.finger_swipe()
+        # Debounce
+        if now - self.last_filter_change_time < self.filter_cooldown:
+            return
+        
+        # Direction → next or previous filter
+        if gesture.endswith("_Right"):
+            self.core.filters.next_filter()
+        else:  # endswith "_Left"
+            self.core.filters.previous_filter()
+        
+        # Update the UI & record the time
+        self.core.ui.set_filter(
+            self.core.filters.current_name,
+            self.core.get_current_perf()
+        )
+        print(f"Current filter is {self.core.filters.current_name}")
+        self.last_filter_change_time = now
 
-        #TODO Gesture detection for swiping
-        if (swipe_direction == "Swipe_Right"):
-                # Check if we are in cooldown
-                if time.time() - self.right_swipe_cooldown < 0.3:
-                    return
-                self.core.filters.next_filter()
-                self.core.ui.set_filter(self.core.filters.current_name, self.core.get_current_perf())
-                print('Current filter is' + self.core.filters.current_name)
-                self.left_swipe_cooldown = time.time()
-
-        elif (swipe_direction == "Swipe_Left"):
-                if time.time() - self.left_swipe_cooldown < 0.3:
-                    return
-                self.core.filters.previous_filter()
-                self.core.ui.set_filter(self.core.filters.current_name, self.core.get_current_perf())
-                print('Current filter is' + self.core.filters.current_name)
-                self.right_swipe_cooldown = time.time()
+        
     
     def update_countdown_trigger(self):
       
@@ -263,9 +276,6 @@ class Active(State):
                 self.core.set_state(Countdown())
 
 
-
-
-    
 
 class Countdown(State):
     def __init__(self):
@@ -328,7 +338,7 @@ class ShowPic(State):
         # Frame does not change so update only once
         if self.core.filtered_frame is not None and self.core.image_id is not None:
             self.core.ui.show_image(self.core.filtered_frame)
-            self.core.ui.show_qr(self.core.image_id, self.core.hostname)
+            self.core.ui.show_qr(self.core.image_id)
 
 
 
@@ -349,8 +359,6 @@ class ShowPic(State):
             print ("No hand landmarks found. Skipping frame.")
             return
         else:
-             print ("Gesture data:", gesture_data)
-             # Unpack the gesture data  
              self.current_gesture = gesture_data[0]
              self.wrist_position = gesture_data[1]
              self.current_gesture, self.wrist_position, self.stable_for, fingertip = gesture_data
@@ -373,10 +381,3 @@ class ShowPic(State):
                 self.core.ui.hide("image")
                 self.core.ui.hide("qr")     
                 self.core.set_state(Active())
-
-        swipe_direction = self.core.gesture_detector.finger_swipe()
-        if swipe_direction in ["Swipe_Left", "Swipe_Right"]:
-                 print(f"{swipe_direction} detected. Exiting artistic view.")
-                 self.core.ui.hide("image")
-                 self.core.ui.hide("qr")
-                 self.core.set_state(Active())

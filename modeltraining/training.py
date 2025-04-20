@@ -26,16 +26,17 @@ print("Exporting model to:", export_dir)
 
 # 5) HParams & options (dropout/layers if desired)
 hparams = gesture_recognizer.HParams(
-    export_dir   = export_dir,
-    epochs       = 30,
-    batch_size   = 16,
-    learning_rate= 5e-4,
-    lr_decay     = 0.99,
-    shuffle = True
-)
+     export_dir   = export_dir,
+     epochs       = 40,        # up from 20
+     batch_size   = 16,
+     learning_rate = 5e-4,
+     lr_decay     = 0.995,     # gentler decay
+     shuffle      = True
+ )
+
 model_opts = gesture_recognizer.ModelOptions(
-  dropout_rate=0.1,
-  layer_widths=[512,256,128,64]   # a four‑layer head
+  dropout_rate=0.15,
+  layer_widths=[512,256,128]   # a four‑layer head
 )
 options = gesture_recognizer.GestureRecognizerOptions(
     hparams=hparams,

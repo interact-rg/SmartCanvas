@@ -1,13 +1,15 @@
 version: "3.8"
 
 services:
-  gesture-training:
+  gesture_training:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        TF_TAG: "2.15.0"
-        TF_FLAVOR: ""               # ← empty → CPU base image
+        TF_TAG:    "${TF_TAG:-2.15.0}"
+        TF_FLAVOR: "${TF_FLAVOR:-}"       # empty → CPU image, “gpu” → GPU image
+    # only inject the runtime line if you need GPU
+    runtime: "${DOCKER_RUNTIME:-}"
     volumes:
       - ./dataset:/app/dataset
       - ./training.py:/app/training.py
