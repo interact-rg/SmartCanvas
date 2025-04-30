@@ -17,6 +17,7 @@ from .pointillism.pointillism import Pointillism
 from smart_canvas.filters.testfilter import TestFilter
 from smart_canvas.filters.sketchmodel import SketchModel
 from smart_canvas.filters.toripolliisi import Toripolliisi
+from smart_canvas.filters.italian_pizza import ItalianPizza  # Import the new filter
 
 from typing import Callable, Any
 from cv2.typing import MatLike
@@ -27,6 +28,7 @@ class FilterCarousel:
 
     catalog: dict[str, Filter] = {
         'toripolliisi': Toripolliisi(),
+        'italian pizza': ItalianPizza(),  # Add the new filter to the catalog
         'painterly': Painterly(),
         'watercolor': Watercolor(),
         'oil painting': OilPainting(),

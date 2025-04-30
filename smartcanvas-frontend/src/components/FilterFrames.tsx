@@ -8,16 +8,17 @@ interface FilterFramesProps {
 type FilterFrame = {
   image: string;
   key: number;
-}
+};
 
 const FilterFrames: React.FC<FilterFramesProps> = ({
   availableFilters,
   chosenFilter,
 }) => {
   // Construct filter paths dynamically using availableFilters
+  console.log(availableFilters);
   const filters: string[] =
     availableFilters.length !== 0
-      ? availableFilters.map((filterName) => (`/images/${filterName}.jpg`))
+      ? availableFilters.map((filterName) => `/images/${filterName}.jpg`)
       : ["/images/anime style.jpg"]; // Default filter if availableFilters is empty
 
   const [chosenFilterIndex, setChosenFilterIndex] = useState<number>(0); // Max value: filters.length
@@ -36,7 +37,7 @@ const FilterFrames: React.FC<FilterFramesProps> = ({
       for (let i = -MAX_FILTERS; i <= MAX_FILTERS; i++) {
         list.push({
           image: filters[(filterIndex + i + filters.length) % filters.length],
-          key: filterIndex + i
+          key: filterIndex + i,
         });
       }
       setPaddedList(list);
@@ -44,17 +45,13 @@ const FilterFrames: React.FC<FilterFramesProps> = ({
   }, [chosenFilter, availableFilters]); // Re-run this effect when chosenFilter or availableFilters change
 
   return (
-    <div id="filter-carousel"
-      ref={containerRef}
-    >
+    <div id="filter-carousel" ref={containerRef}>
       {/* TODO: carousel "snaps" when looping over */}
       {paddedList.map((filter) => (
         <img
           key={filter.key}
           src={filter.image}
-          className={
-            filter.key === chosenFilterIndex ? "selected" : ""
-          }
+          className={filter.key === chosenFilterIndex ? "selected" : ""}
         />
       ))}
     </div>
