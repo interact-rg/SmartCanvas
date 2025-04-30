@@ -18,12 +18,7 @@ class ForegroundMask:
 
     def __init__(self):
         self.selfie_segmentation = SelfieSegmentation(model_selection=1)
-        self.bg_image = cv2.imread('smart_canvas/backgrounds/painterly_bg.jpg')
-        dim = (1280,720)
-        self.bg_image = cv2.resize(self.bg_image, dim, )
-        self.output_image = None
         self.mask = None
-
 
     def remove_isolated_pixels(self, mask: MatLike):
         kernel = np.ones((5, 5), np.uint8)
