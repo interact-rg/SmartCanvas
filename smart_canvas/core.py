@@ -373,7 +373,7 @@ class ShowPic(State):
             self.core.ui.set_prog(0.0)
 
         if fraction >= 1.0 and self.current_gesture == "Closed_Fist":
-                print("Closed fist detected. Hiding image and QR code.")
+                print("Closed fist detected. Hiding image.")
                 self.core.ui.hide("image")
                 self.core.ui.hide("qr")     
                 self.core.set_state(Active())

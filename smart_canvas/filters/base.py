@@ -44,6 +44,10 @@ class Filter:
         """ Masks the background with the given mask. """
         condition: ArrayLike = np.stack((mask, ) * 3, axis=-1) > 0.1
 
+        # Zero out alpha channel if it somehow exists
+        if len(condition.shape) == 4:
+            condition = condition[:,:,:,0]
+            
         try:
             output_image = np.where(condition, frame, background)
         except:

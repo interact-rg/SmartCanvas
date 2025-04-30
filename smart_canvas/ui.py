@@ -1,6 +1,5 @@
 # Types
 UI_State = dict[str, str|float]
-from typing import Dict, List
 from cv2.typing import MatLike
 from web.main.common_events import send_ui_state, send_filter, send_image, send_hand_position, send_qr, send_acknowledge, send_fingertip_position
 
@@ -77,7 +76,8 @@ class UI:
             send_ui_state({key: False for key in names}, self.sid)
 
     def show_image(self, image: MatLike):
-        send_image(image, self.sid)
+        if self.is_webapp:
+            send_image(image, self.sid)
 
     def show_qr(self, image_id: str):
         """Generate and send a QR code to the client."""
@@ -86,10 +86,12 @@ class UI:
             return  # Exit early if base_url is not set
 
         # Call send_qr with the valid base_url
-        send_qr(image_id, self.sid, self.base_url)
+        if self.is_webapp:
+            send_qr(image_id, self.sid, self.base_url)
 
     def set_wrist_position(self, position: tuple[float, float]):
-        send_hand_position(position, self.sid)
+        if self.is_webapp:
+            send_hand_position(position, self.sid)
 
     def ready(self):
         if self.is_webapp:

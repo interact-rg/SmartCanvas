@@ -3,13 +3,10 @@
 from __future__ import annotations
 
 # Default packages
-import base64
 from queue import Queue
 
 # External packages
 from flask import request
-import numpy as np
-import cv2
 
 # Internal modules
 from .. import socketio
@@ -19,6 +16,8 @@ from smart_canvas.core import CanvasCore
 from smart_canvas.core_alternate import CanvasCoreAlternate
 from smart_canvas.image_store import ImageStore
 from smart_canvas.qr_code import *
+
+from .imgutils import b64_to_cv
 
 type Core = CanvasCore | CanvasCoreAlternate
 
@@ -54,14 +53,6 @@ def disconnect_web():
     core_threads.pop(sid)
     image_stores.pop(sid)
     core_queues.pop(sid)
-
-
-def b64_to_cv(jpg_as_text: str):
-    jpg_original = base64.b64decode(jpg_as_text)
-    jpg_as_np = np.frombuffer(jpg_original, dtype=np.uint8)
-    img = cv2.imdecode(jpg_as_np, flags=1)
-    return img
-
 
 @socketio.on('produce')
 def handle_client_message(message: dict):  # Expect a dictionary
