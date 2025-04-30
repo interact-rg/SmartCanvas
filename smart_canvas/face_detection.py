@@ -9,8 +9,21 @@ import cv2
 from typing import Literal
 
 class FaceDetection:
+    _instance: "None|FaceDetection" = None
 
+    def __new__(cls, running_mode: Literal['VIDEO', 'IMAGE'] = 'VIDEO'):
+        if running_mode == 'IMAGE':
+            if cls._instance is None:
+                cls._instance = super(FaceDetection, cls).__new__(cls)
+            return cls._instance
+        else:
+            return super(FaceDetection, cls).__new__(cls)
+        
     def __init__(self, running_mode: Literal['VIDEO', 'IMAGE'] = 'VIDEO'):
+        # Early return if already initialized (singleton)
+        if hasattr(self, 'detector'):
+            return
+        
         if running_mode == 'VIDEO':
             self.running_mode = vision.RunningMode.VIDEO
         elif running_mode == 'IMAGE':
@@ -22,7 +35,6 @@ class FaceDetection:
             running_mode=self.running_mode,
         )
         self.detector: FaceDetector = vision.FaceDetector.create_from_options(self.options)
-
 
         if self.detector is None:
             raise RuntimeError("Failed to load face detection model from" + vision.FaceDetectorOptions.base_options.model_asset_path)

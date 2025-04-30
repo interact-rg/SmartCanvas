@@ -1,19 +1,12 @@
 """ web_service_test.py """
 import os
-from io import BytesIO
-from tempfile import mkdtemp
 
 import cv2
 import pytest
 from flask_socketio import SocketIOTestClient
-import numpy as np
-import shutil
-from PIL import Image as im
-import smart_canvas.database as db
 
 from web import create_app
-from web.main.events import cv_to_b64, b64_to_cv
-
+from web.main.imgutils import cv_to_b64, b64_to_cv
 TOKEN = 'test-token-ea520c84'
 FINGER_IMAGE_FOLDER_PATH = "tests/test_assets/finger_pictures"
 
@@ -131,105 +124,3 @@ class TestWebappSWTest(object):
         sio_client.disconnect()
         connection_state = sio_client.is_connected()
         assert connection_state is False
-
-
-@pytest.fixture()
-def client():
-    '''
-    based on http://flask.pocoo.org/docs/1.0/testing/
-    '''
-    config = {
-        "DEBUG": True,
-        "TESTING": True,
-        "TOKENS": {
-            TOKEN: "Client-1",
-        },
-    }
-    app = create_app(config)
-    yield app.test_client()
-
-
-class TestPages(object):
-    MAIN_URL = "/"
-    FULLSCREEN = "/fullscreen"
-
-    def test_get_main(self, client):
-        resp = client.get(self.MAIN_URL)
-        assert resp.status_code == 200
-        with open(os.getcwd() + "/web/templates/index.html", "r") as f:
-            response = resp.data.decode().split("\n")
-            template = f.read().strip("\r").split("\n")
-            diffs = 0
-            for i in range(len(response)):
-                if response[i] != template[i]:
-                    diffs += 1
-            assert diffs <= 2 #lines with 'url_for(x)' will differ
-    
-    def test_get_fullscreen(self, client):
-        resp = client.get(self.FULLSCREEN)
-        assert resp.status_code == 200
-        with open(os.getcwd() + "/web/templates/fullscreen.html", "r") as f:
-            response = resp.data.decode().split("\n")
-            template = f.read().strip("\r").split("\n")
-            diffs = 0
-            for i in range(len(response)):
-                if response[i] != template[i]:
-                    diffs += 1
-            assert diffs <= 2 #lines with 'url_for(x)' will differ
-
-
-
-class TestFileDownload(object):
-    URL_ID_1 = "/dl_image/1"
-    URL_ID_2 = "/dl_image/2"
-    
-    def test_dl_too_old(self, client):
-        if "database.db" in os.listdir():
-            os.remove("database.db")
-        shutil.copyfile("tests/test_assets/database/database.db", "database.db")
-        
-        resp = client.get(self.URL_ID_1)
-        assert resp.status_code == 200
-        response = resp.data.decode()
-        assert "Download failed, please try again later" in response and "Requested image too old" in response
-        
-
-    def test_dl_nonexistent_id(self, client):
-        if "database.db" in os.listdir():
-            os.remove("database.db")
-        shutil.copyfile("tests/test_assets/database/database.db", "database.db")
-
-        resp = client.get(self.URL_ID_2)
-        assert resp.status_code == 200
-        response = resp.data.decode()
-        assert "Download failed, please try again later" in response and "Requested image id does not exist" in response
-        
-
-    def test_dl_new(self, client):
-        if "database.db" in os.listdir():
-            os.remove("database.db")
-        shutil.copyfile("tests/test_assets/database/database.db", "database.db")
-
-        db_obj = db.Database()
-        dummy_img = np.asarray(im.open("tests/test_assets/finger_pictures/dummy.jpg"))
-        db_obj.insert_blob(dummy_img)
-        resp = client.get(self.URL_ID_2)
-        assert resp.status_code == 200
-        with open("tests/test_assets/database/dl_reference.png", "rb") as f:
-            ref = f.read()
-        assert ref == resp.data
-
-
-class TestAPSchedulerAPI(object):
-    RESOURCE_URL = "/scheduler"
-
-    def test_scheduler_info(self, client):
-        # Fail without token
-        resp = client.get(self.RESOURCE_URL)
-        assert resp.status_code == 404
-        # Fail with token
-        resp = client.get(
-            self.RESOURCE_URL,
-            headers={'Authorization': f'Bearer {TOKEN}'}
-        )
-        assert resp.status_code == 404

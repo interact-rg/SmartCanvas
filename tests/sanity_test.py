@@ -4,15 +4,15 @@ import pytest
 
 class TestPackageImports:
     def test_smart_canvas(self):
-        from smart_canvas.core import CanvasCore
-        from queue import Queue
-        q_producer = Queue(maxsize=1)
-        core = CanvasCore(q_producer, screensize=(1280,720))
-        core.start()
-        core.stop()
-        q_producer.put(None)
-        assert True == True
-    
-    def test_web(self):
-        from web import create_app
+        try:
+            import smart_canvas.core
+            from smart_canvas.image_store import ImageStore
+            from queue import Queue
+            q_producer = Queue(maxsize=1)
+            core = smart_canvas.core.CanvasCore(q_producer, ImageStore())
+            core.start()
+            core.stop()
+            q_producer.put(None)
+        except ImportError as e:
+            pytest.fail(f"Import failed: {e}")
         assert True == True

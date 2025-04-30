@@ -3,22 +3,23 @@
 from __future__ import annotations
 
 # Default packages
-import base64
 from queue import Queue
 
 # External packages
 from flask import request
-import numpy as np
-import cv2
 
 # Internal modules
 from .. import socketio
 from cv2.typing import MatLike
 
-from smart_canvas.core import CanvasCore
-from smart_canvas.core_alternate import CanvasCoreAlternate
-from smart_canvas.image_store import ImageStore
-from smart_canvas.qr_code import *
+try:
+    from smart_canvas.core import CanvasCore
+    from smart_canvas.core_alternate import CanvasCoreAlternate
+    from smart_canvas.image_store import ImageStore
+except ImportError: 
+    print('Prevented Circular Import in web.main')
+
+from .imgutils import b64_to_cv
 
 type Core = CanvasCore | CanvasCoreAlternate
 
@@ -30,8 +31,8 @@ image_stores: dict[str, ImageStore] = {}
 
 @socketio.on('connect')
 def connect_web():
-    print('[INFO] Web client connected: {}'.format(request.sid))
-    sid: str = request.sid
+    sid: str = str(request.sid) # type: ignore
+    print(f'[INFO] Web client connected: {sid}')
     core_queues.update({sid: Queue()})
     image_stores.update({sid: ImageStore()})
     try: 
@@ -46,26 +47,17 @@ def connect_web():
 
 @socketio.on('disconnect')
 def disconnect_web():
-    print('[INFO] Web client disconnected: {}'.format(request.sid))
-    sid: str = request.sid
+    sid: str = str(request.sid) # type: ignore
+    print('[INFO] Web client disconnected: {}'.format(sid))
     core = core_threads[sid]
     core.stop()
-    core_queues[sid].put(None)
     core_threads.pop(sid)
     image_stores.pop(sid)
     core_queues.pop(sid)
 
-
-def b64_to_cv(jpg_as_text: str):
-    jpg_original = base64.b64decode(jpg_as_text)
-    jpg_as_np = np.frombuffer(jpg_original, dtype=np.uint8)
-    img = cv2.imdecode(jpg_as_np, flags=1)
-    return img
-
-
 @socketio.on('produce')
 def handle_client_message(message: dict):  # Expect a dictionary
-    sid: str = request.sid
+    sid: str = str(request.sid) # type: ignore
     if sid not in core_threads:
         print(f"Error: Core thread not found for sid {sid} in 'produce' handler.")
         return
@@ -96,7 +88,7 @@ def handle_client_message(message: dict):  # Expect a dictionary
 
 @socketio.on('check_image_processing')
 def check_image_processing():
-    sid = request.sid
+    sid: str = str(request.sid) # type: ignore
     core = core_threads[sid]
     if core.image_processing_active:
         socketio.emit('imgage_processing_started', '', to=sid)

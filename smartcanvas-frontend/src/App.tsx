@@ -7,6 +7,7 @@ import ServerFeed from "./components/ServerFeed";
 import FilterFrames from "./components/FilterFrames";
 import ProgressCircle from "./components/ProgressCircle";
 import DownloadPrompt from "./components/DownloadPrompt";
+import filtercolors from './assets/filtercolors.json'
 
 const App: React.FC = () => {
   const [appState, setAppState] = useState<any>({});
@@ -31,21 +32,11 @@ const App: React.FC = () => {
 
   // Map filter to highlight color
   const getHighlightColor = (filter: string) => {
-    switch (filter) {
-      case "mosaic":
-        return "lightskyblue";
-      case "oil painting":
-        return "orange";
-      case "painterly":
-        return "darkblue";
-      case "pointillism":
-        return "goldenrod";
-      case "watercolor":
-        return "lightsalmon";
-      case "testfilter":
-        return "green";
-      default:
-        return "#706EBD"; // Default purple
+    if (filter in filtercolors) {
+      return filtercolors[filter as keyof typeof filtercolors];
+    }
+    else {
+      return filtercolors["default"]
     }
   };
 
