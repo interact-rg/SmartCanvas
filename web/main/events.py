@@ -12,10 +12,12 @@ from flask import request
 from .. import socketio
 from cv2.typing import MatLike
 
-from smart_canvas.core import CanvasCore
-from smart_canvas.core_alternate import CanvasCoreAlternate
-from smart_canvas.image_store import ImageStore
-from smart_canvas.qr_code import *
+try:
+    from smart_canvas.core import CanvasCore
+    from smart_canvas.core_alternate import CanvasCoreAlternate
+    from smart_canvas.image_store import ImageStore
+except ImportError: 
+    print('Prevented Circular Import in web.main')
 
 from .imgutils import b64_to_cv
 
@@ -29,8 +31,8 @@ image_stores: dict[str, ImageStore] = {}
 
 @socketio.on('connect')
 def connect_web():
-    print('[INFO] Web client connected: {}'.format(request.sid))
-    sid: str = request.sid
+    sid: str = str(request.sid) # type: ignore
+    print(f'[INFO] Web client connected: {sid}')
     core_queues.update({sid: Queue()})
     image_stores.update({sid: ImageStore()})
     try: 
@@ -45,18 +47,17 @@ def connect_web():
 
 @socketio.on('disconnect')
 def disconnect_web():
-    print('[INFO] Web client disconnected: {}'.format(request.sid))
-    sid: str = request.sid
+    sid: str = str(request.sid) # type: ignore
+    print('[INFO] Web client disconnected: {}'.format(sid))
     core = core_threads[sid]
     core.stop()
-    core_queues[sid].put(None)
     core_threads.pop(sid)
     image_stores.pop(sid)
     core_queues.pop(sid)
 
 @socketio.on('produce')
 def handle_client_message(message: dict):  # Expect a dictionary
-    sid: str = request.sid
+    sid: str = str(request.sid) # type: ignore
     if sid not in core_threads:
         print(f"Error: Core thread not found for sid {sid} in 'produce' handler.")
         return
@@ -87,7 +88,7 @@ def handle_client_message(message: dict):  # Expect a dictionary
 
 @socketio.on('check_image_processing')
 def check_image_processing():
-    sid = request.sid
+    sid: str = str(request.sid) # type: ignore
     core = core_threads[sid]
     if core.image_processing_active:
         socketio.emit('imgage_processing_started', '', to=sid)

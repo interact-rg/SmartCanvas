@@ -63,7 +63,7 @@ class CanvasCore:
         while not self.stopped:
             frame = self.q_consumer.get()
             self.tick = time.time()
-            self.image_store.check_expiry
+            self.image_store.check_expiry()
 
             # update state we are currently in
             self._state.update(self.tick, frame) # type: ignore
