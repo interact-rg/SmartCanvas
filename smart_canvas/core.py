@@ -28,7 +28,7 @@ class CanvasCore:
     """
     _state = None
 
-    def __init__(self, q_consumer: Queue[MatLike], img_store: ImageStore, sid: str = '', hostname: str = 'localhost'):
+    def __init__(self, q_consumer: Queue[MatLike], img_store: ImageStore, sid: str = '', hostname: str = 'localhost', is_webapp: bool = False):
         self.q_consumer = q_consumer
         self.stopped = False
         self.tick = time.time()
@@ -42,7 +42,7 @@ class CanvasCore:
         self.filtered_frame: None|MatLike = None
         self.sid = sid
         self.hostname = hostname
-        self.ui = UI(sid, is_webapp=True, base_url=self.hostname) 
+        self.ui = UI(sid, is_webapp=is_webapp, base_url=self.hostname) 
 
 
         # This is initial state
