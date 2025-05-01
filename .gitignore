@@ -43,6 +43,7 @@ nosetests.xml
 coverage.xml
 *,cover
 .hypothesis/
+tests/output/
 
 # dotenv
 .env
