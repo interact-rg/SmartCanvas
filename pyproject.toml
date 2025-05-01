@@ -28,6 +28,7 @@ dev = [
     "pytest-cov>=6.0.0",
     "pytest>=8.3.4",
     "pyparsing>=3.2.1",
+    "pytest-xdist>=^3.6.1"
 ]
 
 [tool.setuptools]
@@ -41,4 +42,11 @@ torchvision = {source = "pytorch_cpu"}
 name = "pytorch_cpu"
 url = "https://download.pytorch.org/whl/cpu"
 priority = "explicit"
+
+[tool.poetry.group.dev.dependencies]
+pylint = "^3.3.6"
+pytest-cov = "^6.1.1"
+pytest = "^8.3.5"
+pyparsing = "^3.2.3"
+pytest-xdist = "^3.6.1"
 
