@@ -62,6 +62,8 @@ class FilterCarousel:
             current_index = self.carousel.index(self.current_name)
             new_index = self.carousel.index(filter_name)
             self.carousel.rotate(current_index - new_index)
+            self.current_name = self.carousel[0]
+            self.current_filter = self.catalog[self.current_name]
         else:
             raise ValueError(f"Filter '{filter_name}' not found in catalog.")
     
