@@ -28,7 +28,6 @@ class FilterCarousel:
 
     catalog: dict[str, Filter] = {
         'toripolliisi': Toripolliisi(),
-        'italian pizza': ItalianPizza(),  # Add the new filter to the catalog
         'painterly': Painterly(),
         'watercolor': Watercolor(),
         'oil painting': OilPainting(),
@@ -39,6 +38,12 @@ class FilterCarousel:
         'testfilter': TestFilter(),
         'sketch': SketchModel(),  # Placeholder for sketch filter
     }
+
+
+    hiddenFilters: dict[str, Filter] = {  
+        'italian pizza': ItalianPizza(),  
+    }
+
     # carousel = itertools.cycle(catalog)
     carousel: deque[str] = deque(catalog.keys())
     def __init__(self, **kwargs):
@@ -64,6 +69,10 @@ class FilterCarousel:
             self.carousel.rotate(current_index - new_index)
             self.current_name = self.carousel[0]
             self.current_filter = self.catalog[self.current_name]
+        elif filter_name in self.hiddenFilters:
+            # If the filter is hidden, we can still set it as the current filter
+            self.current_name = filter_name
+            self.current_filter = self.hiddenFilters[filter_name]
         else:
             raise ValueError(f"Filter '{filter_name}' not found in catalog.")
     

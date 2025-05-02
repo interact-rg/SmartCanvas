@@ -224,6 +224,7 @@ class Active(State):
                            "Point_Gun_Left",    "Point_Gun_Right"):
             return
 
+
         now = time.time()
 
         
@@ -252,7 +253,7 @@ class Active(State):
         hold_required = 4.0
         fraction = self.stable_for / hold_required
 
-        if self.current_gesture == "Open_Palm":
+        if self.current_gesture in ["Open_Palm", "Chefs_Kiss"]:
             self.core.ui.set_prog(fraction)
             
         else:
@@ -261,6 +262,11 @@ class Active(State):
         if fraction >= 1.0 and self.current_gesture == "Open_Palm":
                 self.core.ui.set_prog(0.0)
                 self.core.set_state(Countdown())
+        elif fraction >= 1.0 and self.current_gesture == "Chefs_Kiss":
+            print("Mamma mia! Setting filter to Italian pizza.")
+            self.core.filters.set_filter("italian pizza")
+            self.core.ui.set_filter("italian pizza", self.core.get_current_perf())
+            self.core.set_state(Countdown())
 
 
 #
