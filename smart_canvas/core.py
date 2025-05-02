@@ -145,8 +145,6 @@ class Idle(State):
     def __init__(self):
         print ("Initializing core in Idle state...") #debug
         self.name = "Idle"
-        self.progress_counter = 0.0
-        self.change_filter_time = 0.0
         self.current_gesture = "No gestures yet"
 
     # Runs once on init
@@ -166,25 +164,19 @@ class Idle(State):
         
 class Active(State):
     """
-    Next state is Filter. Handles filter change and starts filtering
+    State class for active state. This is the main state where the user can interact with the canvas.
+    The user can change filters and start the countdown to take a picture.
     """
-
-    # State holds its own variables and these are not persistent after a state change
+    
     def __init__(self):
         self.name = "Active"
-        self.progress_counter = 0.0
-        self.change_filter_time = 0.0
         self.current_gesture = "No gestures yet"
         self.wrist_position = [0,0]
         self.previous_gesture = None
         self.stable_for = 0.0
-
         self.last_filter_change_time = 0.0
         self.filter_cooldown = 2.0  # seconds
 
-
-
-    # Runs once on init
     def enter(self, tick: float):
         self.core.ui.set_prog(0.0)
         print("Entering active state")
@@ -194,7 +186,6 @@ class Active(State):
 
     def update(self, tick: float, frame: MatLike):
 
-  
         face_present, face_duration = self.core.face_detector.detect_face_duration(frame)
         if (face_present == False and (face_duration > 5.0)):
             print("Face not present for duration:", str(face_duration) + "seconds")
@@ -272,19 +263,21 @@ class Active(State):
                 self.core.set_state(Countdown())
 
 
-
+#
 class Countdown(State):
     def __init__(self):
         self.name = "Countdown"
         self.countdown_time = 0.0
 
-    def enter(self, tick:float):
-        self.countdown_time = tick + 4
-        print ("Starting the countdown")
+    def enter(self, tick: float):
+        self.countdown_time = time.time() + 4
+        print("Starting the countdown")
     
     def update(self, tick: float, frame: MatLike):
-        if self.countdown_time - tick > 0:
-            self.core.ui.set_timer(self.countdown_time - tick)
+        now = time.time()
+        remaining = self.countdown_time - now
+        if remaining > 0:
+            self.core.ui.set_timer(remaining)
         else:
             self.core.ui.hide("countdown")
             self.core.set_state(Painting())
@@ -340,8 +333,8 @@ class ShowPic(State):
 
     def update(self, tick: float, frame: MatLike):
 
-
-        if time.time() >= self.show_image_end_time + 60: 
+#        # Check if the image is still shown. If not, go back to idle state
+        if time.time() >= self.show_image_end_time + 30: 
             self.core.ui.hide("image")
             self.core.ui.hide("qr")     
             self.core.filtered_frame = None
