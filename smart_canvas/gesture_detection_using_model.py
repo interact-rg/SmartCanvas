@@ -105,12 +105,7 @@ class GestureDetection:
         self,
         hand_lms: List[NormalizedLandmark]
     ) -> str:
-        """
-        Returns:
-          - "_Right" if the fingertip x > wrist x
-          - "_Left"  if the fingertip x < wrist x
-          - ""        if exactly equal (rare)
-        """
+
         # Type‑guard
         if not hand_lms or len(hand_lms) <= 8:
             return ""

@@ -31,7 +31,6 @@ class CanvasCore:
     def __init__(self, q_consumer: Queue[MatLike], img_store: ImageStore, sid: str = '', hostname: str = 'localhost', is_webapp: bool = False):
         self.q_consumer = q_consumer
         self.stopped = False
-        self.tick = time.time()
         self.filters = FilterCarousel()
         self.fg_masker = ForegroundMask()
         self.gesture_detector = GestureDetection()
@@ -56,17 +55,16 @@ class CanvasCore:
         self._state.core = self
         # FYI runs state "init"-function
         self.ui.show(state.name)
-        self._state.enter(self.tick)
+        self._state.enter()
         
 
     def process(self):
         while not self.stopped:
             frame = self.q_consumer.get()
-            self.tick = time.time()
             self.image_store.check_expiry()
 
             # update state we are currently in
-            self._state.update(self.tick, frame) # type: ignore
+            self._state.update(frame) # type: ignore
             self.ui.ready()
 
     def start(self):
@@ -112,11 +110,11 @@ class State(ABC):
         self._core = core
 
     @abstractmethod
-    def enter(self, tick: float):
+    def enter(self):
         pass
 
     @abstractmethod
-    def update(self, tick: float, frame: MatLike):
+    def update(self, frame: MatLike):
         pass
 
 
@@ -129,11 +127,11 @@ class Startup(State):
         self.name = "Startup"
         pass
 
-    def enter(self, tick: float):
+    def enter(self, ):
         self.ui = self.core.ui
         self.core.ui.set_filter(self.core.filters.current_name, self.core.get_current_perf())
 
-    def update(self, tick: float, frame: MatLike):
+    def update(self, frame: MatLike):
         self.core.set_state(Idle())
 
 
@@ -148,12 +146,12 @@ class Idle(State):
         self.current_gesture = "No gestures yet"
 
     # Runs once on init
-    def enter(self, tick: float):
+    def enter(self):
         self.core.ui.set_prog(0)
         print ("Entering Idle state...")  #debug
 
     # Update is called on new frame
-    def update(self, tick: float, frame: MatLike):
+    def update(self, frame: MatLike):
         
         face_present, duration = self.core.face_detector.detect_face_duration(frame)
         print("Face present:", face_present, "Duration:", str(duration) + "seconds")
@@ -171,21 +169,23 @@ class Active(State):
     def __init__(self):
         self.name = "Active"
         self.current_gesture = "No gestures yet"
-        self.wrist_position = [0,0]
-        self.previous_gesture = None
-        self.stable_for = 0.0
-        self.last_filter_change_time = 0.0
+        self.wrist_position = [0,0] # wrist position in x,y coordinates
+        self.previous_gesture = None 
+        self.stable_for = 0.0 # seconds
+        self.last_filter_change_time = 0.0 # seconds
         self.filter_cooldown = 2.0  # seconds
 
-    def enter(self, tick: float):
+    def enter(self):
         self.core.ui.set_prog(0.0)
         print("Entering active state")
         self.core.gesture_detector.reset_state()
 
         self.core.ui.set_filter(self.core.filters.current_name, self.core.get_current_perf())
 
-    def update(self, tick: float, frame: MatLike):
+    def update(self, frame: MatLike):
 
+        # Check if a face is present in the frame.
+        # If face is not present for more than 5 seconds, go back to idle state
         face_present, face_duration = self.core.face_detector.detect_face_duration(frame)
         if (face_present == False and (face_duration > 5.0)):
             print("Face not present for duration:", str(face_duration) + "seconds")
@@ -219,7 +219,7 @@ class Active(State):
         Change filter on a stable left/right pointing gesture held
         for at least gesture_hold_required seconds, with a short cooldown.
         """
-        # We only care about these pointing gestures:
+        # Check if the gesture is a pointing gesture
         if gesture not in ("Point_Finger_Left", "Point_Finger_Right",
                            "Point_Gun_Left",    "Point_Gun_Right"):
             return
@@ -269,11 +269,11 @@ class Countdown(State):
         self.name = "Countdown"
         self.countdown_time = 0.0
 
-    def enter(self, tick: float):
+    def enter(self):
         self.countdown_time = time.time() + 4
         print("Starting the countdown")
     
-    def update(self, tick: float, frame: MatLike):
+    def update(self, frame: MatLike):
         now = time.time()
         remaining = self.countdown_time - now
         if remaining > 0:
@@ -285,21 +285,20 @@ class Countdown(State):
 class Painting(State):
     """
     State class for applying filter to image. First show countdown and after that apply filter.
-    Next state is ShowPic
     """
 
     def __init__(self):
         self.name = "Painting"
 
-    def enter(self, tick: float):
+    def enter(self):
         self.core.image_processing_active = True
 
-    def update(self, tick: float, frame: MatLike):
+    def update(self, frame: MatLike):
         self.apply_filter(frame)
         self.core.set_state(ShowPic())
 
 
-
+    # Apply filter to the image and add it to the image store
     def apply_filter(self, frame: MatLike):
 
         mask: MatLike = self.core.fg_masker.apply(frame)
@@ -312,14 +311,14 @@ class Painting(State):
 
 class ShowPic(State):
     """
-    Stateclass just for showing the filtered image. Next state is Idle
+    Stateclass for showing the filtered image. 
     """
 
     def __init__(self):
         self.name = "ShowPic"
 
 
-    def enter(self, tick: float):
+    def enter(self):
         self.show_image_end_time = time.time()
         self.core.image_processing_active = False
         print ("Entering ShowPic state...")  #debug
@@ -331,9 +330,9 @@ class ShowPic(State):
 
 
 
-    def update(self, tick: float, frame: MatLike):
+    def update(self, frame: MatLike):
 
-#        # Check if the image is still shown. If not, go back to idle state
+#        # Check if the image should still be still shown or if the time has expired. If not, go back to idle state
         if time.time() >= self.show_image_end_time + 30: 
             self.core.ui.hide("image")
             self.core.ui.hide("qr")     
@@ -351,11 +350,11 @@ class ShowPic(State):
              self.current_gesture = gesture_data[0]
              self.wrist_position = gesture_data[1]
              self.current_gesture, self.wrist_position, self.stable_for, fingertip = gesture_data
-             self.update_filter_trigger()
+             self.update_close_picture()
              self.core.ui.set_wrist_position(self.wrist_position)
 
-    def update_filter_trigger(self):
-
+    # Close the picture if the gesture is a closed fist and held for 2 seconds
+    def update_close_picture(self):
         hold_required = 2
         fraction = self.stable_for / hold_required
 
