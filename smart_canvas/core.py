@@ -262,14 +262,14 @@ class Active(State):
         if fraction >= 1.0 and self.current_gesture == "Open_Palm":
                 self.core.ui.set_prog(0.0)
                 self.core.set_state(Countdown())
+
+        # Easter egg filter 1:  Italian pizza
         elif fraction >= 1.0 and self.current_gesture == "Chefs_Kiss":
             print("Mamma mia! Setting filter to Italian pizza.")
             self.core.filters.set_filter("italian pizza")
             self.core.ui.set_filter("italian pizza", self.core.get_current_perf())
             self.core.set_state(Countdown())
 
-
-#
 class Countdown(State):
     def __init__(self):
         self.name = "Countdown"
@@ -302,7 +302,6 @@ class Painting(State):
     def update(self, frame: MatLike):
         self.apply_filter(frame)
         self.core.set_state(ShowPic())
-
 
     # Apply filter to the image and add it to the image store
     def apply_filter(self, frame: MatLike):

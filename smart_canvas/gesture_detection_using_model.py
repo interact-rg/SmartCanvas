@@ -112,9 +112,9 @@ class GestureDetection:
         wrist_x = hand_lms[0].x
         tip_x   = hand_lms[8].x
     
-        if tip_x > wrist_x:
+        if tip_x > wrist_x: # type: ignore
             return "_Left"
-        if tip_x < wrist_x:
+        if tip_x < wrist_x: # type: ignore
             return "_Right"
         return ""
         

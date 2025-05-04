@@ -3,55 +3,6 @@
 
 Check out full instructions [HERE](docs/docker.md)
 
-## Usage with terminal commands
-
-Setting up the Python environment uses https://github.com/astral-sh/uv, a Python package and project manager.
-
-```ps
-uv python install 3.12
-uv venv --python 3.12
-.venv\Scripts\activate # This command may differ depending on your platform
-uv sync
-uv build
-python -m smart_canvas
-```
-
-You can also add extra options such as `--fullscreen` for fullscreen mode or `--camera 1` to change the camera source.
-
-
-## Usage with Make
-Makefile is used to manage the build scripts.\
-On Windows cmd or Powershell is not supported.\
-To run `make` commands on Windows, use BASH emulator (for e.g. git bash) or alternatively WSL.
-
-Init environment:  
-`make init`
-
-Run the program:  
-`make run`
-
-Run the web-service:  
-`make web`
-
-Run the web-service with gunicorn:\
-`make web-local`
-
-Test the code:  
-`make test`
-
-Test the code with warnings:  
-`make test-w-warnings`
-
-Test the code with coverage:  
-`make test-cov`
-
-Lint the code:  
-`make lint`
-
-Clean environment:  
-`make clean`
-
-
 ## Contributing
 
 See the [CONTRIBUTING.md](CONTRIBUTING.md) guide.
@@ -74,3 +25,9 @@ See the [CONTRIBUTING.md](CONTRIBUTING.md) guide.
 - @0LTSU0
 - @jouniwho
 - @morriskrr
+- @pklemettila
+- @JokelaR
+- @Petercode12
+- @naanatin
+- @juvalta
+- @sanpitka 
