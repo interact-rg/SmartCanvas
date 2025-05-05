@@ -11,7 +11,6 @@ services:
       - ./models:/models
     environment:
       - FLASK_ENV=development
-      - CLIENT_TOKEN=d159f6d5-6bb6-44c3-a2fa-ae5a60b5ce75
     restart: unless-stopped
 
   frontend:

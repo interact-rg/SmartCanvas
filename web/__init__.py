@@ -20,24 +20,13 @@ def create_app(test_config: dict[str, Any]|None = None):
     app.env = "development"
     config: dict[str, Any] = {
         "SCHEDULER_API_ENABLED": False,
-        "TOKENS": dict(),
     }
     app.config.from_mapping(config)
     app.config['TEMPLATES_AUTO_RELOAD'] = True
-    if os.getenv('CLIENT_TOKEN'):
-        auth_token = os.getenv('CLIENT_TOKEN')
-        app.config["TOKENS"].update({auth_token: 'Client-1'})
 
     if test_config:
         app.config.from_mapping(test_config)
 
-    if not app.config['TOKENS']:
-        sys.exit(
-            """
-            No TOKENS set!
-            atleast environment variable CLIENT_TOKEN must be set!
-            """
-        )
 
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
