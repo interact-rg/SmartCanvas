@@ -62,9 +62,4 @@ database.db
 typings/
 
 epoch_models
-modeltraining/exported_model/logs
-modeltraining/CN_Gesture_Recognition
-modeltraining/raw_data
-modeltraining/dataset
-modeltraining/dataset_backup
-modeltraining/dataset.rar
+modeltraining/exported_model

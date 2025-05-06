@@ -1,0 +1,3 @@
+Data is obtained from https://huggingface.co/datasets/CNGR/CN_Gesture_Recognition, licensed under MIT License for free use.
+
+https://huggingface.co/datasets/choosealicense/licenses/blob/main/markdown/mit.md

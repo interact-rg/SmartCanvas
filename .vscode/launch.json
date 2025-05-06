@@ -21,7 +21,6 @@
         "env": {
           "FLASK_APP": "web",  // Update with your actual Flask app file
           "FLASK_ENV": "development",
-          "CLIENT_TOKEN": "90371948-9461-11ee-924d-4c348848282b"
         },
         "jinja": true
       },
