@@ -8,5 +8,8 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 5173,
     allowedHosts: ['vm1029.kaj.pouta.csc.fi']
+  },
+  build: {
+    outDir: '../web/templates'
   }
 })
