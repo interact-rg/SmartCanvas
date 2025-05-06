@@ -65,7 +65,7 @@
 
 .instructions {
   display: grid;
-  grid-template-rows: 85vh 15vh; /* Divide into 2 rows */
+  grid-template-rows: 75vh 25vh; /* Divide into 2 rows */
   width: 100vw;
   height: 100vh;
   position: absolute; /* Position it on top of the container */
@@ -104,7 +104,7 @@
 .bottom-row {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: top;
   background: transparent; /* Optional: Add a semi-transparent background */
 }
 

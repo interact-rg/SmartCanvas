@@ -5,7 +5,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ImagePainter from './ImagePainter';
 import '../styles/ServerFeed.css';
-import closed_fist from '../assets/closed_fist.png';
+import closed_fist from '../assets/closed_fist_shadow.png';
 import exit from '../assets/exit.png';
 
 interface ServerFeedProps {
