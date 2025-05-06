@@ -15,12 +15,10 @@ def create_app(test_config: dict[str, Any]|None = None):
     """
     Based on http://flask.pocoo.org/docs/1.0/tutorial/factory/#the-application-factory
     """
-    app = Flask(__name__)
+    app = Flask(__name__, static_url_path='')
     app.debug = True
     app.env = "development"
-    config: dict[str, Any] = {
-        "SCHEDULER_API_ENABLED": False,
-    }
+    config: dict[str, Any] = {}
     app.config.from_mapping(config)
     app.config['TEMPLATES_AUTO_RELOAD'] = True
 

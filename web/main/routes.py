@@ -1,7 +1,7 @@
 """ routes.py """
 
 
-from flask import render_template, send_file
+from flask import render_template, send_file, send_from_directory
 import io, cv2
 from . import main
 from .events import image_stores
@@ -9,17 +9,9 @@ from .events import image_stores
 MAX_IMAGE_AGE_DOWNLOAD = 120 #seconds
 
 
-""" @main.route('/')
+@main.route('/')
 def index():
-    # if "Firefox" in request.headers.get('User-Agent'):
-    #     return render_template('us_browser.html')
-    return render_template('index.html')
-
-@main.route('/fullscreen')
-def fs_sym():
-    # if "Firefox" in request.headers.get('User-Agent'):
-    #     return render_template('us_browser.html')
-    return render_template('fullscreen.html') """
+    return send_from_directory('static', 'index.html')
 
 @main.route('/dl/<sid>/<id>', methods=['GET'])
 def download_image(sid: str, id: str):
@@ -37,4 +29,4 @@ def download_image(sid: str, id: str):
         else:
             return render_template("dl_failed.html", reason="Requested image too old")
 
-    return render_template("dl_failed.html", reason="Requested image id does not exist")
+    return render_template("dl_failed.html", reason="Requested image id does not exist", )

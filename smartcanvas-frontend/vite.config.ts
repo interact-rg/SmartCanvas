@@ -10,6 +10,6 @@ export default defineConfig({
     allowedHosts: ['vm1029.kaj.pouta.csc.fi']
   },
   build: {
-    outDir: '../web/templates'
+    outDir: '../web/static'
   }
 })
