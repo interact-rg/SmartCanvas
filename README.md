@@ -38,6 +38,11 @@ and started with
 npm run dev
 ```
 
+Before deploying, the frontend can be built into a static bundle in the [`web/static`](/web/static) folder with 
+```
+npm run build
+```
+
 ## Other considerations
 The project comes with a VSCode [`launch.json`](/.vscode/launch.json) to simplify debugging the backend and frontend separately. When contributing, strongly consider utilizing tooling like VSCode to simplify the environment management, and to [run strict type checks](vscode://settings/python.analysis.typeCheckingMode) on your code.
 
