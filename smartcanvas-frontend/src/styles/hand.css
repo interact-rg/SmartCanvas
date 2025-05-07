@@ -2,6 +2,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(45deg);
   }
@@ -11,6 +12,7 @@
   0% {
     rotate: -30deg;
   }
+
   100% {
     rotate: 30deg;
   }
@@ -20,9 +22,11 @@
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.7);
   }
+
   100% {
     transform: scale(2.5);
   }
@@ -32,9 +36,11 @@
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.3);
   }
+
   100% {
     transform: scale(1.6);
   }
@@ -45,15 +51,19 @@
     translate: 100%;
     transform: rotateX(0deg);
   }
+
   40% {
     transform: rotateX(0deg);
   }
+
   60% {
     transform: rotateX(180deg);
   }
+
   90% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
     translate: -100%;
@@ -68,8 +78,19 @@
   margin-top: 90%;
 }
 
+#point_left {
+  transform: scaleX(-1);
+  rotate: -90deg;
+  margin-right: 1%;
+}
+
+#point_right {
+  rotate: 90deg;
+  margin-left: 1%;
+}
+
 #hand {
-  animation: 4s ease-in-out infinite pulse;
+  animation: 4s ease-in-out infinite wave;
   transform-origin: 50% 100%;
 }
 

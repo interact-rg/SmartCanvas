@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import ArrowIcon from "../../public/arrow-down-solid.svg";
 
 interface DownloadPromptProps {
