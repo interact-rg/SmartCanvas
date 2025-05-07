@@ -116,6 +116,7 @@ const Instructions: React.FC<InstructionsProps> = ({
           case "Active":
             return (
               <div className="instructions">
+                <button onClick={renderGDPR} style={{maxHeight: '10%', maxWidth: '10%'}}> GDPR test button </button>
                 <div className="top-row">
                   <div className="column" id="column-1"></div>
                   <div className="column" id="column-2">
@@ -154,6 +155,12 @@ const Instructions: React.FC<InstructionsProps> = ({
     }
     return <></>;
   };
+
+  const renderGDPR = () => {
+    return (
+      <div> YEET </div>
+    );
+  }
 
   const renderCountdown = () => {
     if (countdown > 0) {
