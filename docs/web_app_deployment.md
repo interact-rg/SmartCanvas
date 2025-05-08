@@ -8,7 +8,14 @@ For a Smart Canvas student project, https://docs.csc.fi/cloud/pouta/ is a good o
 
 As of May 2025, the dockerized version of the application should work "out of the box" both locally and when cloned to a cloud environment, with the Flask server running on port 5000 and React frontend on port 5173.
 
+> [!NOTE]
+> The paths `/socket.io/*` and `/dl/*` should always be directed to the backend container
+
 Refer to the instructions of your cloud service of choice. 
+
+## Only deploying with the backend
+
+You may also attempt only deploying the backend, in which scenario the Flask server will handle serving the static frontend build in [`/web/static`](/web/static) from the backend (5000). In this scenario you can omit binding the frontend ports. 
 
 # Camera not showing when deployed to the cloud?
 
