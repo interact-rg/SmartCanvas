@@ -43,14 +43,6 @@ Before deploying, the frontend can be built into a static bundle in the [`web/st
 npm run build
 ```
 
-## Issues with GDPR
-
-Smartcanvas is not currently GDPR compliant.
-
-As per the legislation (https://gdpr-info.eu/art-4-gdpr/), personal data includes the face of the person and doing image manipulation with your face is processing (adaptation or alteration) personal data. This means that the user will need to accept GDPR, even if we don’t save their face. It would seem that even temporarily storing the face in RAM wouldn’t be GDPR compliant, as we would still be processing personal information. The app deletes (as of 3.5.25) the faces/altered faces of people after the QR code countdown has passed, so no information *should* be saved.
-
-Consent needs to be a “clear affirmative action”, and in the past Smartcanvas asked for a thumbs up to accept GDPR. However, what constitutes a “thumbs up” was defined by programming logic and affected by camera quality and thus cannot be guaranteed to be robust enough for legal consent.
-
 ## Other considerations
 The project comes with a VSCode [`launch.json`](/.vscode/launch.json) to simplify debugging the backend and frontend separately. When contributing, strongly consider utilizing tooling like VSCode to simplify the environment management, and to [run strict type checks](vscode://settings/python.analysis.typeCheckingMode) on your code.
 
