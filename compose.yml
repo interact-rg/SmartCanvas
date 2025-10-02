@@ -1,6 +1,27 @@
-services: 
-  web: 
-    build: .
-    ports: 
-      - '5000:5000'
-    restart: on-failure
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./smart_canvas:/smart_canvas
+      - ./web:/web
+      - ./models:/models
+    environment:
+      - FLASK_ENV=development
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./smartcanvas-frontend/src:/smartcanvas-frontend/src
+      - ./smartcanvas-frontend/public:/smartcanvas-frontend/public  
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    restart: unless-stopped

@@ -1,0 +1,8 @@
+dataset/
+exported_model/
+__pycache__/
+*.pyc
+raw_data
+useful_scripts
+license.txt
+readme.txt

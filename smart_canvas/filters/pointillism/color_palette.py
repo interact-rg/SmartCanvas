@@ -4,14 +4,16 @@ import math
 from sklearn.cluster import KMeans
 from .utils import limit_size, regulate
 
+# Types
+from cv2.typing import MatLike
 
 class ColorPalette:
-    def __init__(self, colors, base_len=0):
+    def __init__(self, colors: MatLike, base_len: int=0):
         self.colors = colors
         self.base_len = base_len if base_len > 0 else len(colors)
 
     @staticmethod
-    def from_image(img, n, max_img_size=200, n_init=10):
+    def from_image(img: MatLike, n, max_img_size=200, n_init=10):
         # scale down the image to speedup kmeans
         img = limit_size(img, max_img_size)
 

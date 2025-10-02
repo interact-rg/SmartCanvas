@@ -1,100 +1,96 @@
 """ __main__.py """
 
+from __future__ import annotations
+
 # Default packages
-import uuid
-import base64
 from queue import Queue
 
 # External packages
-from flask_socketio import SocketIO, send, emit
 from flask import request
-import numpy as np
-import cv2
-import smart_canvas.core
 
 # Internal modules
 from .. import socketio
-from smart_canvas.qr_code import *
+from cv2.typing import MatLike
 
+try:
+    from smart_canvas.core import CanvasCore
+    from smart_canvas.core_alternate import CanvasCoreAlternate
+    from smart_canvas.image_store import ImageStore
+except ImportError: 
+    print('Prevented Circular Import in web.main')
+
+from .imgutils import b64_to_cv
+
+type Core = CanvasCore | CanvasCoreAlternate
 
 # Global dicts
-core_threads = {}
-core_queues = {}
+core_threads: dict[str, Core] = {}
+core_queues: dict[str, Queue[MatLike]] = {}
+image_stores: dict[str, ImageStore] = {}
 
-#HOST_IP = "86.50.168.39"
-HOST_IP = "127.0.0.1"
 
 @socketio.on('connect')
 def connect_web():
-    print('[INFO] Web client connected: {}'.format(request.sid))
-    sid = request.sid
+    sid: str = str(request.sid) # type: ignore
+    print(f'[INFO] Web client connected: {sid}')
     core_queues.update({sid: Queue()})
-    core_threads.update({sid: smart_canvas.core.CanvasCore(q_consumer=core_queues[sid], screensize=(0, 0), webapp=True, sid=sid).start()})
+    image_stores.update({sid: ImageStore()})
+    try: 
+        if request.values['version'] == 'alternate':
+            core_threads.update({sid: CanvasCoreAlternate(q_consumer=core_queues[sid], img_store=image_stores[sid], sid=sid, hostname=request.host_url).start()})
+        else:
+            core_threads.update({sid: CanvasCore(q_consumer=core_queues[sid], img_store=image_stores[sid], sid=sid, is_webapp=True, hostname=request.host_url).start()})
+    except Exception as e:
+        core_threads.update({sid: CanvasCore(q_consumer=core_queues[sid], img_store=image_stores[sid], sid=sid, is_webapp=True, hostname=request.host_url).start()})
+    socketio.emit('available_filters', core_threads[sid].get_available_filters(), to=sid)
 
 
 @socketio.on('disconnect')
 def disconnect_web():
-    print('[INFO] Web client disconnected: {}'.format(request.sid))
-    sid = request.sid
+    sid: str = str(request.sid) # type: ignore
+    print('[INFO] Web client disconnected: {}'.format(sid))
     core = core_threads[sid]
     core.stop()
-    core_queues[sid].put(None)
     core_threads.pop(sid)
+    image_stores.pop(sid)
     core_queues.pop(sid)
 
-
-def cv_to_b64(cv_image):
-    if (cv_image is None):
-        return ''
-    _, buffer = cv2.imencode('.jpg', cv_image)
-    jpg_as_text = base64.b64encode(buffer)
-    string_b64 = jpg_as_text.decode("utf-8")
-    return string_b64
-
-
-def b64_to_cv(jpg_as_text):
-    jpg_original = base64.b64decode(jpg_as_text)
-    jpg_as_np = np.frombuffer(jpg_original, dtype=np.uint8)
-    img = cv2.imdecode(jpg_as_np, flags=1)
-    return img
-
-
 @socketio.on('produce')
-def handle_client_message(message):
-    sid = request.sid
+def handle_client_message(message: dict):  # Expect a dictionary
+    sid: str = str(request.sid) # type: ignore
+    if sid not in core_threads:
+        print(f"Error: Core thread not found for sid {sid} in 'produce' handler.")
+        return
+
     core = core_threads[sid]
     producer_q = core_queues[sid]
-    header = message.split(",")[0]
-    b64_frame = message.split(",")[1]
-    cv_image = b64_to_cv(b64_frame)
-    producer_q.put(cv_image)
-    if 'out_frame' not in vars(core):
-        return
-    if core.out_frame is None:
-        return
-    mod_message = header + "," + cv_to_b64(core.out_frame)
-    socketio.emit('current_state', core.get_current_state(), to=sid) #send current state
-    socketio.emit('consume', mod_message, to=sid)
+
+    # Handle baseUrl on the first 'produce' message
+    if core.ui and core.ui.is_webapp and core.ui.base_url is None:
+        received_base_url = message.get('baseUrl')  # Extract baseUrl from the message
+        if received_base_url:
+            print(f"Received base URL from client {sid}: {received_base_url}")
+            core.ui.base_url = received_base_url
+        else:
+            print(f"Warning: 'produce' message from {sid} did not contain 'baseUrl'. QR codes may fail.")
+
+    # Process the frame data
+    base64_data_url = message.get('currentFrame', '')  # Extract currentFrame from the message
+    if base64_data_url and ',' in base64_data_url:
+        b64_frame = base64_data_url.split(",")[1]  # Extract the base64-encoded part
+        try:
+            cv_image = b64_to_cv(b64_frame)
+            producer_q.put(cv_image)
+        except Exception as e:
+            print(f"Error decoding/processing frame from {sid}: {e}")
+    else:
+        print(f"Warning: 'produce' message from {sid} missing or invalid frame data.")
 
 @socketio.on('check_image_processing')
 def check_image_processing():
-    sid = request.sid
+    sid: str = str(request.sid) # type: ignore
     core = core_threads[sid]
     if core.image_processing_active:
         socketio.emit('imgage_processing_started', '', to=sid)
     if not core.image_processing_active and "ShowPic" in core.get_current_state():
         socketio.emit('imgage_processing_finished', '', to=sid)
-
-@socketio.on('get_dl_link')
-def get_dl_qr(message):
-    core = core_threads[request.sid]
-    if core.gdpr_accepted:
-        header = message.split(",")[0]
-        if core.image_id:
-            cv_qr = cv2.resize(create_qr_code(f"{HOST_IP}:5000/dl_image/{core.image_id}"), (200, 200), interpolation = cv2.INTER_AREA)
-            mod_message = header + "," + cv_to_b64(cv_qr)
-            socketio.emit('dl_qr', mod_message, to=request.sid)
-        else:
-            print("Missing image id -> cannot generate link")
-
-

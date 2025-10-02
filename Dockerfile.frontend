@@ -1,0 +1,18 @@
+FROM node:18
+
+# Set working directory to the frontend folder
+WORKDIR /smartcanvas-frontend
+
+# Copy frontend dependency files and install Node modules
+COPY smartcanvas-frontend/package.json smartcanvas-frontend/package-lock.json ./
+RUN npm install
+RUN npm ls
+
+# Copy the rest of the frontend code
+COPY smartcanvas-frontend/ ./
+
+# Expose Vite’s port
+EXPOSE 5173
+
+# Start the Vite dev server on port 5173
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173", "--strictPort", "true", "--force"]

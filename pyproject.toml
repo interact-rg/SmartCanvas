@@ -1,0 +1,52 @@
+[project]
+name = "smart_canvas"
+version = "0.1.0"
+description = "SmartCanvas-project"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "opencv-contrib-python-headless>=4.11.0.86",
+    "mediapipe>=0.10.20",
+    "numpy>=1.26.4",
+    "qrcode>=8.0",
+    "requests>=2.32.3",
+    "flask-socketio>=5.5.1",
+    "gunicorn>=23.0.0",
+    "eventlet>=0.39.0",
+    "werkzeug>=3.1.3",
+    "scipy>=1.15.1",
+    "scikit-learn>=1.6.1",
+    "pyrr>=0.10.3",
+    "flask>=3.1.0",
+    "torch (>=2.6.0,<3.0.0)",
+    "torchvision (>=0.21.0,<0.22.0)",
+]
+
+[dependency-groups]
+dev = [
+    "pylint>=3.3.4",
+    "pytest-cov>=6.0.0",
+    "pytest>=8.3.4",
+    "pyparsing>=3.2.1",
+    "pytest-xdist>=^3.6.1"
+]
+
+[tool.setuptools]
+packages = ["smart_canvas", "web"]
+[tool.poetry.dependencies]
+torchaudio = {source = "pypi"}
+torch = {source = "pytorch_cpu"}
+torchvision = {source = "pytorch_cpu"}
+
+[[tool.poetry.source]]
+name = "pytorch_cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
+
+[tool.poetry.group.dev.dependencies]
+pylint = "^3.3.6"
+pytest-cov = "^6.1.1"
+pytest = "^8.3.5"
+pyparsing = "^3.2.3"
+pytest-xdist = "^3.6.1"
+

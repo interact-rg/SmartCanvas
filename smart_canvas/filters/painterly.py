@@ -1,8 +1,40 @@
 # External packages
 import cv2
 import numpy as np
+from smart_canvas.filters.base import Filter
+from cv2.typing import MatLike
 
-def makeStroke(brush, x, y, img):
+
+class Painterly(Filter):
+    background = 'painterly_bg.jpg'
+
+    def filter(self, frame: MatLike) -> MatLike:
+        '''
+        paint the final painting by painting layer for each brush size
+        '''
+        width = frame.shape[1]
+        height = frame.shape[0]
+        canvas = np.zeros((height, width,3), dtype=np.uint8)
+        gradients = calcImageGradients(frame)
+
+        if gradients[1].ndim == 1 or gradients[2].ndim == 1:
+            return canvas 
+
+        # f_s controls the blur amount of the reference image
+        f_s = 1.0
+        # small brush sizes are slow to compute
+        # large brushes are not precise enough
+        # TODO: find a solution for this
+        brush_sizes = [8,6,4]
+
+        for brush in brush_sizes:
+            ref_img = cv2.GaussianBlur(frame, (0,0), sigmaX=f_s*brush, sigmaY=f_s*brush)
+            canvas = paintLayer(canvas, ref_img, brush, gradients)
+
+        return canvas
+
+
+def makeStroke(brush, x: int, y: int, img: MatLike):
     '''
     add diagonal stroke to list and return for the paintLayer function
     '''
@@ -109,27 +141,3 @@ def calcImageGradients(img):
     grad_magnitude = np.sqrt((grad_x ** 2) + (grad_y ** 2))
     return grad_magnitude, grad_x, grad_y
 
-def painterly_filter(image):
-    '''
-    paint the final painting by painting layer for each brush size
-    '''
-    width = image.shape[1]
-    height = image.shape[0]
-    canvas = np.zeros((height, width,3), dtype=np.uint8)
-    gradients = calcImageGradients(image)
-
-    if gradients[1].ndim == 1 or gradients[2].ndim == 1:
-        return canvas 
-
-    # f_s controls the blur amount of the reference image
-    f_s = 1.0
-    # small brush sizes are slow to compute
-    # large brushes are not precise enough
-    # TODO: find a solution for this
-    brush_sizes = [8,6,4]
-
-    for brush in brush_sizes:
-        ref_img = cv2.GaussianBlur(image, (0,0), sigmaX=f_s*brush, sigmaY=f_s*brush)
-        canvas = paintLayer(canvas, ref_img, brush, gradients)
-
-    return canvas
