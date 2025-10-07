@@ -28,7 +28,7 @@ dev = [
     "pytest-cov>=6.0.0",
     "pytest>=8.3.4",
     "pyparsing>=3.2.1",
-    "pytest-xdist>=^3.6.1"
+    "pytest-xdist>=3.6.1"
 ]
 
 [tool.setuptools]
