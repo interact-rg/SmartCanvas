@@ -9,15 +9,17 @@ import time
 import os
 
 script_dir = os.path.dirname(__file__)
-rel_path = r"test_assets/finger_pictures"
-abs_file_path = os.path.join(script_dir, rel_path)
+rel_path_finger = r"test_assets/finger_pictures"
+rel_path_normal = r"test_assets/normal_images"
+abs_file_path_finger = os.path.join(script_dir, rel_path_finger)
+abs_file_path_normal = os.path.join(script_dir, rel_path_normal)
 
-FINGER_IMAGE_FOLDER_PATH = abs_file_path
 
-
-two_fingers = cv2.resize(cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/2.jpeg"), (1280,720), interpolation = cv2.INTER_AREA)
-five_fingers = cv2.resize(cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/5.jpeg"), (1280, 720), interpolation = cv2.INTER_AREA)
-thumbs_down = cv2.resize(cv2.imread(f"{FINGER_IMAGE_FOLDER_PATH}/thumbs_down_720.jpg"), (1280, 720), interpolation = cv2.INTER_AREA)
+two_fingers = cv2.resize(cv2.imread(f"{abs_file_path_finger}/2.jpeg"), (1280,720), interpolation = cv2.INTER_AREA)
+five_fingers = cv2.resize(cv2.imread(f"{abs_file_path_finger}/5.jpeg"), (1280, 720), interpolation = cv2.INTER_AREA)
+thumbs_down = cv2.resize(cv2.imread(f"{abs_file_path_finger}/thumbs_down_720.jpg"), (1280, 720), interpolation = cv2.INTER_AREA)
+face_neutral = cv2.resize(cv2.imread(f"{abs_file_path_normal}/neutral.png"), (1280, 720), interpolation = cv2.INTER_AREA)
+face_neutral_with_five_fingers = cv2.resize(cv2.imread(f"{abs_file_path_normal}/neutral_with_five_fingers.png"), (1280, 720), interpolation = cv2.INTER_AREA)
 
 @pytest.fixture()
 def queue():
@@ -34,18 +36,28 @@ def core(queue):
 
 class TestCoreState:
     def test_smart_canvas(self, core, queue):
+        assert two_fingers is not None
+        assert face_neutral is not None
         assert type(core._state) is type(Startup())
         queue.put(two_fingers)
         time.sleep(0.1)
         assert type(core._state) is type(Idle())
-        for _ in range(0,20):
-            queue.put(five_fingers)
+
+        for _ in range(0,30):
+            print(f"face")
+            queue.put(face_neutral)
             time.sleep(0.1)
         assert type(core._state) is type(Active())
-        queue.put(five_fingers)
-        timeout = 0
-        while type(core._state) is not type(Painting()) and timeout < 20:
+        
+        for _ in range(0,20):
+            print(f"five fingers")
             queue.put(five_fingers)
+            time.sleep(0.1)
+
+        timeout = 0
+        while type(core._state) is not type(Painting()) and timeout < 100:
+            print(f"not painting")
+            queue.put(face_neutral_with_five_fingers)
             timeout += 1
             time.sleep(0.1)
         assert type(core._state) is type(Painting())
