@@ -50,3 +50,12 @@ pytest = "^8.3.5"
 pyparsing = "^3.2.3"
 pytest-xdist = "^3.6.1"
 
+[tool.coverage.run]
+omit = [
+    # Ignore alt core in coverage result
+    "*/smart_canvas/core_alternate.py",
+    # Ignore init and main files
+    "__init__.py",
+    "__main__.py"
+]
+
