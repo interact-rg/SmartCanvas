@@ -1,7 +1,7 @@
 # Types
 UI_State = dict[str, str|float]
 from cv2.typing import MatLike
-from web.main.common_events import send_ui_state, send_filter, send_image, send_hand_position, send_qr, send_acknowledge, send_fingertip_position
+# from web.main.common_events import send_ui_state, send_filter, send_image, send_hand_position, send_qr, send_acknowledge, send_fingertip_position
 
 class Progressbar:
     """
@@ -48,35 +48,42 @@ class UI:
     def set_prog(self, value: float, max: float = 1.0):
         self.progressbar.value = value / max
         if self.is_webapp:
+            from web.main.common_events import send_ui_state
             send_ui_state({"hold_timer": self.progressbar.value}, self.sid)
     
     def set_fingertip_position(self, position: tuple[float, float]):
         """Sends index fingertip position data using the common_events helper."""
         if self.is_webapp:
+            from web.main.common_events import send_fingertip_position
             send_fingertip_position(position, self.sid)
 
     def set_timer(self, value: float):
         if self.is_webapp:
+            from web.main.common_events import send_ui_state
             send_ui_state({"timer": value}, self.sid)
     
     def set_filter(self, name: str, performance: float):
         if self.is_webapp:
+            from web.main.common_events import send_filter
             send_filter(name, performance, self.sid)
 
     def show(self, *names: str):
         for name in names:
             self.keys[name] = True
         if self.is_webapp:
+            from web.main.common_events import send_ui_state
             send_ui_state({key: True for key in names}, self.sid)
 
     def hide(self, *names: str):
         for name in names:
             self.keys[name] = False
         if self.is_webapp:
+            from web.main.common_events import send_ui_state
             send_ui_state({key: False for key in names}, self.sid)
 
     def show_image(self, image: MatLike):
         if self.is_webapp:
+            from web.main.common_events import send_image
             send_image(image, self.sid)
 
     def show_qr(self, image_id: str):
@@ -87,14 +94,17 @@ class UI:
 
         # Call send_qr with the valid base_url
         if self.is_webapp:
+            from web.main.common_events import send_qr
             send_qr(image_id, self.sid, self.base_url)
 
     def set_wrist_position(self, position: tuple[float, float]):
         if self.is_webapp:
+            from web.main.common_events import send_hand_position
             send_hand_position(position, self.sid)
 
     def ready(self):
         if self.is_webapp:
+            from web.main.common_events import send_acknowledge
             send_acknowledge(self.sid)
 
     def get_state(self) -> UI_State:
