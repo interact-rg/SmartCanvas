@@ -15,6 +15,12 @@ def build_filter_catalog():
         pytest.param(filter, name, id=name) for name, filter in carousel.catalog.items()
     ]
 
+def build_hidden_filter_catalog():
+    carousel = FilterCarousel()
+    return [
+        pytest.param(filter, name, id=name) for name, filter in carousel.hiddenFilters.items()
+    ]
+
 def build_frame_catalog():
     return [
         pytest.param(cv2.imread("tests/test_assets/normal_images/neutral.png"), 'neutral', id="neutral"),
@@ -101,3 +107,15 @@ class TestFilters(object):
         assert c == p_c, f'wrong amount of color channels in: {name}'
         os.makedirs(f'tests/output/{name}', exist_ok=True)
         cv2.imwrite(f'tests/output/{name}/{frame_name}.png', filtered_frame)
+
+@pytest.mark.parametrize("filter, name", build_hidden_filter_catalog())
+class TestHiddenFilters(object):
+    def test_filter_with_image(self, filter: Filter, name: str):
+        frame = cv2.imread("tests/test_assets/small_image/image.png")
+        mask = cv2.imread("tests/test_assets/small_image/mask.png")
+        w, h, c = frame.shape
+        filtered_frame = filter.filter_frame(frame, mask)
+        p_w, p_h, p_c = filtered_frame.shape
+        assert w == p_w, f'wrong width in: {name}'
+        assert h == p_h, f'wrong height in: {name}'
+        assert c == p_c, f'wrong amount of color channels in: {name}'

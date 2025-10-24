@@ -1,6 +1,7 @@
 # Types
 UI_State = dict[str, str|float]
 from cv2.typing import MatLike
+# Imports are set per function to fix circular import. <- This caused pytest runs to break. 
 # from web.main.common_events import send_ui_state, send_filter, send_image, send_hand_position, send_qr, send_acknowledge, send_fingertip_position
 
 class Progressbar:
