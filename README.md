@@ -23,7 +23,7 @@ Up to version **3.12.11** is currently supported. Using newer will mostly likely
 <br>
 Pyenv is a good option for multiple python versions https://github.com/pyenv/pyenv.
 
-## Install pipx
+## Install pipx (This is not mandatory, but recommended for poetry)
 Follow instructions here -> https://pipx.pypa.io/stable/installation/
 
 ## Install poetry 
@@ -32,8 +32,6 @@ After python and pipx are installed insall poetru with pipx
 pipx install poetry
 ```
 After installing reload you shell and poetry should work.
-
-
 
 ## Backend in the terminal
 The backend environment is managed with [Poetry](https://python-poetry.org/), a Python package and project manager. To install the project and its prerequisites simply use
@@ -56,10 +54,25 @@ To run the web backend, you can use.
 flask --app web run
 ```
 
-And for unit testing, you can simply use the `pytest` command to run the tests defined in [`/tests/`](/tests/).
+### Testing
+
+For unit testing, you can simply use the `pytest` command to run the tests defined in [`/tests/`](/tests/).
 ```ps
 pytest
 ```
+
+Collect coverage from project 
+```
+pytest --cov=smart_canvas --cov=web --cov-report=html
+```
+
+The results in `/htmlcov/index.html`. Open with the following command or open via filesystem.
+```
+xdg-open htmlcov/index.html  # Linux
+open htmlcov/index.html      # macOS
+start htmlcov/index.html     # Windows
+```
+
 
 ## Frontend in the terminal
 The frontend is managed with [npm](https://nodejs.org/en) and can be installed in the [`smartcanvas-frontend`](/smartcanvas-frontend/) directory with

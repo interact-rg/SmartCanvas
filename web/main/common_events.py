@@ -6,9 +6,10 @@
 from flask import request
 from web import socketio
 from cv2.typing import MatLike
-from smart_canvas.ui import UI_State
 from smart_canvas.qr_code import create_qr_code
 from .imgutils import cv_to_b64
+
+UI_State = dict[str, str|float]
 
 def send_image(image: MatLike, sid: str|None):
     string_b64 = cv_to_b64(image)

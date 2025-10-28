@@ -12,12 +12,9 @@ from flask import request
 from .. import socketio
 from cv2.typing import MatLike
 
-try:
-    from smart_canvas.core import CanvasCore
-    from smart_canvas.core_alternate import CanvasCoreAlternate
-    from smart_canvas.image_store import ImageStore
-except ImportError: 
-    print('Prevented Circular Import in web.main')
+from smart_canvas.core import CanvasCore
+from smart_canvas.core_alternate import CanvasCoreAlternate
+from smart_canvas.image_store import ImageStore
 
 from .imgutils import b64_to_cv
 
