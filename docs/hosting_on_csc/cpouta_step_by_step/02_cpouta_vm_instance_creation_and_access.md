@@ -13,7 +13,7 @@ https://docs.csc.fi/cloud/pouta/launch-vm-from-web-gui/#firewalls-and-security-g
 
 Create a security group and new rule in the group for every IP that needs access to the virtual machine. This group needs to be attached to the instance during or after the launch.
 
-The IP of your current personal computer can be discovered using:
+The IP of your current personal computer can be discovered using:<br>
 https://apps.csc.fi/myip/
 
 SSH rule creation:
@@ -36,7 +36,7 @@ Trying to login as `root` over SSH can output a name of less privileged default 
 
 `ssh root@xxx.xxx.xxx.xxx`
 
-Alternatively check from list of usernames of CSC images:
+Alternatively check from list of usernames of CSC images:<br>
 https://docs.csc.fi/cloud/pouta/images/#images
 
 ## Connect to the virtual machine using SSH
