@@ -2,7 +2,7 @@
 
 Here is a short summary of the main actions required for setting up a virtual machine with SSH access over the internet in unmodified cPouta environment.
 
-## If missing, create an SSH keypair on your personal computer
+## If nonexistent, create an SSH keypair on your personal computer
 https://docs.csc.fi/cloud/pouta/launch-vm-from-web-gui/#setting-up-ssh-keys
 
 ## If you have multiple CSC projects, select the wanted project
