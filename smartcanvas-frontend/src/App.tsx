@@ -148,13 +148,26 @@ const App: React.FC = () => {
             padding: "20px",
             pointerEvents: "auto",
             fontSize: "1.5rem",
+            boxSizing: "border-box",     // include padding in width
+            overflowX: "hidden"          // extra safety to prevent horizontal scroll
           }}
         >
           <h2>Consent for Image Processing</h2>
           <p>
-            University of Oulu requires your consent to process your camera feed for generating cartoon images.
-            Give a 👍 to accept or 👎 to decline.
-          </p>
+  University of Oulu requires your consent to process your camera feed for AI-generated images. 
+  Your consent will be given using gestures: <strong>👍 for "I agree"</strong> or <strong>👎 for "I do not agree"</strong>.
+</p>
+<ul>
+  <li>👍 Gesture: You agree to the processing of your camera feed for generating AI-based images.</li>
+  <li>👎 Gesture: You do not agree to the processing of your camera feed.</li>
+  <li>Your image will <strong>not be permanently stored</strong> and will only be held for a few seconds during processing.</li>
+  <li>The AI-generated image is created temporarily and is used only within the application.</li>
+  <li>No personal data beyond the camera feed will be collected or saved.</li>
+</ul>
+<p>
+  By giving consent via gestures, you acknowledge that the processing is performed for AI-generated image purposes only and all data is handled securely and temporarily.
+</p>
+
           <button
             style={{ fontSize: "2rem", margin: "10px" }}
             onClick={() => {
