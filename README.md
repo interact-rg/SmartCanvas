@@ -5,7 +5,7 @@ Check out full instructions [HERE](docs/docker.md)
 
 ## Deploying to cloud
 
-Previous projects have utilized CSC cloud services for running SmartCanvas, so that the laptop attached to a large display needs to only run a web browser that is then used for accessing SmartCanvas running in the cloud. 
+Previous project groups have utilized CSC cloud services for running SmartCanvas, so that the laptop attached to a large display needs to only run a web browser that is then used for accessing SmartCanvas running in the cloud.
 
 CSC deployment instructions can be found from documentation [HERE](docs/hosting_on_csc/cpouta_step_by_step) specifically.
 
