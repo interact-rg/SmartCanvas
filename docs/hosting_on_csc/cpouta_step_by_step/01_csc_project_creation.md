@@ -10,4 +10,5 @@ And follow instructions under heading: "Getting an account with Haka or Virtu". 
 When you can login to MyCSC, navigate to:<br>
 https://docs.csc.fi/accounts/how-to-create-new-project/
 
-There follow the instructions under heading: "Student". During (or after) the project creation you can attach the cPouta service to the project.
+There follow the instructions under heading: "Student". During (or after) the project creation you can attach the cPouta service to the project. It is possible to create virtual machines in cPouta.<br>
+https://docs.csc.fi/cloud/pouta/
