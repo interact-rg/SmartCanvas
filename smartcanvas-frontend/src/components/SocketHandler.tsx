@@ -1,8 +1,3 @@
-/**
- * Code to handle socket connection and receive data from the server
- * 
- * */
-
 import React, { useEffect, useState, useRef } from 'react';
 import useSocket from '../hooks/useSocket';
 
@@ -17,28 +12,37 @@ interface SocketHandlerProps {
   onChosenFilter: (filter: string) => void;
   onFilterPerformance: (performance: number) => void;
   onQrCode: (qrCode: string) => void;
+  onGesture?: (gesture: string) => void; // ✅ Gesture callback
 }
 
-const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame, onArtisticFrame, onHandPosition, onProgress, onHoldStill, onFilters, onChosenFilter, onFilterPerformance, onQrCode }) => {
-  const serverHostname = window.location.hostname; // e.g., vm1029.kaj.pouta.csc.fi
-  const protocol = window.location.protocol;     // e.g., https:
+const SocketHandler: React.FC<SocketHandlerProps> = ({
+  onStateChange,
+  videoFrame,
+  onArtisticFrame,
+  onHandPosition,
+  onProgress,
+  onHoldStill,
+  onFilters,
+  onChosenFilter,
+  onFilterPerformance,
+  onQrCode,
+  onGesture,
+}) => {
+  const serverHostname = window.location.hostname;
+  const protocol = window.location.protocol;
   let serverUrl: string;
 
   if (serverHostname === 'localhost' || serverHostname === '127.0.0.1') {
-    // Local development: Use explicit port for the backend
     serverUrl = `${protocol}//${serverHostname}:5000`;
   } else {
-    // Deployed: Connect via reverse proxy 
     serverUrl = `${protocol}//${serverHostname}`;
   }
 
-
   const isSecure = protocol === 'https:';
-
   const socket = useSocket(serverUrl, {
     path: "/socket.io/",
     transports: ['websocket', 'polling'],
-    secure: isSecure // Use the dynamic value
+    secure: isSecure
   });
 
   const [canSendFrame, setCanSendFrame] = useState(true);
@@ -46,53 +50,36 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
 
   useEffect(() => {
     if (!socket) return;
-    // Handle the list of available filters received from the server
+
     const handleAvailableFilters = (filters: string[]) => {
-      if (filters.length > 0) {
-        onFilters(filters);
-      }
+      if (filters.length > 0) onFilters(filters);
     };
 
-    // Update the UI state when the server sends a message
     const handleUpdateUIResponse = (msg: any) => {
-      //console.log('Received update_ui_response: ', msg);
-
-      // Counter to hold your hand still
       if (msg.hold_timer !== undefined) {
-        //console.log('Hold timer: ', msg.hold_timer);
         onProgress(msg.hold_timer);
         return;
-      }
-      // Counter to keep still when the image is "being painted"
-      else if (msg.timer !== undefined) {
-        //console.log('Timer: ', msg.timer);
+      } else if (msg.timer !== undefined) {
         onHoldStill(msg.timer);
         return;
       } else {
         onStateChange(msg);
       }
+
+      // ✅ Gesture handling
+      if (msg.gesture && (msg.gesture === "thumbs_up" || msg.gesture === "thumbs_down")) {
+        onGesture?.(msg.gesture);
+      }
     };
 
-    // Handle frame received acknowledgement from the server
-    const handleAck = () => {
-      //console.log('Received ack, ready to send new frame');
-      setCanSendFrame(true);
-    };
+    const handleAck = () => setCanSendFrame(true);
 
     const handleFilter = (message: any) => {
-      if (message.name) {
-        onChosenFilter(message.name);
-      }
-      if (message.performance) {
-        onFilterPerformance(message.performance);
-      }
-    }
-
-    // Handle the processed artistic image from the server
-    const handleArtisticFrame = (frame: string) => {
-      //console.log('Received artistic frame from the server: ', frame);
-      onArtisticFrame(frame);
+      if (message.name) onChosenFilter(message.name);
+      if (message.performance) onFilterPerformance(message.performance);
     };
+
+    const handleArtisticFrame = (frame: string) => onArtisticFrame(frame);
 
     socket.on('ack', handleAck);
     socket.on('update_ui_response', handleUpdateUIResponse);
@@ -113,31 +100,21 @@ const SocketHandler: React.FC<SocketHandlerProps> = ({ onStateChange, videoFrame
   }, [socket]);
 
   useEffect(() => {
-    // Try to send frame to the server
     const sendFrame = (frame: Blob) => {
-      if (!socket || !canSendFrame) return; // Wait for ack before sending a new frame
-
-      // Convert blob to base64 string
+      if (!socket || !canSendFrame) return;
       const reader = new FileReader();
       reader.onloadend = () => {
         const currentFrame = reader.result as string;
-
-        // Compare the current frame with the previous frame to avoid duplicates
         if (currentFrame !== previousFrameRef.current) {
-          //console.log('Sending frame to the server...');
-          socket.emit('produce', {currentFrame, baseUrl: window.location.origin});
-          previousFrameRef.current = currentFrame; // Update the previous frame
-          setCanSendFrame(false); // Prevent sending until ack is received
-        } else {
-          // Frame is identical to the previous one. Skipping.
+          socket.emit('produce', { currentFrame, baseUrl: window.location.origin });
+          previousFrameRef.current = currentFrame;
+          setCanSendFrame(false);
         }
       };
       reader.readAsDataURL(frame);
     };
 
-    if (socket && videoFrame && canSendFrame) {
-      sendFrame(videoFrame);
-    }
+    if (socket && videoFrame && canSendFrame) sendFrame(videoFrame);
   }, [socket, videoFrame, canSendFrame]);
 
   return null;

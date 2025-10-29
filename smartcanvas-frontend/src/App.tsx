@@ -7,41 +7,37 @@ import ServerFeed from "./components/ServerFeed";
 import FilterFrames from "./components/FilterFrames";
 import ProgressCircle from "./components/ProgressCircle";
 import DownloadPrompt from "./components/DownloadPrompt";
-import filtercolors from './assets/filtercolors.json'
+import filtercolors from './assets/filtercolors.json';
 
 const App: React.FC = () => {
   const [appState, setAppState] = useState<any>({});
-  const [outboundFrame, setOutboundFrame] = useState<Blob | null>(null); // Frame that is sent to the server
-  const [inboundFrame, setInboundFrame] = useState<string>(""); // Artistic picture sent by the server
-  const [qrCode, setQrCode] = useState<string | null>(""); // QR code sent by the server
+  const [outboundFrame, setOutboundFrame] = useState<Blob | null>(null);
+  const [inboundFrame, setInboundFrame] = useState<string>("");
+  const [qrCode, setQrCode] = useState<string | null>("");
   const [handPosition, setHandPosition] = useState<[number, number]>([0, 0]);
   const [progress, setProgress] = useState<number>(0);
   const [holdStill, setHoldStill] = useState<number>(0);
-  const [paintingTimer, setPaintingTimer] = useState<number>(12); // Timer for the painting
+  const [paintingTimer, setPaintingTimer] = useState<number>(12);
   const [filters, setFilters] = useState<string[]>([]);
   const [chosenFilter, setChosenFilter] = useState<string>("");
   const [chosenFilterPerformance, setChosenFilterPerformance] = useState<number>(0);
   const [serverFeedVisible, setServerFeedVisible] = useState<boolean>(false);
+
+  const intervalRef = useRef<number | null>(null);
+  const paintingTimerRef = useRef<number>(paintingTimer);
+  const needsInstruction = true;
+
+  // ⚡ Force popup on first load
+  const [showConsentPopup, setShowConsentPopup] = useState<boolean>(true);
+
   let qrTimeout: number | undefined = undefined;
-  const intervalRef = useRef<number | null>(null); // Ref to store the interval ID
-  const paintingTimerRef = useRef<number>(paintingTimer); // Ref to store the painting timer
 
-  // For testing purposes. Set to true when the core version is set to main (closed fist closes the artistic view)
-  // Set to false when the core version is set to alternate (artistic view closes on a timer)
-  const needsInstruction = true;  
-
-  // Map filter to highlight color
   const getHighlightColor = (filter: string) => {
-    if (filter in filtercolors) {
-      return filtercolors[filter as keyof typeof filtercolors];
-    }
-    else {
-      return filtercolors["default"]
-    }
+    if (filter in filtercolors) return filtercolors[filter as keyof typeof filtercolors];
+    return filtercolors["default"];
   };
 
   const handleStateChange = (state: any) => {
-    //console.log("State change received in App: ", state);
     if (state.Countdown) {
       clearTimeout(qrTimeout);
       setQrCode(null);
@@ -52,7 +48,6 @@ const App: React.FC = () => {
 
       if (state.Painting) {
         setAppState(state);
-
         if (intervalRef.current) clearInterval(intervalRef.current);
 
         intervalRef.current = setInterval(() => {
@@ -64,14 +59,9 @@ const App: React.FC = () => {
             return prev - 1;
           });
         }, 1000);
-      }
-      else if (state.ShowPic && paintingTimerRef.current > 0) {
-        console.log("Painting timer left: ", paintingTimerRef.current);
-        setTimeout(() => {
-          setAppState(state);
-        }, paintingTimerRef.current * 1000);
-      }
-      else {
+      } else if (state.ShowPic && paintingTimerRef.current > 0) {
+        setTimeout(() => setAppState(state), paintingTimerRef.current * 1000);
+      } else {
         setAppState(state);
       }
     } else {
@@ -81,29 +71,18 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    //console.log("App state: ", appState);
-  }, [appState]);
+    paintingTimerRef.current = paintingTimer;
+  }, [paintingTimer]);
 
   useEffect(() => {
-    // Set painting timer to the chosen filter performance
     if (chosenFilterPerformance > 0) {
-      setPaintingTimer(Math.floor(chosenFilterPerformance) - 4); // Subtract 4 seconds for the countdown
-      //console.log("Painting timer set to: ", Math.floor(chosenFilterPerformance) -4); 
+      setPaintingTimer(Math.floor(chosenFilterPerformance) - 4);
     } else {
       setPaintingTimer(12);
-      //console.log("Painting timer set to default 12 seconds");
     }
   }, [chosenFilterPerformance]);
 
-  useEffect(() => {
-    paintingTimerRef.current = paintingTimer;
-    //console.log("Painting timer updated:", paintingTimer);
-  }, [paintingTimer]);
-
-  const handleOutboundFrame = (frame: Blob) => {
-    setOutboundFrame(frame);
-  };
-
+  const handleOutboundFrame = (frame: Blob) => setOutboundFrame(frame);
   const handleQrCode = (qr: string) => {
     setQrCode(qr);
     clearTimeout(qrTimeout);
@@ -112,53 +91,120 @@ const App: React.FC = () => {
       setInboundFrame("");
     }, 60000);
   };
+  const handleHoldStill = (timer: number) => setHoldStill(timer);
+  const handleArtisticFrame = (frame: string) => setInboundFrame(frame);
 
-  const handleHoldStill = (timer: number) => {
-    setHoldStill(timer);
-    //console.log("Painting timer: ", timer);
+  // Optional: gesture-based consent
+  const handleGestureConsent = (gesture: string) => {
+    if (!showConsentPopup) return;
+    if (gesture === "thumbs_up") {
+      localStorage.setItem("gdpr_consent", "accepted");
+      setShowConsentPopup(false);
+    } else if (gesture === "thumbs_down") {
+      localStorage.setItem("gdpr_consent", "declined");
+      setShowConsentPopup(false);
+    }
   };
 
-  const handleArtisticFrame = (frame: string) => {
-    setInboundFrame(frame);
-  }
-
   return (
-    <div id="mainContainer" className="container_fs" style={{ "--color-highlight": getHighlightColor(chosenFilter) } as React.CSSProperties}>
-      <SocketHandler
-        onStateChange={handleStateChange}
-        videoFrame={outboundFrame}
-        onArtisticFrame={handleArtisticFrame}
-        onHandPosition={setHandPosition}
-        onProgress={setProgress}
-        onHoldStill={handleHoldStill}
-        onFilters={setFilters}
-        onChosenFilter={setChosenFilter}
-        onFilterPerformance={setChosenFilterPerformance}
-        onQrCode={handleQrCode}
-      />
+    <div
+      id="mainContainer"
+      className="container_fs"
+      style={{ "--color-highlight": getHighlightColor(chosenFilter) } as React.CSSProperties}
+    >
+      {/* ⚡ Consent Popup */}
+      {showConsentPopup && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.85)",
+            color: "white",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 99999,
+            textAlign: "center",
+            padding: "20px",
+            pointerEvents: "auto",
+            fontSize: "1.5rem",
+          }}
+        >
+          <h2>Consent for Image Processing</h2>
+          <p>
+            University of Oulu requires your consent to process your camera feed for generating cartoon images.
+            Give a 👍 to accept or 👎 to decline.
+          </p>
+          <button
+            style={{ fontSize: "2rem", margin: "10px" }}
+            onClick={() => {
+              localStorage.setItem("gdpr_consent", "accepted");
+              setShowConsentPopup(false);
+            }}
+          >
+            👍 Accept
+          </button>
+          <button
+            style={{ fontSize: "2rem", margin: "10px" }}
+            onClick={() => {
+              localStorage.setItem("gdpr_consent", "declined");
+              setShowConsentPopup(false);
+            }}
+          >
+            👎 Decline
+          </button>
+        </div>
+      )}
 
-      <div
-        className={`${serverFeedVisible ? "server-feed-container" : "hidden"}`}>
-        <ServerFeed state={appState} artisticFrame={inboundFrame} visible={serverFeedVisible} filter={chosenFilter} paintingTimer={chosenFilterPerformance} needsInstruction={needsInstruction}/>
-      </div>
+      {/* ⚡ Only render app after consent */}
+      {!showConsentPopup && (
+        <>
+          <SocketHandler
+            onStateChange={handleStateChange}
+            videoFrame={outboundFrame}
+            onArtisticFrame={handleArtisticFrame}
+            onHandPosition={setHandPosition}
+            onProgress={setProgress}
+            onHoldStill={handleHoldStill}
+            onFilters={setFilters}
+            onChosenFilter={setChosenFilter}
+            onFilterPerformance={setChosenFilterPerformance}
+            onQrCode={handleQrCode}
+            onGesture={handleGestureConsent}
+          />
 
-      <div
-        className={`${serverFeedVisible ? "hidden" : "camera-feed-container"}`}>
-        <ProgressCircle idle={appState.Idle ? true : false} position={handPosition} progress={progress} />
-        <CameraFeed
-          onFrameCapture={handleOutboundFrame}
-          width={1280}
-          height={720}
-          state={appState}
-        />
-        <Instructions state={appState} countdown={holdStill} filter={chosenFilter} />
-        <FilterFrames availableFilters={filters} chosenFilter={chosenFilter} />
-      </div>
+          <div className={`${serverFeedVisible ? "server-feed-container" : "hidden"}`}>
+            <ServerFeed
+              state={appState}
+              artisticFrame={inboundFrame}
+              visible={serverFeedVisible}
+              filter={chosenFilter}
+              paintingTimer={chosenFilterPerformance}
+              needsInstruction={needsInstruction}
+            />
+          </div>
 
-      {!(appState.Painting == true || appState.Painting == false) && <DownloadPrompt
-        image={inboundFrame}
-        downloadQr={qrCode}
-      />}
+          <div className={`${serverFeedVisible ? "hidden" : "camera-feed-container"}`}>
+            <CameraFeed
+              onFrameCapture={handleOutboundFrame}
+              width={1280}
+              height={720}
+              state={appState}
+            />
+            <ProgressCircle idle={appState.Idle ? true : false} position={handPosition} progress={progress} />
+            <Instructions state={appState} countdown={holdStill} filter={chosenFilter} />
+            <FilterFrames availableFilters={filters} chosenFilter={chosenFilter} />
+          </div>
+
+          {!(appState.Painting === true || appState.Painting === false) && (
+            <DownloadPrompt image={inboundFrame} downloadQr={qrCode} />
+          )}
+        </>
+      )}
     </div>
   );
 };
