@@ -1,6 +1,6 @@
 # CSC project creation
 
-A CSC user account is required for creating and using a CSC project. Your university user account can be used to access MyCSC.
+A CSC user account is required for creating and using a CSC project, where cloud computing billing units are allocated. Your university user account can be used to access MyCSC.
 
 Navigate to:<br>
 https://docs.csc.fi/accounts/how-to-create-new-user-account/
@@ -10,4 +10,4 @@ And follow instructions under heading: "Getting an account with Haka or Virtu". 
 When you can login to MyCSC, navigate to:<br>
 https://docs.csc.fi/accounts/how-to-create-new-project/
 
-There follow the instructions under heading: "Student". During (or after) the project creation you can attach the Rahti service to the project.
+There follow the instructions under heading: "Student". During (or after) the project creation you can attach the cPouta service to the project.
