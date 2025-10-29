@@ -1,111 +1,110 @@
-import React, { useEffect, useRef } from "react";
-import { Hands, Results } from "@mediapipe/hands";
-import { Camera } from "@mediapipe/camera_utils";
+import React, { useRef, useEffect, useState } from 'react';
+import {
+  FilesetResolver,
+  FaceDetector,
+  GestureRecognizer,
+  GestureRecognizerResult
+} from '@mediapipe/tasks-vision';
 
-interface ConsentCameraProps {
-  onConsent: (accepted: boolean) => void;
-  width?: number;
-  height?: number;
+interface FaceAndGestureDetectionProps {
+  setIsGivingConsent: (val: boolean) => void
 }
 
-const ConsentCamera: React.FC<ConsentCameraProps> = ({ onConsent, width = 640, height = 360 }) => {
+const FaceAndGestureDetection: React.FC<FaceAndGestureDetectionProps> = ({setIsGivingConsent}) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const cameraRef = useRef<Camera | null>(null);
-
-  // Stable gesture detection
-  const thumbsUpCount = useRef(0);
-  const thumbsDownCount = useRef(0);
-  const gestureThreshold = 5; // number of consecutive frames to confirm
-  const consentGivenRef = useRef(false); // prevent multiple triggers
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const faceDetectorRef = useRef<FaceDetector | null>(null);
+  const gestureRecognizerRef = useRef<GestureRecognizer | null>(null);
+  const lastUpdateTimeRef = useRef<number>(0);
 
   useEffect(() => {
-    if (!videoRef.current) return;
-
-    const hands = new Hands({
-      locateFile: (file) =>
-        `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` // load models from CDN
-    });
-
-    hands.setOptions({
-      maxNumHands: 1,
-      minDetectionConfidence: 0.7,
-      minTrackingConfidence: 0.7,
-    });
-
-    hands.onResults((results: Results) => {
-      if (consentGivenRef.current) return;
-
-      if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
-        thumbsUpCount.current = 0;
-        thumbsDownCount.current = 0;
-        return;
+    const setupCamera = async (): Promise<void> => {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await new Promise(resolve => {
+          videoRef.current!.onloadedmetadata = () => resolve(true);
+        });
       }
-
-      const landmarks = results.multiHandLandmarks[0];
-      const thumbTip = landmarks[4];
-      const wrist = landmarks[0];
-
-      const vertical = thumbTip.y - wrist.y;
-
-      if (vertical < -0.25) {
-        thumbsUpCount.current += 1;
-        thumbsDownCount.current = 0;
-        if (thumbsUpCount.current >= gestureThreshold) {
-          consentGivenRef.current = true;
-          onConsent(true);
-        }
-      } else if (vertical > 0.25) {
-        thumbsDownCount.current += 1;
-        thumbsUpCount.current = 0;
-        if (thumbsDownCount.current >= gestureThreshold) {
-          consentGivenRef.current = true;
-          onConsent(false);
-        }
-      } else {
-        thumbsUpCount.current = 0;
-        thumbsDownCount.current = 0;
-      }
-    });
-
-    cameraRef.current = new Camera(videoRef.current, {
-      onFrame: async () => {
-        await hands.send({ image: videoRef.current! });
-      },
-      width,
-      height,
-    });
-
-    cameraRef.current.start();
-
-    return () => {
-      cameraRef.current?.stop();
     };
-  }, [onConsent, width, height]);
+
+    const loadModels = async (): Promise<void> => {
+      const vision = await FilesetResolver.forVisionTasks(
+        'node_modules/@mediapipe/tasks-vision/wasm'
+      );
+
+      // Resolve full runtime URLs for model assets so paths work both in
+      // Vite dev and when the built frontend is served from a backend origin.
+      const basePath = (typeof window !== 'undefined')
+        ? `${window.location.origin}${import.meta.env.BASE_URL ?? '/'}`
+        : '/';
+
+      const faceModelPath = `${basePath}models/face_detector_short_range.tflite`;
+      const gestureModelPath = `${basePath}models/gesture_recognizer.task`;
+      console.log(faceModelPath)
+      console.log(gestureModelPath)
+      faceDetectorRef.current = await FaceDetector.createFromOptions(vision, {
+        baseOptions: {
+        modelAssetPath: faceModelPath
+        },
+        runningMode: 'VIDEO'
+      });
+
+      gestureRecognizerRef.current = await GestureRecognizer.createFromOptions(vision, {
+        baseOptions: {
+        modelAssetPath: gestureModelPath
+        },
+        runningMode: 'VIDEO'
+      });
+    };
+
+    const detect = async (): Promise<void> => {
+      const canvas = canvasRef.current;
+      const ctx = canvas?.getContext('2d');
+      const video = videoRef.current;
+      if (!video || !canvas || !ctx || !faceDetectorRef.current || !gestureRecognizerRef.current) return;
+
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const now = performance.now();
+      const shouldUpdate = now - lastUpdateTimeRef.current > 3000;
+
+      //Run update every X seconds to preserve compute
+      if (shouldUpdate) {
+        // Face detection
+        const faceResult = await faceDetectorRef.current.detectForVideo(video, now);
+        const faceFound = faceResult.detections.length > 0;
+
+        // Gesture detection
+        const gestureResult = await gestureRecognizerRef.current.recognizeForVideo(video, now);
+        const thumbsUp = gestureResult.gestures.some((gestureList: any[]) =>
+          gestureList.some((gesture: { categoryName: string; score: number; }) => gesture.categoryName === 'Thumb_Up' && gesture.score > 0.7)
+        );
+        console.log(`Is giving thumbs upd: ${thumbsUp} and face is shown: ${faceFound}`)
+        setIsGivingConsent((faceFound && thumbsUp))
+        lastUpdateTimeRef.current = now;
+      }
+
+      requestAnimationFrame(detect);
+    };
+
+
+    const init = async (): Promise<void> => {
+      await setupCamera();
+      await loadModels();
+      detect();
+    };
+
+    init();
+  }, []);
 
   return (
-    <div className="consent-camera" style={{ position: "relative" }}>
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        width={width}
-        height={height}
-        style={{ transform: "scaleX(-1)" }}
-      />
-      {/* Optional: visual feedback */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 10,
-          left: 10,
-          width: `${(thumbsUpCount.current / gestureThreshold) * 100}%`,
-          height: "5px",
-          backgroundColor: "green",
-          transition: "width 0.1s",
-        }}
-      />
+    <div>
+      <h2>Face & Gesture Detection</h2>
+      <video ref={videoRef} width={"100%"} height={"100%"} autoPlay playsInline muted />
+      <canvas ref={canvasRef} width={640} height={480} />
     </div>
   );
 };
 
-export default ConsentCamera;
+export default FaceAndGestureDetection;
