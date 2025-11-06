@@ -3,6 +3,8 @@
 TODO link to all CSC step-by-step documents in top level README.md
 
 ## If virtual machine does not have lots of RAM, add swap space
+You can check memory consumption with: `free -m` .
+
 For adding a swapfile and configuring swap to be enabled on boot due to a new `/etc/fstab` entry, check out:<br>
 https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-20-04
 
