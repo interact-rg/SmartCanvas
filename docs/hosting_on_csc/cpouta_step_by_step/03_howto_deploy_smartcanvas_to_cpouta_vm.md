@@ -1,5 +1,7 @@
 # Deploy SmartCanvas to cPouta virtual machine
 
+[UNTESTED]
+
 The instructions for getting SmartCanvas running on an existing cPouta virtual machine follow.
 
 ## If virtual machine does not have lots of RAM, add swap space
