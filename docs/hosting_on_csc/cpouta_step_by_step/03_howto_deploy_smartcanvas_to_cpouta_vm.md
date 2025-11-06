@@ -17,21 +17,21 @@ https://docs.docker.com/engine/install/ubuntu/
 ## Start all SmartCanvas docker containers
 `sudo echo "" ; nohup sudo docker compose up &`
 
-Lead with `sudo echo` for caching user password.
+Lead with `sudo echo` for caching user password.<br>
 https://en.wikipedia.org/wiki/Nohup
 
-Docker compose process (there were multiple processes) can be stopped with:
+Docker compose process (there were multiple processes) can be stopped with:<br>
 `sudo kill <process_id>`
-in case of no effect, you can try:
+<br>in case of no effect, you can try:<br>
 `sudo kill -9 <process_id>`
-This results in stopping all SmartCanvas containers.
+<br>This results in stopping all SmartCanvas containers.
 
-The process ID can be found with:
+The process ID can be found with:<br>
 `ps aux | grep -i compose`
 
-The legend of `ps` output can be checked with:
+The legend of `ps` output can be checked with:<br>
 `ps aux | head`
-and a detailed description of 'STAT' column for example can be found with:
+<br>and a detailed description of 'STAT' column for example can be found with:<br>
 `man ps`
 
 ## Allow inbound traffic to port 5173 in firewall rules
