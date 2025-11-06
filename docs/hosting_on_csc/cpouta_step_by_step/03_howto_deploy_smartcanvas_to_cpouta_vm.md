@@ -1,6 +1,6 @@
 # Deploy SmartCanvas to cPouta virtual machine
 
-TODO link to all CSC step-by-step documents in top level README.md
+The instructions for getting SmartCanvas running on an existing cPouta virtual machine follow.
 
 ## If virtual machine does not have lots of RAM, add swap space
 You can check memory consumption with: `free -m` .
@@ -37,3 +37,7 @@ The legend of `ps` output can be checked with:<br>
 ## Allow inbound traffic to port 5173 in firewall rules
 Add a new TCP rule to security group attached to the virtual machine instance running the containers.<br>
 https://docs.csc.fi/cloud/pouta/launch-vm-from-web-gui/#firewalls-and-security-groups
+
+## Configure HTTPS
+
+TODO Write the instructions
