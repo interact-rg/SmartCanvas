@@ -18,6 +18,7 @@ from smart_canvas.filters.testfilter import TestFilter
 from smart_canvas.filters.sketchmodel import SketchModel
 from smart_canvas.filters.toripolliisi import Toripolliisi
 from smart_canvas.filters.italian_pizza import ItalianPizza  # Import the new filter
+from smart_canvas.filters.cartoonify_filter import CartoonifyFilter
 
 from typing import Callable, Any
 from cv2.typing import MatLike
@@ -37,6 +38,7 @@ class FilterCarousel:
         'pointillism': Pointillism(),
         'testfilter': TestFilter(),
         'sketch': SketchModel(),  # Placeholder for sketch filter
+        'cartoonify': CartoonifyFilter(),
     }
 
 
