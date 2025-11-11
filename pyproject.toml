@@ -20,6 +20,7 @@ dependencies = [
     "flask>=3.1.0",
     "torch (>=2.6.0,<3.0.0)",
     "torchvision (>=0.21.0,<0.22.0)",
+    "Pillow>=10.0.0",
 ]
 
 [dependency-groups]
@@ -34,9 +35,9 @@ dev = [
 [tool.setuptools]
 packages = ["smart_canvas", "web"]
 [tool.poetry.dependencies]
-torchaudio = {source = "pypi"}
-torch = {source = "pytorch_cpu"}
-torchvision = {source = "pytorch_cpu"}
+torchaudio = "^2.6"  # Removed CPI flag to let Poetry pick compatible version
+torch = "^2.6"
+torchvision = "^0.21"
 
 [[tool.poetry.source]]
 name = "pytorch_cpu"
