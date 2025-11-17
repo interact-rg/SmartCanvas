@@ -155,7 +155,7 @@ const App: React.FC = () => {
       )
     } else {
       return (
-        <div>
+        <div style={{zIndex: "11"}}>
           <FaceAndGestureDetection setIsGivingConsent={setIsGivingConsent}></FaceAndGestureDetection>
           {(isGivingConsent == false) && <ConsentForm></ConsentForm>}      
         </div>

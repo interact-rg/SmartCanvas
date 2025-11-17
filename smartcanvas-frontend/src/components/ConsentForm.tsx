@@ -1,3 +1,5 @@
+import visual from "../assets/consent_visual.gif";
+
 const ConsentForm = () => {
 
     return (
@@ -23,10 +25,10 @@ const ConsentForm = () => {
                 overflowX: "hidden"          // extra safety to prevent horizontal scroll
             }}
         >
-
+            <img src={visual} alt="Description of GIF" />
             <button
                 style={{ fontSize: "2rem", margin: "10px" }}>
-                👍 Accept
+                By giving 👍 you accept that your image will be processed.
             </button>
         </div>
     );

@@ -101,9 +101,8 @@ const FaceAndGestureDetection: React.FC<FaceAndGestureDetectionProps> = ({setIsG
 
   return (
     <div>
-      <h2>Face & Gesture Detection</h2>
-      <video ref={videoRef} width={"100%"} height={"100%"} autoPlay playsInline muted />
-      <canvas ref={canvasRef} width={640} height={480} />
+      <video ref={videoRef} autoPlay playsInline muted />
+      <canvas style={{"visibility": "hidden", "display": "none"}} ref={canvasRef}/>
     </div>
   );
 };
