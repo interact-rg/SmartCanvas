@@ -1,9 +1,8 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   FilesetResolver,
   FaceDetector,
   GestureRecognizer,
-  GestureRecognizerResult
 } from '@mediapipe/tasks-vision';
 
 interface FaceAndGestureDetectionProps {
@@ -29,8 +28,9 @@ const FaceAndGestureDetection: React.FC<FaceAndGestureDetectionProps> = ({setIsG
     };
 
     const loadModels = async (): Promise<void> => {
+
       const vision = await FilesetResolver.forVisionTasks(
-        'node_modules/@mediapipe/tasks-vision/wasm'
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm"
       );
 
       // Resolve full runtime URLs for model assets so paths work both in
@@ -90,6 +90,7 @@ const FaceAndGestureDetection: React.FC<FaceAndGestureDetectionProps> = ({setIsG
 
 
     const init = async (): Promise<void> => {
+      console.log("Local Face & Gesture Detection")
       await setupCamera();
       await loadModels();
       detect();

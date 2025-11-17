@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev-consent": "vite --mode consent_on",
     "build": "tsc -b && vite build",
+    "build-consent": "tsc -b && vite build --mode consent_on",
     "lint": "eslint .",
     "preview": "vite preview"
   },
