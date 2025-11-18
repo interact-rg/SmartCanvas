@@ -1,89 +1,114 @@
 /**
- * This element displays the video feed from the client side camera.
+ * This component displays the live video feed from the user's camera.
+ * It captures frames and sends them to the parent via onFrameCapture().
  */
 
 import React, { useEffect, useRef, useState } from "react";
 
-// Allow the video frame size to be customized
 interface CameraFeedProps {
-    onFrameCapture: (frame: Blob) => void;
-    width?: number;
-    height?: number;
-    state: { [key: string]: any };
+  onFrameCapture: (frame: Blob) => void;
+  width?: number;
+  height?: number;
+  state: { [key: string]: any };
 }
 
-const CameraFeed: React.FC<CameraFeedProps> = ({ onFrameCapture, width = 1280, height = 720, state }: CameraFeedProps) => {
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [videoReady, setVideoReady] = useState(false);
+const CameraFeed: React.FC<CameraFeedProps> = ({
+  onFrameCapture,
+  width = 1280,
+  height = 720,
+  state,
+}) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [videoReady, setVideoReady] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        const startCamera = async () => {
-            console.log("Requesting camera access...");
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30, max: 60 } },
-                audio: false,
-            });
+  useEffect(() => {
+    const startCamera = async () => {
+      console.log("📸 Requesting camera access...");
 
-            if (videoRef.current) {
-                console.log("Attaching video stream...");
-                videoRef.current.srcObject = stream;
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            frameRate: { ideal: 30, max: 60 },
+          },
+          audio: false,
+        });
 
-                videoRef.current.onloadedmetadata = () => {
-                    console.log("Playing video...");
-                    videoRef.current?.play();
-                    setVideoReady(true);                    
-                };
-                
-            }
+        if (videoRef.current) {
+          console.log("✅ Attaching video stream...");
+          videoRef.current.srcObject = stream;
+
+          videoRef.current.onloadedmetadata = () => {
+            console.log("▶️ Playing video...");
+            videoRef.current?.play();
+            setVideoReady(true);
+          };
         }
-        startCamera();
+      } catch (err: any) {
+        console.error("❌ Camera access error:", err);
+        setError(err.message || "Unable to access camera");
+      }
+    };
 
-    }, []);
+    startCamera();
 
-    useEffect(() => {
-        if (!videoReady || onFrameCapture === undefined) {
-            //console.log("Video not ready yet...");
-            return;
-        }
-        
-        const captureFrame = () => {
-            if (videoRef.current && canvasRef.current) {
-                //console.log("Capturing frame...");
-                const canvas = canvasRef.current;
-                const context = canvas.getContext("2d");
-                context?.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-                
-                // Convert to Blob and send it to parent component
-                canvas.toBlob((blob) => {
-                    if (blob) onFrameCapture(blob);
-                }, "image/jpeg", 1.0);
-            }
+    return () => {
+      // Stop camera when component unmounts
+      if (videoRef.current?.srcObject) {
+        const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+        tracks.forEach((track) => track.stop());
+      }
+    };
+  }, []);
 
-        };
+  useEffect(() => {
+    if (!videoReady || !onFrameCapture) return;
 
-        // Adjust the interval based on the app state
-        const intervalTime = state.Idle ? 500 : 66; // 500ms for Idle state, 33ms for other states
+    const captureFrame = () => {
+      if (!videoRef.current || !canvasRef.current) return;
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+      ctx?.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
-        const interval = setInterval(() => {
-            if (videoReady) {
-                //console.log("Interval time is: ", intervalTime);
-                captureFrame();
-            } 
-        }, intervalTime); // Tries every intervalTime ms but only if the video is ready
+      canvas.toBlob((blob) => {
+        if (blob) onFrameCapture(blob);
+      }, "image/jpeg", 0.9);
+    };
 
+    const intervalTime = state?.Idle ? 500 : 66;
+    const interval = setInterval(captureFrame, intervalTime);
 
-        return () => {
-            clearInterval(interval);
-        };
-    }, [videoReady, onFrameCapture, state]);
+    return () => clearInterval(interval);
+  }, [videoReady, onFrameCapture, state]);
 
-    return (
-        <div className="video-feed" >
-            <video ref={videoRef} autoPlay playsInline width={width} height={height} style={{ transform: 'scaleX(-1)' }} />
-            <canvas ref={canvasRef} width={width} height={height} style={{ display: "none" }} />
+  return (
+    <div className="video-feed">
+      {error ? (
+        <div style={{ color: "red", textAlign: "center" }}>
+          <p>Camera Error: {error}</p>
+          <p>Please check browser permissions and reload.</p>
         </div>
-    );
+      ) : (
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          width={width}
+          height={height}
+          style={{ transform: "scaleX(-1)" }}
+        />
+      )}
+      <canvas
+        ref={canvasRef}
+        width={width}
+        height={height}
+        style={{ display: "none" }}
+      />
+    </div>
+  );
 };
 
 export default CameraFeed;

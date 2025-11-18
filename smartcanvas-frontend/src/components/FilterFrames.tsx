@@ -15,7 +15,6 @@ const FilterFrames: React.FC<FilterFramesProps> = ({
   chosenFilter,
 }) => {
   // Construct filter paths dynamically using availableFilters
-  console.log(availableFilters);
   const filters: string[] =
     availableFilters.length !== 0
       ? availableFilters.map((filterName) => `/images/${filterName}.jpg`)
