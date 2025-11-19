@@ -72,6 +72,9 @@ main() {
 			|| error_exit "Failed to remove docker containers: ${container_ids}"
 	fi
 
+	echo "Caching sudo password"
+	sudo echo ""
+
 	echo "Starting backend container"
 	nohup sudo docker run -p 5000:5000 "${docker_image_backend}" &> $(pwd)/backend.log &
 
