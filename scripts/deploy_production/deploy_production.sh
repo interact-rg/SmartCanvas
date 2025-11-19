@@ -78,7 +78,7 @@ build_backend_docker_image() {
 		| grep "${IMAGE_BACKEND_NAME}" \
 		| grep -q "${IMAGE_BACKEND_TAG}" \
 		; ret=$?
-	if "0" != "${ret}" ; then
+	if [ "0" != "${ret}" ] ; then
 		echo "Building backend Docker image"
 		sudo docker build --file Dockerfile.backend -t "${DOCKER_IMAGE_BACKEND}" . \
 			|| error_exit "Failed to build backend Docker image"
