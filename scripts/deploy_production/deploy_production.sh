@@ -39,6 +39,19 @@ install_dependencies() {
 	fi
 }
 
+remove_docker_containers() {
+	if [ "TRUE" != "${CONTAINER_REMOVE_ENABLED}" ] ; then
+		return
+	fi
+
+	container_ids="$(sudo docker container ps -a | cut -f 1 -d ' ' | grep -v CONTAINER)" || true
+	if [ "" != "${container_ids}" ] ; then
+		echo "Removing all Docker containers"
+		sudo docker container rm "${container_ids}" \
+			|| error_exit "Failed to remove docker containers: ${container_ids}"
+	fi
+}
+
 clean_host_state() {
 	local caddy_processes=""
 	local container_ids=""
@@ -51,12 +64,7 @@ clean_host_state() {
 		sudo pkill caddy || error_exit "Failed to signal Caddy"
 	fi
 
-	container_ids="$(sudo docker container ps -a | cut -f 1 -d ' ' | grep -v CONTAINER)" || true
-	if [ "" != "${container_ids}" ] ; then
-		echo "Removing all Docker containers"
-		sudo docker container rm "${container_ids}" \
-			|| error_exit "Failed to remove docker containers: ${container_ids}"
-	fi
+	remove_docker_containers
 }
 
 build_backend_docker_image() {
