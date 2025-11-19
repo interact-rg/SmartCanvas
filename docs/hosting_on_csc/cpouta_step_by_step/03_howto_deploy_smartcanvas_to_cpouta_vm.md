@@ -10,36 +10,58 @@ You can check memory consumption with: `free -m` .
 For adding a swapfile and configuring swap to be enabled on boot due to a new `/etc/fstab` entry, check out:<br>
 https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-20-04
 
-## Install Docker
-https://docs.docker.com/engine/install/ubuntu/
-
 ## Clone repository
 `git clone https://github.com/interact-rg/SmartCanvas.git`
 
-## Start all SmartCanvas docker containers
-`sudo echo "" ; nohup sudo docker compose up &`
+## Execute deployment script
+SmartCanvas repository contains a deployment script:<br>
+`scripts/deploy_production/deploy_production.sh`<br>
+To execute, `cd` to the top level of SmartCanvas repository and run `./scripts/deploy_production/deploy_production.sh`.
 
-Lead with `sudo echo` for caching user password.<br>
+The script takes no parameters and has the intent of starting two background
+processes. One process for running backend Docker container and another process
+for running a reverse proxy, serving the application over HTTPS. Camera usage
+requires HTTPS.
+
+The `nohup` utility is used to avoid the background processes being terminated
+when exiting from a shell that was used for starting the background processes.<br>
 https://en.wikipedia.org/wiki/Nohup
 
-Docker compose process (there were multiple processes) can be stopped with:<br>
-`sudo kill <process_id>`
-<br>in case of no effect, you can try:<br>
-`sudo kill -9 <process_id>`
-<br>This results in stopping all SmartCanvas containers.
+The processes write their log to:
+* `scripts/backend.log`
+* `scripts/caddy.log`
 
-The process ID can be found with:<br>
-`ps aux | grep -i compose`
+A live feed of the logs can be achieved with: `tail -f <logfile>`, Ctrl-C to exit.
 
-The legend of `ps` output can be checked with:<br>
-`ps aux | head`
-<br>and a detailed description of 'STAT' column for example can be found with:<br>
-`man ps`
+The script removes all Docker containers on the host prior to creating a new
+one. Removal fails if any containers are running. To successfully run the
+script to completion in this case, please stop all running containers manually
+before running the script again.
 
-## Allow inbound traffic to port 5173 in firewall rules
-Add a new TCP rule to security group attached to the virtual machine instance running the containers.<br>
-https://docs.csc.fi/cloud/pouta/launch-vm-from-web-gui/#firewalls-and-security-groups
+## Host management cheatsheet
+Check computation resource usage:<br>
+`top`<br>
+use 'q' to exit.
 
-## Configure HTTPS
+Check Docker container statuses:<br>
+`sudo docker container ps -a`
 
-TODO Write the instructions
+Stop running containers:<br>
+`sudo docker container stop <container name/ID>`
+
+Check existing docker images:<br>
+`sudo docker image ls`
+
+Filter running processes using:<br>
+`ps aux | grep -i <process name>`
+
+Terminate proceesses using:<br>
+`kill <process ID>`
+or the more forceful:<br>
+`kill -9 <process ID>`
+
+Check command documentation:<br>
+`man <command>`<br>
+To search in man pages, press '/' and give a search term. Cycle through matches
+using 'n' and 'N'.<br>
+`<command> --help`
