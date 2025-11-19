@@ -49,7 +49,7 @@ remove_docker_containers() {
 		|| true
 	if [ "" != "${container_ids}" ] ; then
 		echo "Removing all Docker containers"
-		sudo docker container rm "${container_ids}" \
+		sudo docker container rm ${container_ids} \
 			|| error_exit "Failed to remove docker containers: ${container_ids}"
 	fi
 }
