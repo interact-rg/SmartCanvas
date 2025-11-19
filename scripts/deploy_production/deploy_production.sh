@@ -4,8 +4,6 @@ set -e
 
 cd $(dirname $0)
 
-readonly UPGRADE_PACKAGES="TRUE"
-
 readonly IMAGE_BACKEND_NAME="smartcanvas_backend"
 readonly IMAGE_BACKEND_TAG="latest"
 readonly DOCKER_IMAGE_BACKEND="${IMAGE_BACKEND_NAME}:${IMAGE_BACKEND_TAG}"
