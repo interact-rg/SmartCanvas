@@ -74,7 +74,7 @@ build_backend_docker_image() {
 }
 
 deploy_application() {
-	local -r own_dns_name="${CPOUTA_VIRTUAL_MACHINE_DNS_NAME}"
+	local -r own_dns_name="${VIRTUAL_MACHINE_DNS_NAME}"
 	local -r backend_port="5000"
 
 	echo "Deploying application"
