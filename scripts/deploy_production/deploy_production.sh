@@ -68,7 +68,7 @@ clean_host_state() {
 build_backend_docker_image() {
 	local -r match_backend_image="${IMAGE_BACKEND_NAME}[[:space:]]+${IMAGE_BACKEND_TAG}"
 
-	pushd ..
+	pushd ../../
 
 	if ! $(sudo docker image ls | grep -q -E "${match_backend_image}") ; then
 		echo "Building backend Docker image"
@@ -76,7 +76,7 @@ build_backend_docker_image() {
 			|| error_exit "Failed to build backend Docker image"
 	fi
 
-	popd # ..
+	popd # ../../
 }
 
 deploy_application() {
