@@ -12,12 +12,15 @@ error_exit() {
 }
 
 install_dependencies() {
+	echo "Installing dependencies"
+
 	if [ "TRUE" == "${UPGRADE_PACKAGES}" ] ; then
 		sudo apt update
 		sudo apt upgrade
 	fi
 
 	if [ "" == "$(which etckeeper 2> /dev/null)" ] ; then
+		echo "Installing etckeeper"
 		sudo apt install etckeeper
 	fi
 
