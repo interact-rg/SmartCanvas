@@ -15,7 +15,9 @@ https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu
 
 ## Execute deployment script
 
-SmartCanvas repository contains a deployment script:<br>
+SmartCanvas repository contains a deployment script that can be used for
+setting up the application in a reproducible way in the production
+environment:<br>
 `scripts/deploy_production/deploy_production.sh`<br>
 
 Please insert the DNS name of your virtual machine into:<br>
@@ -44,6 +46,10 @@ The script removes all Docker containers on the host prior to creating a new
 one. Removal fails if any containers are running. To successfully run the
 script to completion in this case, please stop all running containers manually
 before running the script again.
+
+When the processes have had enough time to execute, the application can be
+accessed by giving the virtual machine DNS name to a web browser and
+connecting.
 
 ## Host management cheatsheet
 Check computation resource usage:<br>
