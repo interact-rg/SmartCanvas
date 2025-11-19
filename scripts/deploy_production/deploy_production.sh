@@ -78,7 +78,7 @@ deploy_application() {
 	#
 	# It is not recommended to use predefined fip-XXX... DNS names in
 	# production.
-	local -r own_dns_name="fip-86-50-20-216.kaj.poutavm.fi"
+	local -r own_dns_name="${CPOUTA_VIRTUAL_MACHINE_DNS_NAME}"
 	local -r backend_port="5000"
 
 	echo "Deploying application"
