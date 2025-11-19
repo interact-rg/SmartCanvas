@@ -6,6 +6,11 @@ cd $(dirname $0)
 
 readonly UPGRADE_PACKAGES="TRUE"
 
+error_exit() {
+	echo "${1}"
+	exit 1
+}
+
 install_dependencies() {
 	if [ "TRUE" == "${UPGRADE_PACKAGES}" ] ; then
 		sudo apt update
@@ -40,6 +45,7 @@ main() {
 	local -r docker_image_backend="${image_backend_name}:${image_backend_tag}"
 	local -r match_backend_image="${image_backend_name}[[:space:]]+${image_backend_tag}"
 
+	local caddy_processes=""
 	local container_ids=""
 
 	install_dependencies
@@ -48,7 +54,8 @@ main() {
 
 	if ! $(sudo docker image ls | grep -q -E "${match_backend_image}") ; then
 		echo "Building backend Docker image"
-		sudo docker build --file Dockerfile.backend -t "${docker_image_backend}" .
+		sudo docker build --file Dockerfile.backend -t "${docker_image_backend}" . \
+			|| error_exit "Failed to build backend Docker image"
 	fi
 
 	popd # ..
@@ -56,7 +63,8 @@ main() {
 	container_ids="$(sudo docker container ps -a | cut -f 1 -d ' ' | grep -v CONTAINER)" || true
 	if [ "" != "${container_ids}" ] ; then
 		echo "Removing all Docker containers"
-		sudo docker container rm "${container_ids}"
+		sudo docker container rm "${container_ids}" \
+			|| error_exit "Failed to remove docker containers: ${container_ids}"
 	fi
 
 	echo "Starting backend container"
