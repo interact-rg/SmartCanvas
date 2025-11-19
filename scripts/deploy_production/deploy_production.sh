@@ -42,6 +42,7 @@ remove_docker_containers() {
 		return
 	fi
 
+	# TODO Utilize --format flag of docker command
 	container_ids="$(sudo docker container ps -a | cut -f 1 -d ' ' | grep -v CONTAINER)" || true
 	if [ "" != "${container_ids}" ] ; then
 		echo "Removing all Docker containers"
@@ -70,6 +71,7 @@ build_backend_docker_image() {
 
 	pushd ../../
 
+	# TODO Utilize --format flag of docker command
 	if ! $(sudo docker image ls | grep -q -E "${match_backend_image}") ; then
 		echo "Building backend Docker image"
 		sudo docker build --file Dockerfile.backend -t "${DOCKER_IMAGE_BACKEND}" . \
