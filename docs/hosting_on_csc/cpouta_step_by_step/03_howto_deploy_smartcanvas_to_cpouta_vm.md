@@ -9,6 +9,7 @@ You can check memory consumption with: `free -m` .
 
 For adding a swapfile and configuring swap to be enabled on boot due to a new `/etc/fstab` entry, check out:<br>
 https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-20-04
+Command `sudo findmnt --verify` can be used to verify fstab correctness.
 
 ## Clone repository
 `git clone https://github.com/interact-rg/SmartCanvas.git`
