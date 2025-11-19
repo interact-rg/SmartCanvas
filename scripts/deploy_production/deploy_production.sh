@@ -74,10 +74,11 @@ build_backend_docker_image() {
 
 	pushd ../../
 
+	ret=0
 	sudo docker image ls --format json \
 		| grep "${IMAGE_BACKEND_NAME}" \
 		| grep -q "${IMAGE_BACKEND_TAG}" \
-		; ret=$?
+		|| ret=$?
 	if [ "0" != "${ret}" ] ; then
 		echo "Building backend Docker image"
 		sudo docker build --file Dockerfile.backend -t "${DOCKER_IMAGE_BACKEND}" . \
