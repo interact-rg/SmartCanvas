@@ -14,9 +14,16 @@ https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu
 `git clone https://github.com/interact-rg/SmartCanvas.git`
 
 ## Execute deployment script
+
 SmartCanvas repository contains a deployment script:<br>
 `scripts/deploy_production/deploy_production.sh`<br>
-To execute, `cd` to the top level of SmartCanvas repository and run `./scripts/deploy_production/deploy_production.sh`.
+
+Please insert the DNS name of your virtual machine into:<br>
+`scripts/deploy_production/config.sh`<br>
+before executing the deployment script.<br>
+
+Then to execute, `cd` to the top level of SmartCanvas repository and run:<br>
+`./scripts/deploy_production/deploy_production.sh`.
 
 The script takes no parameters and has the intent of starting two background
 processes. One process for running backend Docker container and another process
