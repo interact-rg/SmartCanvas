@@ -6,6 +6,10 @@ cd $(dirname $0)
 
 readonly UPGRADE_PACKAGES="TRUE"
 
+readonly IMAGE_BACKEND_NAME="smartcanvas_backend"
+readonly IMAGE_BACKEND_TAG="latest"
+readonly DOCKER_IMAGE_BACKEND="${IMAGE_BACKEND_NAME}:${IMAGE_BACKEND_TAG}"
+
 error_exit() {
 	echo "${1}"
 	exit 1
@@ -35,32 +39,11 @@ install_dependencies() {
 	fi
 }
 
-main() {
-	# https://docs.csc.fi/cloud/pouta/additional-services/#custom-dns-name
-	#
-	# It is not recommended to use predefined fip-XXX... DNS names in
-	# production.
-	local -r own_dns_name="fip-86-50-20-216.kaj.poutavm.fi"
-
-	local -r image_backend_name="smartcanvas_backend"
-	local -r image_backend_tag="latest"
-	local -r docker_image_backend="${image_backend_name}:${image_backend_tag}"
-	local -r match_backend_image="${image_backend_name}[[:space:]]+${image_backend_tag}"
-
+clean_host_state() {
 	local caddy_processes=""
 	local container_ids=""
 
-	install_dependencies
-
-	pushd ..
-
-	if ! $(sudo docker image ls | grep -q -E "${match_backend_image}") ; then
-		echo "Building backend Docker image"
-		sudo docker build --file Dockerfile.backend -t "${docker_image_backend}" . \
-			|| error_exit "Failed to build backend Docker image"
-	fi
-
-	popd # ..
+	echo "Cleaning host state"
 
 	caddy_processes="$(ps aux | grep -v grep | grep -i caddy)" || true
 	if [ "" != "${caddy_processes}" ] ; then
@@ -74,15 +57,58 @@ main() {
 		sudo docker container rm "${container_ids}" \
 			|| error_exit "Failed to remove docker containers: ${container_ids}"
 	fi
+}
+
+build_backend_docker_image() {
+	local -r match_backend_image="${IMAGE_BACKEND_NAME}[[:space:]]+${IMAGE_BACKEND_TAG}"
+
+	pushd ..
+
+	if ! $(sudo docker image ls | grep -q -E "${match_backend_image}") ; then
+		echo "Building backend Docker image"
+		sudo docker build --file Dockerfile.backend -t "${DOCKER_IMAGE_BACKEND}" . \
+			|| error_exit "Failed to build backend Docker image"
+	fi
+
+	popd # ..
+}
+
+deploy_application() {
+	# https://docs.csc.fi/cloud/pouta/additional-services/#custom-dns-name
+	#
+	# It is not recommended to use predefined fip-XXX... DNS names in
+	# production.
+	local -r own_dns_name="fip-86-50-20-216.kaj.poutavm.fi"
+	local -r backend_port="5000"
+
+	echo "Deploying application"
+
+	build_backend_docker_image
 
 	echo "Caching sudo password"
 	sudo echo ""
 
 	echo "Starting backend container"
-	nohup sudo docker run -p 5000:5000 "${docker_image_backend}" &> $(pwd)/backend.log &
+	nohup sudo docker run \
+		-p ${backend_port}:${backend_port} \
+		"${DOCKER_IMAGE_BACKEND}" \
+		&> $(pwd)/backend.log &
 
 	echo "Starting reverse proxy"
-	nohup sudo caddy reverse-proxy --from "${own_dns_name}" --to :5000 &> $(pwd)/caddy.log &
+	nohup sudo caddy reverse-proxy \
+		--from "${own_dns_name}" \
+		--to :${backend_port} \
+		&> $(pwd)/caddy.log &
+}
+
+main() {
+	echo "Deploying to production"
+
+	install_dependencies
+
+	clean_host_state
+
+	deploy_application
 }
 
 main "${@}"
