@@ -12,16 +12,13 @@ install_dependencies() {
 		sudo apt upgrade
 	fi
 
-	if [ "" == "$(which etckeeper)" ] ; then
+	if [ "" == "$(which etckeeper 2> /dev/null)" ] ; then
 		sudo apt install etckeeper
 	fi
 
 	if [ "" == "$(which docker 2> /dev/null)" ] ; then
 		echo "Installing Docker"
-
-		./install_docker_apt_repository.sh
-		./install_docker_packages.sh
-		./run_docker_hello_world.sh
+		./install_docker.sh
 	fi
 
 	if [ "" == "$(which caddy 2> /dev/null)" ] ; then
@@ -32,7 +29,12 @@ install_dependencies() {
 }
 
 main() {
+	# https://docs.csc.fi/cloud/pouta/additional-services/#custom-dns-name
+	#
+	# It is not recommended to use predefined fip-XXX... DNS names in
+	# production.
 	local -r own_dns_name="fip-86-50-20-216.kaj.poutavm.fi"
+
 	local -r image_backend_name="smartcanvas_backend"
 	local -r image_backend_tag="latest"
 	local -r docker_image_backend="${image_backend_name}:${image_backend_tag}"

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+set -e
+
+echo "Installing Docker APT repository"
+
 # Add Docker's official GPG key:
 sudo apt update
 sudo apt install ca-certificates curl
@@ -13,3 +17,5 @@ echo \
   $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt update
+
+echo "Done installing Docker APT repository"
