@@ -106,6 +106,8 @@ deploy_application() {
 }
 
 main() {
+	source ./config.sh
+
 	echo "Deploying to production"
 
 	install_dependencies
