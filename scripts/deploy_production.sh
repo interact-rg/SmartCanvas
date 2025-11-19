@@ -4,7 +4,7 @@ set -ex
 
 cd $(dirname $0)
 
-readonly UPGRADE_PACKAGES="FALSE"
+readonly UPGRADE_PACKAGES="TRUE"
 
 install_dependencies() {
 	if [ "TRUE" == "${UPGRADE_PACKAGES}" ] ; then
