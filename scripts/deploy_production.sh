@@ -60,6 +60,12 @@ main() {
 
 	popd # ..
 
+	caddy_processes="$(ps aux | grep -v grep | grep -i caddy)" || true
+	if [ "" != "${caddy_processes}" ] ; then
+		echo "Signaling already running Caddy"
+		sudo pkill caddy || error_exit "Failed to signal Caddy"
+	fi
+
 	container_ids="$(sudo docker container ps -a | cut -f 1 -d ' ' | grep -v CONTAINER)" || true
 	if [ "" != "${container_ids}" ] ; then
 		echo "Removing all Docker containers"
@@ -71,7 +77,6 @@ main() {
 	nohup sudo docker run -p 5000:5000 "${docker_image_backend}" &> $(pwd)/backend.log &
 
 	echo "Starting reverse proxy"
-	sudo pkill caddy || true
 	nohup sudo caddy reverse-proxy --from "${own_dns_name}" --to :5000 &> $(pwd)/caddy.log &
 }
 
