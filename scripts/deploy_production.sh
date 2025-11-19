@@ -30,7 +30,6 @@ install_dependencies() {
 		echo "Installing Caddy"
 		./install_caddy.sh
 	fi
-
 }
 
 main() {
