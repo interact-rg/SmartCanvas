@@ -122,6 +122,8 @@ main() {
 	clean_host_state
 
 	deploy_application
+
+	echo "Done deploying to production"
 }
 
 main "${@}"
