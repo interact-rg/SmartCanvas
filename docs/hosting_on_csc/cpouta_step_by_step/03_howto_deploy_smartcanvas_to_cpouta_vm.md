@@ -63,8 +63,11 @@ Check Docker container statuses:<br>
 Stop running containers:<br>
 `sudo docker container stop <container name/ID>`
 
-Check existing docker images:<br>
+Check existing Docker images:<br>
 `sudo docker image ls`
+
+Remove Docker image:<br>
+`sudo docker image rm <image>`
 
 Filter running processes using:<br>
 `ps aux | grep -i <process name>`
