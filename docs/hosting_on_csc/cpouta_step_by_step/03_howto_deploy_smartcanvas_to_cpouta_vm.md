@@ -77,8 +77,8 @@ when exiting from a shell that was used for starting the background processes.<b
 https://en.wikipedia.org/wiki/Nohup
 
 The processes write their log to:
-* `scripts/backend.log`
-* `scripts/caddy.log`
+* `./scripts/deploy_production/backend.log`
+* `./scripts/deploy_production/caddy.log`
 
 A live feed of the logs can be achieved with: `tail -f <logfile>`, Ctrl-C to exit.
 
