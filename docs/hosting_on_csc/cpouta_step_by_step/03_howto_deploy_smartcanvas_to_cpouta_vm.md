@@ -30,14 +30,6 @@ HEREDOC
 And then run the generated script:
 `bash update_smartcanvas.sh`
 
-## Build latest frontend and push the results to repository
-
-TODO build frontend in the script
-
-Backend serves the built frontend to connecting clients.
-
-The build instructions can be found from [README](../../../README.md#frontend-in-the-terminal).
-
 ## Execute deployment script
 
 SmartCanvas repository contains a deployment script that can be used for
@@ -76,7 +68,8 @@ again.
 
 When the processes have had enough time to execute, the application can be
 accessed by giving the virtual machine domain name to a web browser and
-connecting.
+connecting. The backend container serves the built frontend to connecting
+clients.
 
 ## Host management cheatsheet
 Check computation resource usage:<br>

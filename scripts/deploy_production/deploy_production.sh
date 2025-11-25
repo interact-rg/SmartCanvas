@@ -78,6 +78,23 @@ clean_host_state() {
 	remove_docker_containers
 }
 
+build_frontend_application_bundle() {
+	echo "Building application bundle (to web/static) from frontend sources."
+	echo "Selected build variant: ${FRONTEND_BUILD_VARIANT}"
+
+	if [ "${BUILD_VARIANT_CONSENT_OFF}" == "${FRONTEND_BUILD_VARIANT}" ] ; then
+		npm run build
+		return
+	fi
+
+	if [ "${BUILD_VARIANT_CONSENT_ON}" == "${FRONTEND_BUILD_VARIANT}" ] ; then
+		npm run build-consent
+		return
+	fi
+
+	error_exit "Failed to select frontend application bundle variant to build."
+}
+
 build_backend_docker_image() {
 	local ret
 
@@ -103,6 +120,8 @@ deploy_application() {
 
 	echo "Deploying application"
 
+	build_frontend_application_bundle
+
 	build_backend_docker_image
 
 	echo "Caching sudo password"
@@ -122,6 +141,7 @@ deploy_application() {
 }
 
 main() {
+	source ./constants.sh
 	source ./config.sh
 
 	echo "Deploying to production"
