@@ -39,19 +39,20 @@ install_dependencies() {
 }
 
 remove_docker_containers() {
+	local containers_json=""
 	local container_ids=""
 
 	if [ "TRUE" != "${CONTAINER_REMOVE_ENABLED}" ] ; then
 		return
 	fi
 
-	container_ids="$(sudo docker container ps -a --format json \
-		| jq '.ID' \
-		| tr '\n' ' ' \
-		| tr -d \")" \
-		|| true
+	containers_json="$(sudo docker container ps -a --format json)"
 	if [ "" != "${container_ids}" ] ; then
 		echo "Removing all Docker containers"
+		container_ids="$(echo ${containers_json}
+			| jq '.ID' \
+			| tr '\n' ' ' \
+			| tr -d \")"
 		sudo docker container rm ${container_ids} \
 			|| error_exit "Failed to remove docker containers: ${container_ids}"
 	fi
