@@ -11,7 +11,7 @@ For adding a swapfile and configuring swap to be enabled on boot due to a new `/
 https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-20-04
 Command `sudo findmnt --verify` can be used to verify fstab correctness.
 
-## Update to most recent version of the repository
+## Codebase update script
 
 For updating the most recent version of SmartCanvas to the virtual machine,
 you can run the following command (single command spanning multiple lines) for
@@ -31,10 +31,10 @@ HEREDOC
 And then run the generated update script:
 `bash update_smartcanvas.sh`
 
-## Execute start script
+## Application start script
 
 For starting the application with the version decided by `DEPLOYMENT_BRANCH`, a
-command can be ran for generating a script:
+command can be ran for generating a start script:
 ```bash
 tee start_smartcanvas.sh << HEREDOC
 #!/bin/bash
@@ -43,12 +43,15 @@ DEPLOYMENT_BRANCH=""
 cd ./repositories/SmartCanvas
 test -z "${DEPLOYMENT_BRANCH}" && echo Please set DEPLOYMENT_BRANCH && exit 1
 git checkout ${DEPLOYMENT_BRANCH}
-./scripts/deploy_production/deploy_production.sh
+./scripts/deploy_production/deploy_production.sh \
+    | tee ./scripts/deploy_production/launch.log
 HEREDOC
 ```
 
 To run the generated start script:
 `bash start_smartcanvas.sh`
+
+### About the start script
 
 SmartCanvas repository contains a deployment script that can be used for
 setting up the application in a reproducible way in the production
@@ -90,7 +93,9 @@ accessed by giving the virtual machine domain name to a web browser and
 connecting. The backend container serves the built frontend to connecting
 clients.
 
-## When the application should be brought down, execute stop script
+## Stop script
+
+When the application should be brought down, execute stop script.
 
 TODO implement stop script
 
