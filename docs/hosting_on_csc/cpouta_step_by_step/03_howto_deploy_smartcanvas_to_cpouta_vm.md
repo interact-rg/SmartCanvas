@@ -14,11 +14,12 @@ Command `sudo findmnt --verify` can be used to verify fstab correctness.
 ## Update to most recent version of the repository
 
 For updating the most recent version of SmartCanvas to the virtual machine,
-you can run the following command (spanning multiple lines) for generating
-an update script:
+you can run the following command (single command spanning multiple lines) for
+generating an update script:
 ```bash
 tee update_smartcanvas.sh << HEREDOC
 #!/bin/bash
+set -e
 which git || sudo apt -y install git
 test -d repositories || mkdir repositories
 test -d ./repositories/SmartCanvas && rm -r ./repositories/SmartCanvas
@@ -27,15 +28,33 @@ echo -e "\nPlease setup ./repositories/SmartCanvas/scripts/deploy_production/con
 HEREDOC
 ```
 
-And then run the generated script:
+And then run the generated update script:
 `bash update_smartcanvas.sh`
 
-## Execute deployment script
+## Execute start script
+
+For starting the application with the version decided by `DEPLOYMENT_BRANCH`, a
+command can be ran for generating a script:
+```bash
+tee start_smartcanvas.sh << HEREDOC
+#!/bin/bash
+set -e
+DEPLOYMENT_BRANCH=""
+cd ./repositories/SmartCanvas
+test -z "${DEPLOYMENT_BRANCH}" && echo Please set DEPLOYMENT_BRANCH && exit 1
+git checkout ${DEPLOYMENT_BRANCH}
+./scripts/deploy_production/deploy_production.sh
+HEREDOC
+```
+
+To run the generated start script:
+`bash start_smartcanvas.sh`
 
 SmartCanvas repository contains a deployment script that can be used for
 setting up the application in a reproducible way in the production
 environment:<br>
 `scripts/deploy_production/deploy_production.sh`<br>
+Also invoked in the generated start script above.
 
 Please insert the domain name of your virtual machine into:<br>
 `scripts/deploy_production/config.sh`<br>
@@ -70,6 +89,10 @@ When the processes have had enough time to execute, the application can be
 accessed by giving the virtual machine domain name to a web browser and
 connecting. The backend container serves the built frontend to connecting
 clients.
+
+## When the application should be brought down, execute stop script
+
+TODO implement stop script
 
 ## Host management cheatsheet
 Check computation resource usage:<br>
