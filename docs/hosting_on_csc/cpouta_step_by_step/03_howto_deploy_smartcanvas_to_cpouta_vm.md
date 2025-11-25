@@ -30,8 +30,8 @@ To do this manually instead:
 
 For updating the most recent available versions of SmartCanvas to the virtual
 machine and selecting the version by setting `DEPLOYMENT_BRANCH`, you can run
-the following command (single command spanning multiple lines) for generating an
-update script:
+the following command (single command spanning multiple lines that can be pasted
+to commandline) for generating an update script:
 ```bash
 tee update_smartcanvas.sh << HEREDOC
 #!/bin/bash
