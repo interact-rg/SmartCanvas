@@ -27,7 +27,7 @@ setting up the application in a reproducible way in the production
 environment:<br>
 `scripts/deploy_production/deploy_production.sh`<br>
 
-Please insert the DNS name of your virtual machine into:<br>
+Please insert the domain name of your virtual machine into:<br>
 `scripts/deploy_production/config.sh`<br>
 before executing the deployment script.<br>
 
@@ -55,7 +55,7 @@ case, please stop all running containers manually before running the script
 again.
 
 When the processes have had enough time to execute, the application can be
-accessed by giving the virtual machine DNS name to a web browser and
+accessed by giving the virtual machine domain name to a web browser and
 connecting.
 
 ## Host management cheatsheet
