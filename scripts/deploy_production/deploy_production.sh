@@ -126,6 +126,9 @@ main() {
 
 	echo "Deploying to production"
 
+	echo "Printing config in use"
+	cat ./config.sh
+
 	install_dependencies
 
 	clean_host_state
