@@ -11,14 +11,32 @@ For adding a swapfile and configuring swap to be enabled on boot due to a new `/
 https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-20-04
 Command `sudo findmnt --verify` can be used to verify fstab correctness.
 
+## Update to most recent version of the repository
+
+For updating the most recent version of SmartCanvas to the virtual machine,
+you can run the following command (spanning multiple lines) for generating
+an update script:
+```bash
+tee update_smartcanvas.sh << HEREDOC
+#!/bin/bash
+which git || sudo apt -y install git
+test -d repositories || mkdir repositories
+test -d ./repositories/SmartCanvas && rm -r ./repositories/SmartCanvas
+git clone https://github.com/interact-rg/SmartCanvas.git ./repositories/SmartCanvas
+echo -e "\nPlease setup ./repositories/SmartCanvas/scripts/deploy_production/config.sh\n"
+HEREDOC
+```
+
+And then run the generated script:
+`bash update_smartcanvas.sh`
+
 ## Build latest frontend and push the results to repository
+
+TODO build frontend in the script
 
 Backend serves the built frontend to connecting clients.
 
 The build instructions can be found from [README](../../../README.md#frontend-in-the-terminal).
-
-## Clone repository
-`git clone https://github.com/interact-rg/SmartCanvas.git`
 
 ## Execute deployment script
 
@@ -30,6 +48,8 @@ environment:<br>
 Please insert the domain name of your virtual machine into:<br>
 `scripts/deploy_production/config.sh`<br>
 before executing the deployment script.<br>
+
+TODO add branch selection to config.sh
 
 Then to execute, `cd` to the top level of SmartCanvas repository and run:<br>
 `./scripts/deploy_production/deploy_production.sh`.
