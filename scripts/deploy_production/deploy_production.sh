@@ -17,6 +17,7 @@ install_dependencies() {
 	echo "Installing dependencies"
 
 	if [ "TRUE" == "${UPGRADE_PACKAGES}" ] ; then
+		echo "Upgrading packages"
 		sudo apt update
 		sudo apt upgrade
 	fi
