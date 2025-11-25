@@ -23,6 +23,11 @@ https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu
 
 ## Codebase update script
 
+To do this manually instead:
+1. Remove old clone
+1. Clone
+1. Checkout
+
 For updating the most recent available versions of SmartCanvas to the virtual
 machine and selecting the version by setting `DEPLOYMENT_BRANCH`, you can run
 the following command (single command spanning multiple lines) for generating an
