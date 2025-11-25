@@ -27,6 +27,11 @@ install_dependencies() {
 		sudo apt install etckeeper
 	fi
 
+	if [ "" == "$(which jq 2> /dev/null)" ] ; then
+		echo "Installing jq"
+		sudo apt install jq
+	fi
+
 	if [ "" == "$(which docker 2> /dev/null)" ] ; then
 		echo "Installing Docker"
 		./install_docker.sh
