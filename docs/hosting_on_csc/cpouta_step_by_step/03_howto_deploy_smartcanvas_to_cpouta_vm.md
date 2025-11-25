@@ -11,6 +11,12 @@ For adding a swapfile and configuring swap to be enabled on boot due to a new `/
 https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-20-04
 Command `sudo findmnt --verify` can be used to verify fstab correctness.
 
+## Build latest frontend and push the results to repository
+
+Backend serves the built frontend to connecting clients.
+
+The build instructions can be found from [README](../../../README.md#frontend-in-the-terminal).
+
 ## Clone repository
 `git clone https://github.com/interact-rg/SmartCanvas.git`
 
