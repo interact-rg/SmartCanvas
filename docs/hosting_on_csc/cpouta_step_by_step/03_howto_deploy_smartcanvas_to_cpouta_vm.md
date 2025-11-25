@@ -34,10 +34,9 @@ before executing the deployment script.<br>
 Then to execute, `cd` to the top level of SmartCanvas repository and run:<br>
 `./scripts/deploy_production/deploy_production.sh`.
 
-The script takes no parameters and has the intent of starting two background
-processes. One process for running backend Docker container and another process
-for running a reverse proxy, serving the application over HTTPS. Camera usage
-requires HTTPS.
+The script has the intent of starting two background processes. One process for
+running backend Docker container and another process for running a reverse
+proxy, serving the application over HTTPS. Camera usage requires HTTPS.
 
 The `nohup` utility is used to avoid the background processes being terminated
 when exiting from a shell that was used for starting the background processes.<br>
@@ -49,10 +48,11 @@ The processes write their log to:
 
 A live feed of the logs can be achieved with: `tail -f <logfile>`, Ctrl-C to exit.
 
-The script removes all Docker containers on the host prior to creating a new
-one. Removal fails if any containers are running. To successfully run the
-script to completion in this case, please stop all running containers manually
-before running the script again.
+If enabled using `CONTAINER_REMOVE_ENABLED` in `config.sh`, the script removes
+all Docker containers on the host prior to creating a new one. Removal fails if
+any containers are running. To successfully run the script to completion in this
+case, please stop all running containers manually before running the script
+again.
 
 When the processes have had enough time to execute, the application can be
 accessed by giving the virtual machine DNS name to a web browser and
