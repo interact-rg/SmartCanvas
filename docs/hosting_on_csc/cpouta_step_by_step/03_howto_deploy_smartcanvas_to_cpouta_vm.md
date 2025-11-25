@@ -1,10 +1,20 @@
 # Deploy SmartCanvas to cPouta virtual machine
 
+## Table of contents
+
+1. [If virtual machine does not have lots of RAM, add swap space](#if-virtual-machine-does-not-have-lots-of-ram-add-swap-space)
+1. [Codebase update script](#codebase-update-script)
+1. [Application start script](#application-start-script)
+    1. [About the start script](#about-the-start-script)
+1. [Stop script](#stop-script)
+1. [Host management cheatsheet](#host-management-cheatsheet)
+
 [UNTESTED]
 
 The instructions for getting SmartCanvas running on an existing cPouta virtual machine follow.
 
 ## If virtual machine does not have lots of RAM, add swap space
+
 You can check memory consumption with: `free -m` .
 
 For adding a swapfile and configuring swap to be enabled on boot due to a new `/etc/fstab` entry, check out:<br>
@@ -100,6 +110,7 @@ When the application should be brought down, execute stop script.
 TODO implement stop script
 
 ## Host management cheatsheet
+
 Check computation resource usage:<br>
 `top`<br>
 use 'q' to exit.
