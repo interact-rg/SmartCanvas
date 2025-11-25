@@ -36,6 +36,11 @@ install_dependencies() {
 		sudo apt install jq
 	fi
 
+	if [ "" == "$(which npm 2> /dev/null)" ] ; then
+		echo "Installing npm"
+		sudo apt install npm
+	fi
+
 	if [ "" == "$(which docker 2> /dev/null)" ] ; then
 		echo "Installing Docker"
 		./install_docker.sh
