@@ -39,6 +39,8 @@ install_dependencies() {
 }
 
 remove_docker_containers() {
+	local container_ids=""
+
 	if [ "TRUE" != "${CONTAINER_REMOVE_ENABLED}" ] ; then
 		return
 	fi
@@ -57,7 +59,6 @@ remove_docker_containers() {
 
 clean_host_state() {
 	local caddy_processes=""
-	local container_ids=""
 
 	echo "Cleaning host state"
 
