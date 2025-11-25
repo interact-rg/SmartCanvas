@@ -9,7 +9,7 @@ You can check memory consumption with: `free -m` .
 
 For adding a swapfile and configuring swap to be enabled on boot due to a new `/etc/fstab` entry, check out:<br>
 https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-20-04
-Command `sudo findmnt --verify` can be used to verify fstab correctness.
+<br>Command `sudo findmnt --verify` can be used to verify fstab correctness.
 
 ## Codebase update script
 
@@ -28,7 +28,7 @@ echo -e "\nPlease setup ./repositories/SmartCanvas/scripts/deploy_production/con
 HEREDOC
 ```
 
-And then run the generated update script:
+And then run the generated update script:<br>
 `bash update_smartcanvas.sh`
 
 ## Application start script
@@ -48,7 +48,7 @@ git checkout ${DEPLOYMENT_BRANCH}
 HEREDOC
 ```
 
-To run the generated start script:
+To run the generated start script:<br>
 `bash start_smartcanvas.sh`
 
 ### About the start script
