@@ -13,36 +13,38 @@ https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu
 
 ## Codebase update script
 
-For updating the most recent version of SmartCanvas to the virtual machine,
-you can run the following command (single command spanning multiple lines) for
-generating an update script:
+For updating the most recent available versions of SmartCanvas to the virtual
+machine and selecting the version by setting `DEPLOYMENT_BRANCH`, you can run
+the following command (single command spanning multiple lines) for generating an
+update script:
 ```bash
 tee update_smartcanvas.sh << HEREDOC
 #!/bin/bash
 set -e
+DEFAULT_DEPLOYMENT_BRANCH=""
+DEPLOYMENT_BRANCH="${DEPLOYMENT_BRANCH:=${DEFAULT_DEPLOYMENT_BRANCH}}"
+test -z "${DEPLOYMENT_BRANCH}" && echo Please set DEPLOYMENT_BRANCH && exit 1
 which git || sudo apt -y install git
 test -d repositories || mkdir repositories
 test -d ./repositories/SmartCanvas && rm -r ./repositories/SmartCanvas
 git clone https://github.com/interact-rg/SmartCanvas.git ./repositories/SmartCanvas
+git checkout -b ${DEPLOYMENT_BRANCH} origin/${DEPLOYMENT_BRANCH}
 echo -e "\nPlease setup ./repositories/SmartCanvas/scripts/deploy_production/config.sh\n"
 HEREDOC
 ```
 
 And then run the generated update script:<br>
-`bash update_smartcanvas.sh`
+`DEPLOYMENT_BRANCH="wanted_target_branch" bash update_smartcanvas.sh`
 
 ## Application start script
 
-For starting the application with the version decided by `DEPLOYMENT_BRANCH`, a
-command can be ran for generating a start script:
+For starting the application, a command can be ran for generating a start
+script:
 ```bash
 tee start_smartcanvas.sh << HEREDOC
 #!/bin/bash
 set -e
-DEPLOYMENT_BRANCH=""
 cd ./repositories/SmartCanvas
-test -z "${DEPLOYMENT_BRANCH}" && echo Please set DEPLOYMENT_BRANCH && exit 1
-git checkout ${DEPLOYMENT_BRANCH}
 ./scripts/deploy_production/deploy_production.sh \
     | tee ./scripts/deploy_production/launch.log
 HEREDOC
@@ -62,8 +64,6 @@ Also invoked in the generated start script above.
 Please insert the domain name of your virtual machine into:<br>
 `scripts/deploy_production/config.sh`<br>
 before executing the deployment script.<br>
-
-TODO add branch selection to config.sh
 
 Then to execute, `cd` to the top level of SmartCanvas repository and run:<br>
 `./scripts/deploy_production/deploy_production.sh`.
