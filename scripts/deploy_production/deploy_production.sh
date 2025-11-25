@@ -63,16 +63,17 @@ remove_docker_containers() {
 	fi
 }
 
-clean_host_state() {
-	local caddy_processes=""
-
-	echo "Cleaning host state"
-
-	caddy_processes="$(ps aux | grep -v grep | grep -i caddy)" || true
-	if [ "" != "${caddy_processes}" ] ; then
+terminate_running_caddy() {
+	if ps -C caddy ; then
 		echo "Signaling already running Caddy"
 		sudo pkill caddy || error_exit "Failed to signal Caddy"
 	fi
+}
+
+clean_host_state() {
+	echo "Cleaning host state"
+
+	terminate_running_caddy
 
 	remove_docker_containers
 }
