@@ -108,7 +108,7 @@ accessed by giving the virtual machine domain name to a web browser and
 connecting. The backend container serves the built frontend to connecting
 clients.
 
-## Stop script
+## Application stop script
 
 When the application should be brought down, execute stop script.
 
