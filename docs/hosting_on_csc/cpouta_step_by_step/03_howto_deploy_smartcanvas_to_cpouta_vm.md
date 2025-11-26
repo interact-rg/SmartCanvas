@@ -64,8 +64,8 @@ tee start_smartcanvas.sh << HEREDOC
 #!/bin/bash
 set -e
 cd ./repositories/SmartCanvas
-./scripts/deploy_production/deploy_production.sh \
-    | tee ./scripts/deploy_production/launch.log
+./scripts/deploy_production/production_start.sh \
+    | tee ./scripts/deploy_production/start.log
 HEREDOC
 ```
 
@@ -79,7 +79,7 @@ bash start_smartcanvas.sh
 SmartCanvas repository contains a deployment script that can be used for
 setting up the application in a reproducible way in the production
 environment:<br>
-`scripts/deploy_production/deploy_production.sh`<br>
+`scripts/deploy_production/production_start.sh`<br>
 Also invoked in the generated start script above.
 
 Please insert the domain name of your virtual machine into:<br>
@@ -87,7 +87,7 @@ Please insert the domain name of your virtual machine into:<br>
 before executing the deployment script.<br>
 
 Then to execute, `cd` to the top level of SmartCanvas repository and run:<br>
-`./scripts/deploy_production/deploy_production.sh`.
+`./scripts/deploy_production/production_start.sh`.
 
 The script has the intent of starting two background processes. One process for
 running backend Docker container and another process for running a reverse
@@ -124,7 +124,7 @@ tee stop_smartcanvas.sh << HEREDOC
 set -e
 cd ./repositories/SmartCanvas
 ./scripts/deploy_production/production_stop.sh \
-    | tee ./scripts/deploy_production/teardown.log
+    | tee ./scripts/deploy_production/stop.log
 HEREDOC
 ```
 
