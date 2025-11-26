@@ -6,7 +6,7 @@
 1. [Codebase update script](#codebase-update-script)
 1. [Application start script](#application-start-script)
     1. [About the start script](#about-the-start-script)
-1. [Stop script](#stop-script)
+1. [Application stop script](#application-stop-script)
 1. [Host management cheatsheet](#host-management-cheatsheet)
 
 [UNTESTED]
