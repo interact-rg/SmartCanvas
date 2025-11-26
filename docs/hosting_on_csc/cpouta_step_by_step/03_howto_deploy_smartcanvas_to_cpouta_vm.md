@@ -50,7 +50,7 @@ HEREDOC
 
 And then run the generated update script:<br>
 ```
-`DEPLOYMENT_BRANCH="wanted_target_branch" bash update_smartcanvas.sh`
+DEPLOYMENT_BRANCH="wanted_target_branch" bash update_smartcanvas.sh
 ```
 
 ## Application start script
@@ -69,7 +69,7 @@ HEREDOC
 
 To run the generated start script:<br>
 ```
-`bash start_smartcanvas.sh`
+bash start_smartcanvas.sh
 ```
 
 ### About the start script
