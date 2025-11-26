@@ -161,3 +161,4 @@ Check command documentation:<br>
 To search in man pages, press '/' and give a search term. Cycle through matches
 using 'n' and 'N'.<br>
 `<command> --help`
+`help <command>`
