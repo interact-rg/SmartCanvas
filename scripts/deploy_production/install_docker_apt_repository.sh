@@ -2,6 +2,9 @@
 
 set -e
 
+# Script contents of all Docker install scripts copied from:
+# https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
+
 echo "Installing Docker APT repository"
 
 # Add Docker's official GPG key:
