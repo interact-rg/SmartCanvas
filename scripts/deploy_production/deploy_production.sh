@@ -113,7 +113,7 @@ assert_frontend_build_variant() {
 	local -r variant_candidate="${1}"
 
 	for variant in ${build_variants} ; do
-		if [[ "${FRONTEND_BUILD_VARIANT}" == "${variant}" ]] ; then
+		if [ "${FRONTEND_BUILD_VARIANT}" == "${variant}" ] ; then
 			return
 		fi
 	done
