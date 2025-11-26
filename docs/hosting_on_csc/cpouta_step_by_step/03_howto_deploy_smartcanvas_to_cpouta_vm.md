@@ -27,6 +27,7 @@ To do this manually instead:
 1. Remove old clone
 1. Clone
 1. Checkout
+1. Adjust `config.sh`
 
 For updating the most recent available versions of SmartCanvas to the virtual
 machine and selecting the version by setting `DEPLOYMENT_REF`, you can run
