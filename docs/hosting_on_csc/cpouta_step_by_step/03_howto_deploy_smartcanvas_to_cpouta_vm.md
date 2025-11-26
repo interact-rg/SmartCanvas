@@ -44,6 +44,7 @@ which git || sudo apt -y install git
 test -d repositories || mkdir repositories
 test -d ./repositories/SmartCanvas && rm -r -f ./repositories/SmartCanvas
 git clone https://github.com/interact-rg/SmartCanvas.git ./repositories/SmartCanvas
+cd ./repositories/SmartCanvas
 git checkout -b \${DEPLOYMENT_REF} origin/\${DEPLOYMENT_REF}
 echo -e "\nPlease setup ./repositories/SmartCanvas/scripts/deploy_production/config.sh\n"
 HEREDOC
