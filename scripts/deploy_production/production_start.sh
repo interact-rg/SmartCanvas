@@ -2,9 +2,6 @@
 
 set -e
 
-# TODO consider renaming to production_start.sh
-# TODO consider splitting to separate init and start scripts
-
 cd $(dirname $0)
 
 readonly IMAGE_BACKEND_NAME="smartcanvas_backend"
