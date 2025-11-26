@@ -51,7 +51,7 @@ HEREDOC
 ```
 
 And then run the generated update script:<br>
-```
+```bash
 DEPLOYMENT_REF="wanted_target_branch" bash update_smartcanvas.sh
 ```
 
@@ -70,7 +70,7 @@ HEREDOC
 ```
 
 To run the generated start script:<br>
-```
+```bash
 bash start_smartcanvas.sh
 ```
 
@@ -116,9 +116,22 @@ clients.
 
 ## Application stop script
 
-When the application should be brought down, execute stop script.
+For stopping the application, a command can be ran for generating a stop
+script:
+```bash
+tee stop_smartcanvas.sh << HEREDOC
+#!/bin/bash
+set -e
+cd ./repositories/SmartCanvas
+./scripts/deploy_production/production_stop.sh \
+    | tee ./scripts/deploy_production/teardown.log
+HEREDOC
+```
 
-TODO implement stop script
+To run the generated stop script:<br>
+```bash
+bash stop_smartcanvas.sh
+```
 
 ## Host management cheatsheet
 
