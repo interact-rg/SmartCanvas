@@ -23,6 +23,8 @@ stop_docker_containers() {
 main() {
 	source ./common.sh
 
+	echo "Stopping application"
+
 	stop_docker_containers
 
 	terminate_running_caddy
