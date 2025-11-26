@@ -90,13 +90,6 @@ remove_docker_containers() {
 	fi
 }
 
-terminate_running_caddy() {
-	if ps -C caddy ; then
-		echo "Signaling already running Caddy"
-		sudo pkill caddy || error_exit "Failed to signal Caddy"
-	fi
-}
-
 clean_host_state() {
 	echo "Cleaning host state"
 
@@ -196,6 +189,7 @@ deploy_application() {
 main() {
 	source ./constants.sh
 	source ./config.sh
+	source ./common.sh
 
 	echo "Deploying to production"
 
