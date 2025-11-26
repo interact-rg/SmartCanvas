@@ -2,7 +2,6 @@
 
 set -e
 
-# TODO test
 # TODO consider renaming to production_start.sh
 # TODO consider splitting to separate init and start scripts
 
