@@ -16,6 +16,6 @@ chmod o+r /usr/share/keyrings/caddy-stable-archive-keyring.gpg
 chmod o+r /etc/apt/sources.list.d/caddy-stable.list
 
 sudo apt update
-sudo apt install caddy
+sudo apt -y install caddy
 
 echo "Done installing Caddy"

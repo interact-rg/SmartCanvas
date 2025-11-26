@@ -23,22 +23,22 @@ install_dependencies() {
 	if [ "TRUE" == "${UPGRADE_PACKAGES}" ] ; then
 		echo "Upgrading packages"
 		sudo apt update
-		sudo apt upgrade
+		sudo apt -y upgrade
 	fi
 
 	if [ "" == "$(which etckeeper 2> /dev/null)" ] ; then
 		echo "Installing etckeeper"
-		sudo apt install etckeeper
+		sudo apt -y install etckeeper
 	fi
 
 	if [ "" == "$(which jq 2> /dev/null)" ] ; then
 		echo "Installing jq"
-		sudo apt install jq
+		sudo apt -y install jq
 	fi
 
 	if [ "" == "$(which npm 2> /dev/null)" ] ; then
 		echo "Installing npm"
-		sudo apt install npm
+		sudo apt -y install npm
 	fi
 
 	if [ "" == "$(which docker 2> /dev/null)" ] ; then
