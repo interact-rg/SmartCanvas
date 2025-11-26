@@ -63,7 +63,8 @@ remove_docker_images() {
 			| jq '.ID' \
 			| tr '\n' ' ' \
 			| tr -d \")"
-		sudo docker image rm ${image_ids}
+		sudo docker image rm ${image_ids} \
+			|| error_exit "Failed to remove docker images: ${image_ids}"
 	fi
 }
 
