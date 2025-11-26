@@ -1,4 +1,5 @@
 CONTAINER_REMOVE_ENABLED="FALSE"
+IMAGE_REMOVE_ENABLED="FALSE"
 UPGRADE_PACKAGES="TRUE"
 
 # See variant options from constants.sh

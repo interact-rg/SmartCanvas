@@ -52,6 +52,25 @@ install_dependencies() {
 	fi
 }
 
+remove_docker_images() {
+	local images_json=""
+	local image_ids=""
+
+	if [ "TRUE" != "${IMAGE_REMOVE_ENABLED}" ] ; then
+		return
+	fi
+
+	images_json="$(sudo docker image ls --format json)"
+	if [ "" != "${images_json}" ] ; then
+		echo "Removing all Docker images"
+		image_ids="$(echo ${images_json} \
+			| jq '.ID' \
+			| tr '\n' ' ' \
+			| tr -d \")"
+		sudo docker image rm ${image_ids}
+	fi
+}
+
 remove_docker_containers() {
 	local containers_json=""
 	local container_ids=""
@@ -85,6 +104,8 @@ clean_host_state() {
 	terminate_running_caddy
 
 	remove_docker_containers
+
+	remove_docker_images
 }
 
 assert_frontend_build_variant() {
