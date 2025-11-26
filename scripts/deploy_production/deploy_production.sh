@@ -80,7 +80,7 @@ remove_docker_containers() {
 	fi
 
 	containers_json="$(sudo docker container ps -a --format json)"
-	if [ "" != "${container_ids}" ] ; then
+	if [ "" != "${containers_json}" ] ; then
 		echo "Removing all Docker containers"
 		container_ids="$(echo ${containers_json} \
 			| jq '.ID' \
