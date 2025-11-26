@@ -87,9 +87,23 @@ clean_host_state() {
 	remove_docker_containers
 }
 
-build_frontend_application_bundle() {
-	echo "Building application bundle (to web/static) from frontend sources."
+assert_frontend_build_variant() {
+	local -r build_variants="${BUILD_VARIANT_CONSENT_ON} ${BUILD_VARIANT_CONSENT_OFF}"
+	local -r variant_candidate="${1}"
+
+	for variant in ${build_variants} ; do
+		if [[ "${FRONTEND_BUILD_VARIANT}" == "${variant}" ]] ; then
+			return
+		fi
+	done
+
+	error_exit "Unknown build variant: ${variant_candidate}"
+}
+
+invoke_npm_build() {
 	echo "Selected build variant: ${FRONTEND_BUILD_VARIANT}"
+
+	assert_frontend_build_variant "${FRONTEND_BUILD_VARIANT}"
 
 	if [ "${BUILD_VARIANT_CONSENT_OFF}" == "${FRONTEND_BUILD_VARIANT}" ] ; then
 		npm run build
@@ -100,8 +114,18 @@ build_frontend_application_bundle() {
 		npm run build-consent
 		return
 	fi
+}
 
-	error_exit "Failed to select frontend application bundle variant to build."
+build_frontend_application_bundle() {
+	echo "Building application bundle (to web/static) from frontend sources."
+
+	pushd ../../smartcanvas-frontend/
+
+	npm install
+
+	invoke_npm_build
+
+	popd # ../../smartcanvas-frontend/
 }
 
 build_backend_docker_image() {
