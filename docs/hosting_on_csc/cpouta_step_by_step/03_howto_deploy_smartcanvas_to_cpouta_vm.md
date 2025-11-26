@@ -38,13 +38,13 @@ tee update_smartcanvas.sh << HEREDOC
 #!/bin/bash
 set -e
 DEFAULT_DEPLOYMENT_REF=""
-DEPLOYMENT_REF="${DEPLOYMENT_REF:=${DEFAULT_DEPLOYMENT_REF}}"
-test -z "${DEPLOYMENT_REF}" && echo Please set DEPLOYMENT_REF && exit 1
+DEPLOYMENT_REF="\${DEPLOYMENT_REF:=\${DEFAULT_DEPLOYMENT_REF}}"
+test -z "\${DEPLOYMENT_REF}" && echo Please set DEPLOYMENT_REF && exit 1
 which git || sudo apt -y install git
 test -d repositories || mkdir repositories
-test -d ./repositories/SmartCanvas && rm -r ./repositories/SmartCanvas
+test -d ./repositories/SmartCanvas && rm -r -f ./repositories/SmartCanvas
 git clone https://github.com/interact-rg/SmartCanvas.git ./repositories/SmartCanvas
-git checkout -b ${DEPLOYMENT_REF} origin/${DEPLOYMENT_REF}
+git checkout -b \${DEPLOYMENT_REF} origin/\${DEPLOYMENT_REF}
 echo -e "\nPlease setup ./repositories/SmartCanvas/scripts/deploy_production/config.sh\n"
 HEREDOC
 ```
