@@ -27,7 +27,7 @@ To do this manually instead:
 1. Remove old clone
 1. Clone
 1. Checkout
-1. Adjust `config.sh`
+1. Continue to adjusting `config.sh` if needed
 
 For updating the most recent available versions of SmartCanvas to the virtual
 machine and selecting the version by setting `DEPLOYMENT_REF`, you can run
@@ -77,7 +77,7 @@ bash start_smartcanvas.sh
 ### About the start script
 
 SmartCanvas repository contains a deployment script that can be used for
-setting up the application in a reproducible way in the production
+launching the application in a reproducible way in the production
 environment:<br>
 `scripts/deploy_production/production_start.sh`<br>
 Also invoked in the generated start script above.
@@ -86,8 +86,11 @@ Please insert the domain name of your virtual machine into:<br>
 `scripts/deploy_production/config.sh`<br>
 before executing the deployment script.<br>
 
-Then to execute, `cd` to the top level of SmartCanvas repository and run:<br>
-`./scripts/deploy_production/production_start.sh`.
+The default configuration with `CONTAINER_REMOVE_ENABLED` and
+`IMAGE_REMOVE_ENABLED` set to 'TRUE' has been tested. This configuration has the
+benefit of allowing variant to be changed and deployed in the next run. It is
+also unambiguous what was the version running in the latest deployment. There is
+currently no support for reusing previously stopped containers.
 
 The script has the intent of starting two background processes. One process for
 running backend Docker container and another process for running a reverse
@@ -102,12 +105,6 @@ The processes write their log to:
 * `./scripts/deploy_production/caddy.log`
 
 A live feed of the logs can be achieved with: `tail -f <logfile>`, Ctrl-C to exit.
-
-If enabled using `CONTAINER_REMOVE_ENABLED` in `config.sh`, the script removes
-all Docker containers on the host prior to creating a new one. Removal fails if
-any containers are running. To successfully run the script to completion in this
-case, please stop all running containers manually before running the script
-again.
 
 When the processes have had enough time to execute, the application can be
 accessed by giving the virtual machine domain name to a web browser and
