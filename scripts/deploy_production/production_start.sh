@@ -13,6 +13,12 @@ error_exit() {
 	exit 1
 }
 
+validate_config() {
+	if [ "" == "${VIRTUAL_MACHINE_DNS_NAME}" ] ; then
+		error_exit "Please set a value for VIRTUAL_MACHINE_DNS_NAME in config.sh"
+	fi
+}
+
 install_dependencies() {
 	echo "Installing dependencies"
 
@@ -188,6 +194,9 @@ main() {
 	source ./constants.sh
 	source ./config.sh
 	source ./common.sh
+
+	echo "Validating config"
+	validate_config
 
 	echo "Deploying to production"
 
