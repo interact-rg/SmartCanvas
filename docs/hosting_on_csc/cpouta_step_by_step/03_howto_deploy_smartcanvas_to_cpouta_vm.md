@@ -94,7 +94,12 @@ currently no support for reusing previously stopped containers.
 
 The script has the intent of starting two background processes. One process for
 running backend Docker container and another process for running a reverse
-proxy, serving the application over HTTPS. Camera usage requires HTTPS.
+proxy, serving the application over HTTPS. Camera usage requires HTTPS. At the
+core are these two commands:
+* `nohup sudo docker run -p 5000:5000 "smartcanvas_backend:latest" &> $(pwd)/backend.log &`
+* `nohup sudo caddy reverse-proxy --from "fip-86-50-20-216.kaj.poutavm.fi" --to :5000 &> $(pwd)/caddy.log &`
+
+https://caddyserver.com/docs/quick-starts/reverse-proxy#https-from-client-to-proxy
 
 The `nohup` utility is used to avoid the background processes being terminated
 when exiting from a shell that was used for starting the background processes.<br>
@@ -152,6 +157,7 @@ Filter running processes using:<br>
 `ps aux | grep -i <process name>`
 
 Terminate proceesses using:<br>
+`pkill <process name>`
 `kill <process ID>`
 or the more forceful:<br>
 `kill -9 <process ID>`

@@ -9,4 +9,4 @@ readonly FRONTEND_BUILD_VARIANT="${BUILD_VARIANT_CONSENT_ON}"
 #
 # It is not recommended to use predefined fip-XXX... DNS names in
 # production.
-readonly VIRTUAL_MACHINE_DNS_NAME="fip-86-50-20-216.kaj.poutavm.fi"
+readonly VIRTUAL_MACHINE_DNS_NAME=""
