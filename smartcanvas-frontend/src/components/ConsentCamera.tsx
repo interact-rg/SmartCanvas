@@ -67,7 +67,7 @@ const FaceAndGestureDetection: React.FC<FaceAndGestureDetectionProps> = ({setIsG
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
       const now = performance.now();
-      const shouldUpdate = now - lastUpdateTimeRef.current > 3000;
+      const shouldUpdate = now - lastUpdateTimeRef.current > 1000;
 
       //Run update every X seconds to preserve compute
       if (shouldUpdate) {
@@ -78,9 +78,9 @@ const FaceAndGestureDetection: React.FC<FaceAndGestureDetectionProps> = ({setIsG
         // Gesture detection
         const gestureResult = await gestureRecognizerRef.current.recognizeForVideo(video, now);
         const thumbsUp = gestureResult.gestures.some((gestureList: any[]) =>
-          gestureList.some((gesture: { categoryName: string; score: number; }) => gesture.categoryName === 'Thumb_Up' && gesture.score > 0.7)
+          gestureList.some((gesture: { categoryName: string; score: number; }) => gesture.categoryName === 'Thumb_Up' && gesture.score > 0.66)
         );
-        console.log(`Is giving thumbs upd: ${thumbsUp} and face is shown: ${faceFound}`)
+        console.log(`Is giving thumbs up: ${thumbsUp} and face is shown: ${faceFound}`)
         setIsGivingConsent((faceFound && thumbsUp))
         lastUpdateTimeRef.current = now;
       }
