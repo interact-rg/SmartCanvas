@@ -1,17 +1,20 @@
 """ routes.py """
 
-
 from flask import render_template, send_file, send_from_directory
-import io, cv2
+import io, cv2, os
 from . import main
 from .events import image_stores
 
 MAX_IMAGE_AGE_DOWNLOAD = 120 #seconds
 
 
-@main.route('/')
-def index():
-    return send_from_directory('static', 'index.html')
+@main.route('/<token>')
+def index(token: str):
+    envToken = os.getenv("SMART_FRONT_TOKEN", "SmartestCanvas")
+    if(token == envToken):
+        return send_from_directory('static', 'index.html')
+    else:
+        return "Invalid token!"
 
 @main.route('/dl/<sid>/<id>', methods=['GET'])
 def download_image(sid: str, id: str):
