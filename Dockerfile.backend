@@ -1,5 +1,8 @@
 FROM python:3.12-slim
 
+# Define build parameters
+ARG APP_ENDPOINT_TOKEN
+
 # Configure Poetry environment
 ENV POETRY_HOME="/opt/poetry"
 ENV PATH="/root/.local/bin:$PATH"
@@ -33,6 +36,7 @@ ENV FLASK_APP=web
 ENV FLASK_ENV=development
 ENV FLASK_DEBUG=1
 ENV PYTHONUNBUFFERED=1
+ENV SMART_FRONT_TOKEN=${APP_ENDPOINT_TOKEN}
 
 
 # Start Flask server
