@@ -32,6 +32,10 @@ install_dependencies() {
 		sudo apt -y upgrade
 	fi
 
+	if [ "TRUE" == "${UPGRADE_NODEJS}" ] ; then
+		nvm install --lts
+	fi
+
 	if [ "" == "$(which etckeeper 2> /dev/null)" ] ; then
 		echo "Installing etckeeper"
 		sudo apt -y install etckeeper
@@ -42,9 +46,19 @@ install_dependencies() {
 		sudo apt -y install jq
 	fi
 
-	if [ "" == "$(which npm 2> /dev/null)" ] ; then
-		echo "Installing npm"
-		sudo apt -y install npm
+	if [ "" == "$(command -v nvm)" ] ; then
+		echo "Installing nvm"
+
+		curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+
+		export NVM_DIR="$HOME/.nvm"
+		[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+		[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+		command -v nvm || error_exit "Failed to install nvm"
+
+		echo "Installing LTS node and bundled npm"
+		nvm install --lts \
+			|| error_exit "Failed to install LTS node and bundled npm"
 	fi
 
 	if [ "" == "$(which docker 2> /dev/null)" ] ; then
@@ -141,6 +155,8 @@ build_frontend_application_bundle() {
 	echo "Building application bundle (to web/static) from frontend sources."
 
 	pushd ../../smartcanvas-frontend/
+
+	nvm use --lts || error_exit "Failed to select LTS node using nvm"
 
 	npm install
 

@@ -1,6 +1,8 @@
 readonly CONTAINER_REMOVE_ENABLED="TRUE"
 readonly IMAGE_REMOVE_ENABLED="TRUE"
+
 readonly UPGRADE_PACKAGES="FALSE"
+readonly UPGRADE_NODEJS="FALSE"
 
 # See variant options from constants.sh
 readonly FRONTEND_BUILD_VARIANT="${BUILD_VARIANT_CONSENT_ON}"
