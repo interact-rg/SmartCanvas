@@ -64,7 +64,7 @@ tee start_smartcanvas.sh << HEREDOC
 #!/bin/bash
 set -e
 cd ./repositories/SmartCanvas
-./scripts/deploy_production/production_start.sh \
+./scripts/deploy_production/production_start.sh 2>&1 \
     | tee ./scripts/deploy_production/start.log
 HEREDOC
 ```
