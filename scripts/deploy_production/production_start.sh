@@ -157,7 +157,10 @@ build_backend_docker_image() {
 		|| ret=$?
 	if [ "0" != "${ret}" ] ; then
 		echo "Building backend Docker image"
-		sudo docker build --file Dockerfile.backend -t "${DOCKER_IMAGE_BACKEND}" . \
+		sudo docker build \
+			--file Dockerfile.backend \
+			-t "${DOCKER_IMAGE_BACKEND}" \
+			. \
 			|| error_exit "Failed to build backend Docker image"
 	fi
 
