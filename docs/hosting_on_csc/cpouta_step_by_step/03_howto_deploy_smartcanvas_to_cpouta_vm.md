@@ -97,7 +97,7 @@ running backend Docker container and another process for running a reverse
 proxy, serving the application over HTTPS. Camera usage requires HTTPS. At the
 core are these two commands:
 * `nohup sudo docker run -p 5000:5000 "smartcanvas_backend:latest" &> $(pwd)/backend.log &`
-* `nohup sudo caddy reverse-proxy --from "fip-86-50-20-216.kaj.poutavm.fi" --to :5000 &> $(pwd)/caddy.log &`
+* `nohup sudo caddy reverse-proxy --from "fip-86-50-168-120.kaj.poutavm.fi" --to :5000 &> $(pwd)/caddy.log &`
 
 https://caddyserver.com/docs/quick-starts/reverse-proxy#https-from-client-to-proxy
 
