@@ -56,8 +56,8 @@ install_dependencies() {
 		command -v nvm || error_exit "Failed to install nvm"
 
 		echo "Installing LTS node and bundled npm"
-		nvm install --lts \
-			|| error_exit "Failed to install LTS node and bundled npm"
+		nvm install ${NODEJS_VERSION} \
+			|| error_exit "Failed to install node ${NODEJS_VERSION} and bundled npm"
 	fi
 
 	if [ "" == "$(which docker 2> /dev/null)" ] ; then
@@ -155,7 +155,8 @@ build_frontend_application_bundle() {
 
 	pushd ../../smartcanvas-frontend/
 
-	nvm use --lts || error_exit "Failed to select LTS node using nvm"
+	nvm use ${NODEJS_VERSION} \
+		|| error_exit "Failed to select node ${NODEJS_VERSION} using nvm"
 
 	npm install
 

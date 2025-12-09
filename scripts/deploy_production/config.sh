@@ -4,6 +4,8 @@ readonly IMAGE_REMOVE_ENABLED="TRUE"
 readonly UPGRADE_PACKAGES="FALSE"
 readonly UPGRADE_NODEJS="FALSE"
 
+readonly NODEJS_VERSION="24.10.0"
+
 # See variant options from constants.sh
 readonly FRONTEND_BUILD_VARIANT="${BUILD_VARIANT_CONSENT_ON}"
 
