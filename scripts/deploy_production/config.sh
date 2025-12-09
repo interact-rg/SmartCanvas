@@ -2,6 +2,8 @@ readonly CONTAINER_REMOVE_ENABLED="TRUE"
 readonly IMAGE_REMOVE_ENABLED="TRUE"
 readonly UPGRADE_PACKAGES_ENABLED="FALSE"
 
+# This should likely be kept synchronized with version of package '@types/node'
+# in frontend 'package.json'.
 readonly NODEJS_VERSION="24.10.0"
 
 # See variant options from constants.sh
