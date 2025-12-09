@@ -26,7 +26,7 @@ validate_config() {
 install_dependencies() {
 	echo "Installing dependencies"
 
-	if [ "TRUE" == "${UPGRADE_PACKAGES}" ] ; then
+	if [ "TRUE" == "${UPGRADE_PACKAGES_ENABLED}" ] ; then
 		echo "Upgrading packages"
 		sudo apt update
 		sudo apt -y upgrade
