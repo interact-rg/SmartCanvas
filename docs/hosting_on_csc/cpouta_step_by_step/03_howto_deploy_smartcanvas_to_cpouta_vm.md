@@ -45,7 +45,7 @@ test -d repositories || mkdir repositories
 test -d ./repositories/SmartCanvas && rm -r -f ./repositories/SmartCanvas
 git clone https://github.com/interact-rg/SmartCanvas.git ./repositories/SmartCanvas
 cd ./repositories/SmartCanvas
-git checkout -b \${DEPLOYMENT_REF} origin/\${DEPLOYMENT_REF}
+git checkout \${DEPLOYMENT_REF} || git checkout -b \${DEPLOYMENT_REF} origin/\${DEPLOYMENT_REF}
 echo -e "\nPlease setup ./repositories/SmartCanvas/scripts/deploy_production/config.sh\n"
 HEREDOC
 ```
@@ -64,7 +64,7 @@ tee start_smartcanvas.sh << HEREDOC
 #!/bin/bash
 set -e
 cd ./repositories/SmartCanvas
-./scripts/deploy_production/production_start.sh \
+./scripts/deploy_production/production_start.sh 2>&1 \
     | tee ./scripts/deploy_production/start.log
 HEREDOC
 ```
@@ -97,7 +97,7 @@ running backend Docker container and another process for running a reverse
 proxy, serving the application over HTTPS. Camera usage requires HTTPS. At the
 core are these two commands:
 * `nohup sudo docker run -p 5000:5000 "smartcanvas_backend:latest" &> $(pwd)/backend.log &`
-* `nohup sudo caddy reverse-proxy --from "fip-86-50-20-216.kaj.poutavm.fi" --to :5000 &> $(pwd)/caddy.log &`
+* `nohup sudo caddy reverse-proxy --from "fip-86-50-168-120.kaj.poutavm.fi" --to :5000 &> $(pwd)/caddy.log &`
 
 https://caddyserver.com/docs/quick-starts/reverse-proxy#https-from-client-to-proxy
 

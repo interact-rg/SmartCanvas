@@ -17,6 +17,10 @@ validate_config() {
 	if [ "" == "${VIRTUAL_MACHINE_DNS_NAME}" ] ; then
 		error_exit "Please set a value for VIRTUAL_MACHINE_DNS_NAME in config.sh"
 	fi
+
+	if [ "" == "${BACKEND_APP_ENDPOINT}" ] ; then
+		error_exit "Please set a value for BACKEND_APP_ENDPOINT in config.sh"
+	fi
 }
 
 install_dependencies() {
@@ -157,7 +161,11 @@ build_backend_docker_image() {
 		|| ret=$?
 	if [ "0" != "${ret}" ] ; then
 		echo "Building backend Docker image"
-		sudo docker build --file Dockerfile.backend -t "${DOCKER_IMAGE_BACKEND}" . \
+		sudo docker build \
+			--file Dockerfile.backend \
+			--build-arg APP_ENDPOINT_TOKEN=${BACKEND_APP_ENDPOINT} \
+			-t "${DOCKER_IMAGE_BACKEND}" \
+			. \
 			|| error_exit "Failed to build backend Docker image"
 	fi
 

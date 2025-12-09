@@ -25,7 +25,7 @@ const ConsentForm = () => {
                 overflowX: "hidden"          // extra safety to prevent horizontal scroll
             }}
         >
-            <img src={visual} alt="Description of GIF" />
+            <img src={visual} alt="Description of service data flow." />
             <button
                 style={{ fontSize: "2rem", margin: "10px" }}>
                 By giving 👍 you accept that your image will be processed.
