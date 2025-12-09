@@ -51,7 +51,7 @@ install_dependencies() {
 		[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 		command -v nvm || error_exit "Failed to install nvm"
 
-		echo "Installing LTS node and bundled npm"
+		echo "Installing node ${NODEJS_VERSION} and bundled npm"
 		nvm install ${NODEJS_VERSION} \
 			|| error_exit "Failed to install node ${NODEJS_VERSION} and bundled npm"
 	fi
