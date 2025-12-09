@@ -224,6 +224,9 @@ main() {
 
 	echo "Deploying to production"
 
+	echo "Printing the latest commit"
+	git show --stat HEAD
+
 	echo "Printing config in use"
 	cat ./config.sh
 
