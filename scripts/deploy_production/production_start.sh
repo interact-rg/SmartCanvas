@@ -26,7 +26,7 @@ validate_config() {
 install_dependencies() {
 	echo "Installing dependencies"
 
-	if [ "TRUE" == "${UPGRADE_PACKAGES}" ] ; then
+	if [ "TRUE" == "${UPGRADE_PACKAGES_ENABLED}" ] ; then
 		echo "Upgrading packages"
 		sudo apt update
 		sudo apt -y upgrade
@@ -42,9 +42,18 @@ install_dependencies() {
 		sudo apt -y install jq
 	fi
 
-	if [ "" == "$(which npm 2> /dev/null)" ] ; then
-		echo "Installing npm"
-		sudo apt -y install npm
+	if [ "" == "$(command -v nvm)" ] ; then
+		echo "Installing nvm"
+
+		curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+
+		export NVM_DIR="$HOME/.nvm"
+		[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+		command -v nvm || error_exit "Failed to install nvm"
+
+		echo "Installing node ${NODEJS_VERSION} and bundled npm"
+		nvm install ${NODEJS_VERSION} \
+			|| error_exit "Failed to install node ${NODEJS_VERSION} and bundled npm"
 	fi
 
 	if [ "" == "$(which docker 2> /dev/null)" ] ; then
@@ -142,6 +151,9 @@ build_frontend_application_bundle() {
 
 	pushd ../../smartcanvas-frontend/
 
+	nvm use ${NODEJS_VERSION} \
+		|| error_exit "Failed to select node ${NODEJS_VERSION} using nvm"
+
 	npm install
 
 	invoke_npm_build
@@ -207,6 +219,9 @@ main() {
 	validate_config
 
 	echo "Deploying to production"
+
+	echo "Printing the latest commit"
+	git show --stat HEAD
 
 	echo "Printing config in use"
 	cat ./config.sh
