@@ -32,10 +32,6 @@ install_dependencies() {
 		sudo apt -y upgrade
 	fi
 
-	if [ "TRUE" == "${UPGRADE_NODEJS}" ] ; then
-		nvm install --lts
-	fi
-
 	if [ "" == "$(which etckeeper 2> /dev/null)" ] ; then
 		echo "Installing etckeeper"
 		sudo apt -y install etckeeper
