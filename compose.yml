@@ -10,7 +10,7 @@ services:
       - ./web:/web
       - ./models:/models
     environment:
-      - FLASK_ENV=development
+      - FLASK_ENV=production
     restart: unless-stopped
 
   frontend:
