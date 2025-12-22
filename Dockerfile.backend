@@ -21,18 +21,15 @@ RUN mv ffmpeg-master-latest-linux64-gpl-shared/bin/ffprobe /usr/local/bin/
 # Install Poetry
 RUN pip install poetry
 
-# Create a non-root user
-RUN adduser --disabled-password smartcanvas_user
-USER smartcanvas_user
-
 # Copy backend dependency files and install Python dependencies
 COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root --no-interaction --no-ansi
 
 # Copy the backend source code
-COPY --chown=smartcanvas_user:smartcanvas_user smart_canvas /home/smartcanvas_user/smart_canvas
-COPY --chown=smartcanvas_user:smartcanvas_user models /home/smartcanvas_user/models
-COPY --chown=smartcanvas_user:smartcanvas_user web /home/smartcanvas_user/web
+COPY smart_canvas /smart_canvas
+COPY models /models
+COPY web /web
+
 
 # Set Flask environment variables
 ENV FLASK_APP=web
