@@ -23,7 +23,6 @@ RUN pip install poetry
 
 # Create a non-root user
 RUN adduser --disabled-password smartcanvas_user
-USER smartcanvas_user
 
 # Copy backend dependency files and install Python dependencies
 COPY pyproject.toml poetry.lock ./
@@ -41,6 +40,8 @@ ENV FLASK_DEBUG=1
 ENV PYTHONUNBUFFERED=1
 ENV SMART_FRONT_TOKEN=${APP_ENDPOINT_TOKEN}
 
+
+USER smartcanvas_user
 
 # Start Flask server
 CMD ["poetry", "run", "flask", "run", "--host=0.0.0.0", "--debug"]
