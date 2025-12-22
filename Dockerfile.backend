@@ -40,7 +40,7 @@ ENV FLASK_DEBUG=1
 ENV PYTHONUNBUFFERED=1
 ENV SMART_FRONT_TOKEN=${APP_ENDPOINT_TOKEN}
 
-
+WORKDIR /home/smartcanvas_user
 USER smartcanvas_user
 
 # Start Flask server
