@@ -141,6 +141,12 @@ Check computation resource usage:<br>
 `top`<br>
 use 'q' to exit.
 
+Free space taken up by Docker resources
+sudo docker system prune
+
+Free space taken up by poetry
+rm -r ~/.cache/pypoetry/
+
 Check Docker container statuses:<br>
 `sudo docker container ps -a`
 
