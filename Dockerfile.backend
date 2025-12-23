@@ -35,7 +35,6 @@ COPY --chown=smartcanvas_user:smartcanvas_user web /home/smartcanvas_user/web
 
 # Set Flask environment variables
 ENV FLASK_APP=web
-ENV FLASK_DEBUG=1
 ENV PYTHONUNBUFFERED=1
 ENV SMART_FRONT_TOKEN=${APP_ENDPOINT_TOKEN}
 
