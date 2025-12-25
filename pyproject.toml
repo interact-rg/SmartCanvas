@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "opencv-contrib-python-headless>=4.11.0.86",
-    "mediapipe>=0.10.20",
+    "mediapipe==0.10.21",
     "numpy>=1.26.4",
     "qrcode>=8.0",
     "requests>=2.32.3",
