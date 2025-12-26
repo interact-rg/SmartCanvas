@@ -26,7 +26,12 @@ https://docs.csc.fi/cloud/pouta/launch-vm-from-web-gui/#launching-a-virtual-mach
 
 Configuration used for a testing virtual machine:
 * For source image, our group ended up picking latest Ubuntu.
-* The selected flavor had least computing resources (such as RAM and VCPUS).
+* For production virtual machine, we selected the flavor `standard.xlarge` that
+  was able to run the more demanding workloads in reasonable time.
+    * The benchmarked application peak RAM usage was 4500 KiB.
+    * The selected flavor for initial testing virtual machine had least
+      computing resources (such as RAM and VCPUS). It struggled to run the more
+      demanding workloads.
 * The only pre-existing network was kept allocated.
 * Network ports were kept as empty.
 * Default security group was kept allocated and the group for SSH access should be allocated into use.
