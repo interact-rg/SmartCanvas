@@ -3,6 +3,8 @@ FROM python:3.12-slim
 # Define build parameters
 ARG APP_ENDPOINT_TOKEN
 
+ENV UNPRIVILEGED_USER="smartcanvas_user"
+
 # Configure Poetry environment
 ENV POETRY_HOME="/opt/poetry"
 ENV PATH="/root/.local/bin:$PATH"
@@ -21,23 +23,26 @@ RUN mv ffmpeg-master-latest-linux64-gpl-shared/bin/ffprobe /usr/local/bin/
 # Install Poetry
 RUN pip install poetry
 
+# Create a non-root user
+RUN adduser --disabled-password ${UNPRIVILEGED_USER}
+
 # Copy backend dependency files and install Python dependencies
 COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root --no-interaction --no-ansi
 
 # Copy the backend source code
-COPY smart_canvas /smart_canvas
-COPY models /models
-COPY web /web
-
+COPY --chown=${UNPRIVILEGED_USER}:${UNPRIVILEGED_USER} smart_canvas /home/${UNPRIVILEGED_USER}/smart_canvas
+COPY --chown=${UNPRIVILEGED_USER}:${UNPRIVILEGED_USER} models /home/${UNPRIVILEGED_USER}/models
+COPY --chown=${UNPRIVILEGED_USER}:${UNPRIVILEGED_USER} web /home/${UNPRIVILEGED_USER}/web
 
 # Set Flask environment variables
 ENV FLASK_APP=web
-ENV FLASK_ENV=development
-ENV FLASK_DEBUG=1
 ENV PYTHONUNBUFFERED=1
 ENV SMART_FRONT_TOKEN=${APP_ENDPOINT_TOKEN}
 
+WORKDIR /home/${UNPRIVILEGED_USER}
+USER ${UNPRIVILEGED_USER}
 
 # Start Flask server
-CMD ["poetry", "run", "flask", "run", "--host=0.0.0.0", "--debug"]
+CMD ["poetry", "run", "flask", "run", "--host=0.0.0.0"]
+# CMD ["poetry", "run", "flask", "run", "--host=0.0.0.0", "--debug"]

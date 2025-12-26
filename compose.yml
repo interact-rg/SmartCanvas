@@ -9,8 +9,6 @@ services:
       - ./smart_canvas:/smart_canvas
       - ./web:/web
       - ./models:/models
-    environment:
-      - FLASK_ENV=development
     restart: unless-stopped
 
   frontend:
