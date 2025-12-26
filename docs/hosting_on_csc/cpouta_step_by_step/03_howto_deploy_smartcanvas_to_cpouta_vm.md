@@ -73,14 +73,19 @@ tee start_smartcanvas.sh << HEREDOC
 #!/bin/bash
 set -e
 cd ./repositories/SmartCanvas
-./scripts/deploy_production/production_start.sh 2>&1 \
-    | tee ./scripts/deploy_production/start.log
+nohup ./scripts/deploy_production/production_start.sh &> \
+    ./scripts/deploy_production/start.log &
 HEREDOC
 ```
 
 To run the generated start script:<br>
 ```bash
 bash start_smartcanvas.sh
+```
+
+To follow the progress of start script:<br>
+```bash
+tail -f ./repositories/SmartCanvas/scripts/deploy_production/start.log
 ```
 
 ### About the start script
