@@ -44,4 +44,5 @@ WORKDIR /home/${UNPRIVILEGED_USER}
 USER ${UNPRIVILEGED_USER}
 
 # Start Flask server
-CMD ["poetry", "run", "flask", "run", "--host=0.0.0.0", "--debug"]
+CMD ["poetry", "run", "flask", "run", "--host=0.0.0.0"]
+# CMD ["poetry", "run", "flask", "run", "--host=0.0.0.0", "--debug"]
