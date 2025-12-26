@@ -21,6 +21,15 @@ For adding a swapfile and configuring swap to be enabled on boot due to a new `/
 https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-20-04
 <br>Command `sudo findmnt --verify` can be used to verify fstab correctness.
 
+## Firewall rule additions
+
+For successfully serving the application, add the following firewall rules:
+```
+Direction   'Ether Type'    'IP Protocol'   'Port Range'    'Remote IP Prefix'
+Ingress     IPv4            TCP             80 (HTTP)       0.0.0.0/0
+Ingress     IPv4            TCP             443 (HTTPS)     0.0.0.0/0
+```
+
 ## Codebase update script
 
 To do this manually instead:
