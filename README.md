@@ -12,7 +12,8 @@ CSC deployment instructions can be found from documentation [HERE](docs/hosting_
 ## Prerequisites
 * Python 3.12.*
 * Poetry (2.1 or higher recommended)
-* Node (22 tested)
+* Node (24 tested)
+    * Node 24 in frontend image has not been tested in a long running test.
 
 ## Install Python
 Check for installation
