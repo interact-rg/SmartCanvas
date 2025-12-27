@@ -157,8 +157,8 @@ use 'q' to exit.
 
 Inspect what parts of directory hierarchy consume most space
 `sudo apt install ncdu`
-cd /
-ncdu --exclude-kernfs # You can navigate using the arrow keys.
+`cd /`
+`ncdu --exclude-kernfs` # You can navigate using the arrow keys.
 
 Free space taken up by Docker resources
 sudo docker system prune
