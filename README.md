@@ -127,3 +127,8 @@ See the [CONTRIBUTING.md](CONTRIBUTING.md) guide.
 - @naanatin
 - @juvalta
 - @sanpitka 
+- @MarkoMikaelT
+- @pottumuusi
+- @safi50
+- @chgasche
+- @TalhaPasha-sudo
