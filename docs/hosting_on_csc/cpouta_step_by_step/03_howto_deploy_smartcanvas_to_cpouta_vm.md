@@ -21,6 +21,15 @@ For adding a swapfile and configuring swap to be enabled on boot due to a new `/
 https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-20-04
 <br>Command `sudo findmnt --verify` can be used to verify fstab correctness.
 
+## Firewall rule additions
+
+For successfully serving the application, add the following firewall rules:
+```
+Direction   'Ether Type'    'IP Protocol'   'Port Range'    'Remote IP Prefix'
+Ingress     IPv4            TCP             80 (HTTP)       0.0.0.0/0
+Ingress     IPv4            TCP             443 (HTTPS)     0.0.0.0/0
+```
+
 ## Codebase update script
 
 To do this manually instead:
@@ -64,14 +73,19 @@ tee start_smartcanvas.sh << HEREDOC
 #!/bin/bash
 set -e
 cd ./repositories/SmartCanvas
-./scripts/deploy_production/production_start.sh 2>&1 \
-    | tee ./scripts/deploy_production/start.log
+nohup ./scripts/deploy_production/production_start.sh &> \
+    ./scripts/deploy_production/start.log &
 HEREDOC
 ```
 
 To run the generated start script:<br>
 ```bash
 bash start_smartcanvas.sh
+```
+
+To follow the progress of start script:<br>
+```bash
+tail -f ./repositories/SmartCanvas/scripts/deploy_production/start.log
 ```
 
 ### About the start script
@@ -140,6 +154,17 @@ bash stop_smartcanvas.sh
 Check computation resource usage:<br>
 `top`<br>
 use 'q' to exit.
+
+Inspect what parts of directory hierarchy consume most space
+`sudo apt install ncdu`
+`cd /`
+`ncdu --exclude-kernfs` # You can navigate using the arrow keys.
+
+Free space taken up by Docker resources
+`sudo docker system prune`
+
+Free space taken up by poetry
+`rm -r ~/.cache/pypoetry/`
 
 Check Docker container statuses:<br>
 `sudo docker container ps -a`

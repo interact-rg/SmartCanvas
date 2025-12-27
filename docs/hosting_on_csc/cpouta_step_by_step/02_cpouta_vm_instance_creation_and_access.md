@@ -21,12 +21,28 @@ SSH rule creation:
 * Remote: CIDR
 * CIDR: xxx.xxx.xxx.xxx/32
 
+The pre-existing Egress rules were kept unchanged:
+```
+Direction   'Ether Type'    'IP Protocol'   'Port Range'    'Remote IP Prefix'
+Egress      IPv4            Any             Any             0.0.0.0/0
+Egress      IPv6            Any             Any             ::/0
+```
+
+The IP addresses of machines which were used to SSH into production server were changing a bit and having a<br>
+CIDR: xxx.xxx.xxx.xxx/24<br>
+rule was preventing legitimate access less often while exposing the server to 256 IP addresses.
+
 ## Launch a virtual machine instance from an image
 https://docs.csc.fi/cloud/pouta/launch-vm-from-web-gui/#launching-a-virtual-machine
 
 Configuration used for a testing virtual machine:
 * For source image, our group ended up picking latest Ubuntu.
-* The selected flavor had least computing resources (such as RAM and VCPUS).
+* For production virtual machine, we selected the flavor `standard.xlarge` that
+  was able to run the more demanding workloads in reasonable time.
+    * The benchmarked application peak RAM usage was 4500 KiB.
+    * The selected flavor for initial testing virtual machine had least
+      computing resources (such as RAM and VCPUS). It struggled to run the more
+      demanding workloads.
 * The only pre-existing network was kept allocated.
 * Network ports were kept as empty.
 * Default security group was kept allocated and the group for SSH access should be allocated into use.
@@ -52,3 +68,6 @@ https://docs.csc.fi/cloud/pouta/images/#images
 
 ## Connect to the virtual machine using SSH
 Use the public floating IP and username discovered above.
+
+## Add SSH access for any additional machines
+Append the public key of a machine to `~/.ssh/authorized_keys` of `ubuntu` user for allowing SSH access.

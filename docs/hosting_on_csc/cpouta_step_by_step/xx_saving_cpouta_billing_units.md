@@ -5,3 +5,7 @@
 In order to save billing units when not using testing virtual machines, they can be shelved.<br>
 https://docs.csc.fi/cloud/pouta/vm-lifecycle/#shelved <br>
 https://docs.csc.fi/cloud/pouta/vm-lifecycle/#save-your-cloud-billing-units
+
+The shelving action can be found from instance dropdown menu shown in the image below.
+
+![cPouta shelving action](./cpouta_shelving_action.jpg)
