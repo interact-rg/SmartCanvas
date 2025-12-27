@@ -21,6 +21,17 @@ SSH rule creation:
 * Remote: CIDR
 * CIDR: xxx.xxx.xxx.xxx/32
 
+The pre-existing Egress rules were kept unchanged:
+```
+Direction   'Ether Type'    'IP Protocol'   'Port Range'    'Remote IP Prefix'
+Egress      IPv4            Any             Any             0.0.0.0/0
+Egress      IPv6            Any             Any             ::/0
+```
+
+The IP addresses of machines which were used to SSH into production server were changing a bit and having a<br>
+CIDR: xxx.xxx.xxx.xxx/24<br>
+rule was preventing legitimate access less often while exposing the server to 256 IP addresses.
+
 ## Launch a virtual machine instance from an image
 https://docs.csc.fi/cloud/pouta/launch-vm-from-web-gui/#launching-a-virtual-machine
 
@@ -57,3 +68,6 @@ https://docs.csc.fi/cloud/pouta/images/#images
 
 ## Connect to the virtual machine using SSH
 Use the public floating IP and username discovered above.
+
+## Add SSH access for any additional machines
+Append the public key of a machine to `~/.ssh/authorized_keys` of `ubuntu` user for allowing SSH access.
