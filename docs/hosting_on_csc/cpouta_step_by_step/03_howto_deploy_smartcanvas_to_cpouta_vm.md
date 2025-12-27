@@ -161,10 +161,10 @@ Inspect what parts of directory hierarchy consume most space
 `ncdu --exclude-kernfs` # You can navigate using the arrow keys.
 
 Free space taken up by Docker resources
-sudo docker system prune
+`sudo docker system prune`
 
 Free space taken up by poetry
-rm -r ~/.cache/pypoetry/
+`rm -r ~/.cache/pypoetry/`
 
 Check Docker container statuses:<br>
 `sudo docker container ps -a`
