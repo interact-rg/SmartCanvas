@@ -9,8 +9,6 @@
 1. [Application stop script](#application-stop-script)
 1. [Host management cheatsheet](#host-management-cheatsheet)
 
-[UNTESTED]
-
 The instructions for getting SmartCanvas running on an existing cPouta virtual machine follow.
 
 ## If virtual machine does not have lots of RAM, add swap space
