@@ -73,6 +73,8 @@ set -e
 cd ./repositories/SmartCanvas
 nohup ./scripts/deploy_production/production_start.sh &> \
     ./scripts/deploy_production/start.log &
+echo -n "To follow the progress, run: "
+echo "tail -f ./repositories/SmartCanvas/scripts/deploy_production/start.log"
 HEREDOC
 ```
 

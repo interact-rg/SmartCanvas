@@ -233,6 +233,7 @@ main() {
 	deploy_application
 
 	echo "Done deploying to production"
+	echo -e "\nThe application should soon be accessible from: https://${VIRTUAL_MACHINE_DNS_NAME}/${BACKEND_APP_ENDPOINT}\n"
 }
 
 main "${@}"
