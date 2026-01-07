@@ -8,6 +8,10 @@ import FilterFrames from "./components/FilterFrames";
 import ProgressCircle from "./components/ProgressCircle";
 import DownloadPrompt from "./components/DownloadPrompt";
 import filtercolors from './assets/filtercolors.json'
+import FaceAndGestureDetection from "./components/ConsentCamera";
+import ConsentForm from "./components/ConsentForm";
+
+const showConsent = import.meta.env.VITE_SHOW_CONSENT == "true";
 
 const App: React.FC = () => {
   const [appState, setAppState] = useState<any>({});
@@ -22,13 +26,15 @@ const App: React.FC = () => {
   const [chosenFilter, setChosenFilter] = useState<string>("");
   const [chosenFilterPerformance, setChosenFilterPerformance] = useState<number>(0);
   const [serverFeedVisible, setServerFeedVisible] = useState<boolean>(false);
-  let qrTimeout: number | undefined = undefined;
-  const intervalRef = useRef<number | null>(null); // Ref to store the interval ID
+  let qrTimeout: NodeJS.Timeout | undefined = undefined;
+  const intervalRef = useRef<NodeJS.Timeout | null>(null); // Ref to store the interval ID
   const paintingTimerRef = useRef<number>(paintingTimer); // Ref to store the painting timer
+
+  const [isGivingConsent, setIsGivingConsent] = useState<boolean>(false);
 
   // For testing purposes. Set to true when the core version is set to main (closed fist closes the artistic view)
   // Set to false when the core version is set to alternate (artistic view closes on a timer)
-  const needsInstruction = true;  
+  const needsInstruction = true;
 
   // Map filter to highlight color
   const getHighlightColor = (filter: string) => {
@@ -41,7 +47,6 @@ const App: React.FC = () => {
   };
 
   const handleStateChange = (state: any) => {
-    //console.log("State change received in App: ", state);
     if (state.Countdown) {
       clearTimeout(qrTimeout);
       setQrCode(null);
@@ -81,7 +86,10 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    //console.log("App state: ", appState);
+    if (appState?.Idle === true) {
+      console.log("Reset consent form")
+      setIsGivingConsent(false)
+    }
   }, [appState]);
 
   useEffect(() => {
@@ -101,6 +109,7 @@ const App: React.FC = () => {
   }, [paintingTimer]);
 
   const handleOutboundFrame = (frame: Blob) => {
+    //set frames ONLY if consent is given
     setOutboundFrame(frame);
   };
 
@@ -122,45 +131,76 @@ const App: React.FC = () => {
     setInboundFrame(frame);
   }
 
-  return (
-    <div id="mainContainer" className="container_fs" style={{ "--color-highlight": getHighlightColor(chosenFilter) } as React.CSSProperties}>
-      <SocketHandler
-        onStateChange={handleStateChange}
-        videoFrame={outboundFrame}
-        onArtisticFrame={handleArtisticFrame}
-        onHandPosition={setHandPosition}
-        onProgress={setProgress}
-        onHoldStill={handleHoldStill}
-        onFilters={setFilters}
-        onChosenFilter={setChosenFilter}
-        onFilterPerformance={setChosenFilterPerformance}
-        onQrCode={handleQrCode}
+  const defaultFeed = () => {
+    return (
+      <CameraFeed
+        onFrameCapture={handleOutboundFrame}
+        width={1280}
+        height={720}
+        state={appState}
       />
+    )
+  }
 
-      <div
-        className={`${serverFeedVisible ? "server-feed-container" : "hidden"}`}>
-        <ServerFeed state={appState} artisticFrame={inboundFrame} visible={serverFeedVisible} filter={chosenFilter} paintingTimer={chosenFilterPerformance} needsInstruction={needsInstruction}/>
-      </div>
 
-      <div
-        className={`${serverFeedVisible ? "hidden" : "camera-feed-container"}`}>
-        <ProgressCircle idle={appState.Idle ? true : false} position={handPosition} progress={progress} />
+  const consentFeed = () => {
+    if (isGivingConsent) {
+      return (
         <CameraFeed
           onFrameCapture={handleOutboundFrame}
           width={1280}
           height={720}
           state={appState}
         />
-        <Instructions state={appState} countdown={holdStill} filter={chosenFilter} />
-        <FilterFrames availableFilters={filters} chosenFilter={chosenFilter} />
-      </div>
+      )
+    } else {
+      return (
+        <div style={{zIndex: "11"}}>
+          <FaceAndGestureDetection setIsGivingConsent={setIsGivingConsent}></FaceAndGestureDetection>
+          {(isGivingConsent == false) && <ConsentForm></ConsentForm>}      
+        </div>
+      )
+    }
+  }
 
-      {!(appState.Painting == true || appState.Painting == false) && <DownloadPrompt
-        image={inboundFrame}
-        downloadQr={qrCode}
-      />}
+
+return (
+  <div id="mainContainer" className="container_fs" style={{ "--color-highlight": getHighlightColor(chosenFilter) } as React.CSSProperties}>
+    <SocketHandler
+      onStateChange={handleStateChange}
+      videoFrame={outboundFrame}
+      onArtisticFrame={handleArtisticFrame}
+      onHandPosition={setHandPosition}
+      onProgress={setProgress}
+      onHoldStill={handleHoldStill}
+      onFilters={setFilters}
+      onChosenFilter={setChosenFilter}
+      onFilterPerformance={setChosenFilterPerformance}
+      onQrCode={handleQrCode}
+    />
+
+    <div
+      className={`${serverFeedVisible ? "server-feed-container" : "hidden"}`}>
+      <ServerFeed state={appState} artisticFrame={inboundFrame} visible={serverFeedVisible} filter={chosenFilter} paintingTimer={chosenFilterPerformance} needsInstruction={needsInstruction} />
     </div>
-  );
+
+    <div
+      className={`${serverFeedVisible ? "hidden" : "camera-feed-container"}`}>
+      <ProgressCircle idle={appState.Idle ? true : false} position={handPosition} progress={progress} />
+
+
+      {showConsent ? consentFeed() : defaultFeed() }
+
+      <Instructions state={appState} countdown={holdStill} filter={chosenFilter} />
+      <FilterFrames availableFilters={filters} chosenFilter={chosenFilter} />
+    </div>
+
+    {!(appState.Painting == true || appState.Painting == false) && <DownloadPrompt
+      image={inboundFrame}
+      downloadQr={qrCode}
+    />}
+  </div>
+);
 };
 
 export default App;

@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "opencv-contrib-python-headless>=4.11.0.86",
-    "mediapipe>=0.10.20",
+    "mediapipe==0.10.21",
     "numpy>=1.26.4",
     "qrcode>=8.0",
     "requests>=2.32.3",
@@ -20,6 +20,7 @@ dependencies = [
     "flask>=3.1.0",
     "torch (>=2.6.0,<3.0.0)",
     "torchvision (>=0.21.0,<0.22.0)",
+    "Pillow>=10.0.0",
 ]
 
 [dependency-groups]
@@ -28,15 +29,15 @@ dev = [
     "pytest-cov>=6.0.0",
     "pytest>=8.3.4",
     "pyparsing>=3.2.1",
-    "pytest-xdist>=^3.6.1"
+    "pytest-xdist>=3.6.1"
 ]
 
 [tool.setuptools]
 packages = ["smart_canvas", "web"]
 [tool.poetry.dependencies]
-torchaudio = {source = "pypi"}
-torch = {source = "pytorch_cpu"}
-torchvision = {source = "pytorch_cpu"}
+torchaudio = "^2.6"  # Removed CPI flag to let Poetry pick compatible version
+torch = "^2.6"
+torchvision = "^0.21"
 
 [[tool.poetry.source]]
 name = "pytorch_cpu"
@@ -49,4 +50,16 @@ pytest-cov = "^6.1.1"
 pytest = "^8.3.5"
 pyparsing = "^3.2.3"
 pytest-xdist = "^3.6.1"
+
+[tool.coverage.run]
+omit = [
+    # Ignore alt core in coverage result
+    "*/smart_canvas/core_alternate.py",
+    # Ignore init and main files
+    "__init__.py",
+    "__main__.py",
+    #Ignore unused filters
+    "*/smart_canvas/filters/canvas.py",
+    "*/smart_canvas/filters/sketch.py"
+]
 
